@@ -3,9 +3,9 @@
 
 Group members (3-5) (no Student IDs, only names and github usernames):
 
-1. 
+1. Evan Dong
 
-2. 
+2. Bridget Green
 
 3. Xuan Zheng
 

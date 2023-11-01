@@ -1,0 +1,594 @@
+import 'package:flutter/material.dart';
+
+//import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+//  await Firebase.initializeApp();
+  runApp(const MyApp());
+}
+
+class SampleMain extends StatefulWidget {
+  @override
+  SampleMainState createState() => SampleMainState();
+}
+
+class SampleMainState extends State<SampleMain> {
+  @override
+  void initState() {
+    super.initState();
+    //_refreshList(); // Initialize _grades inside initState
+  }
+//REFERENCE
+  //https://stackoverflow.com/questions/71288720/how-can-i-create-a-list-of-buttons-in-listview-builder-that-coincide-with-the-la
+
+
+
+
+
+  List<String> pages = ["thing", "idk", "help", "me", "My Accommodations"];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Example Main'),
+        backgroundColor: Colors.blue,
+      ),
+      body: ListView.builder(
+        itemCount: pages.length,
+        itemBuilder: (BuildContext context, index) {
+          return ListTile(
+            title: Text(pages[index]),
+            trailing: Icon(Icons.info_outlined),
+            onTap: () {
+              _toSAS(context);
+            },
+          );
+        },
+      ),
+     /* floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //print ("Add button printed");
+          _toSAS(context);
+        },
+        child: Icon(Icons.add),
+      ),*/
+    );
+  }
+
+
+
+  Future<void> _toSAS(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute<List<String>>(builder: (BuildContext context) {
+        return SASPage();
+      }),
+    );
+
+    if (result != null) {
+    }
+  }
+
+
+}
+
+
+class SASPage extends StatefulWidget {
+  @override
+  SASPageState createState() => SASPageState();
+}
+
+class SASPageState extends State<SASPage> {
+
+  SASModel grade_model = SASModel();
+
+  List<Accessibility> _grades = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshList(); // Initialize _grades inside initState
+  }
+
+  void _refreshList() async {
+    final List<Accessibility> grades = await grade_model.getAll();
+    setState(() {
+      _grades = grades;
+    });
+  }
+
+
+  String selectedGrade = "Not Available";
+  List<String> gradeOptions = ["Not Available", "Deadline Extension", "Accommodated Testing", "Sign Language Interpretation (ASL)", "Extra time", "Computerized Notetaking",
+  "Alternative Testing space", "Scribe"];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Your Accommodations'),
+        backgroundColor: Colors.blue,
+      ),
+      body: ListView.builder(
+        itemCount: _grades.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(_grades[index].name ?? "NA"),
+            subtitle: Text(_grades[index].notes ?? "NA"),
+            onTap: () {
+              _editGrade(context, _grades[index]);
+            },
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                _deleteGrade(_grades[index].id);
+              },
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print ("Add button printed");
+          _addGrade(context);
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+
+//Note: Using a page bc of how long accessibility names are rip 
+  Future<void> _addGrade(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute<List<String>>(builder: (BuildContext context) {
+        return AddAccommodation();
+      }),
+    );
+
+    if (result != null) {
+      // Handle the result, which contains the studentId and grade
+      final studentId = result[0];
+      final g = result[1];
+      grade_model.insertGrade(Accessibility(name: g, notes: studentId));
+      _refreshList();
+      // Perform any additional logic, such as adding the new grade to the list or database
+    }
+  }
+
+  Future<void> _editGrade(BuildContext context, Accessibility grade) async {
+    final editedGrade = await showDialog<Accessibility>(
+      context: context,
+      builder: (BuildContext context) {
+        final sidController = TextEditingController(text: grade.notes);
+        final gradeController = TextEditingController(text: grade.name);
+
+        return AlertDialog(
+          title: Text('Edit Grade'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: sidController,
+                decoration: InputDecoration(labelText: 'Student ID'),
+              ),
+              TextField(
+                controller: gradeController,
+                decoration: InputDecoration(labelText: 'Grade'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                final editedSid = sidController.text;
+                final editedGrade = gradeController.text;
+
+                if (editedSid.isNotEmpty && editedGrade.isNotEmpty) {
+                  final updatedGrade = Accessibility(
+                    id: grade.id,
+                    notes: editedSid,
+                    name: editedGrade,
+                  );
+                  Navigator.of(context).pop(updatedGrade);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (editedGrade != null) {
+      final rowsUpdated = await grade_model.updateGrade(editedGrade);
+
+      if (rowsUpdated > 0) {
+        // The update was successful, update the list of grades
+        _refreshList();
+      }
+    }}
+  Future<void> _deleteGrade(int? id) async {
+    // Delete the grade from the database and get the number of rows deleted
+    final rowsDeleted = await grade_model.deleteGradeById(id);
+
+    if (rowsDeleted > 0) {
+      // The deletion was successful, update the list of grades
+      _refreshList();
+    }
+  }
+}
+
+class AddAccommodation extends StatefulWidget {
+  AddAccommodation();
+
+  @override
+  AddAccommodation_State createState() => AddAccommodation_State();
+
+
+}
+class AddAccommodation_State extends State<AddAccommodation> {
+  String selectedGrade = "Not Available";
+  List<String> gradeOptions = ["Not Available", "Deadline Extension", "Accommodated Testing", "Sign Language Interpretation (ASL)", "Extra time", "Computerized Notetaking",
+    "Alternative Testing space", "Scribe"];
+  final studentIdController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+
+            DropdownButton<String>(
+              value: selectedGrade,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedGrade = newValue!;
+                });
+              },
+              items: gradeOptions.map((String grade) {
+                return DropdownMenuItem<String>(
+                  value: grade,
+                  child: Text(grade),
+                );
+              }).toList(),
+            ),
+            TextField(
+              controller: studentIdController,
+              decoration: InputDecoration(labelText: 'notes'),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          String studentId = studentIdController.text;
+          String g = selectedGrade;
+          final newGrade = Accessibility(
+            notes: studentId,
+            name: g,
+          );
+
+          SASModel gradesModel=new SASModel();
+          gradesModel.insertGrade(newGrade).then((newGradeId) {
+            if (newGradeId != null) {
+              //Navigator.of(context).pop(newGrade);
+              Navigator.of(context).push(
+                MaterialPageRoute<List<String>>(builder: (BuildContext context) {
+                  return SASPage();
+                }),
+              );
+            }
+          });
+        },
+        child: Icon(Icons.save),
+      ),
+    );
+  }
+}
+
+//-----------------------------------------------------------------
+class DBUtils{
+  static Future init() async{
+    late Database db;
+    //set up the database
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'accessibility.db');
+
+    // Open the database
+    db = await openDatabase(path, version: 1, onCreate: (Database db, int version) {
+      // Create the 'grades' table if it doesn't exist
+      db.execute('''
+        CREATE TABLE accessibility (
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          notes TEXT
+        )
+      ''');
+    });
+
+
+    return db;
+  }
+}
+/*
+class GradeWidget extends StatefulWidget {
+  GradeWidget();
+
+  @override
+  GradeWidget_State createState() => GradeWidget_State();
+
+
+}
+class GradeWidget_State extends State<GradeWidget> {
+  String selectedGrade = "A"; // Default grade
+  final studentIdController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Grade'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: studentIdController,
+              decoration: InputDecoration(labelText: 'Student ID'),
+            ),
+            DropdownButton<String>(
+              value: selectedGrade,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedGrade = newValue!;
+                });
+              },
+              items: ["A+","A", "A-", "B+", "B", "B-", "C", "D", "F"].map((String grade) {
+                return DropdownMenuItem<String>(
+                  value: grade,
+                  child: Text(grade),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          String studentId = studentIdController.text;
+          String g = selectedGrade;
+          final newGrade = Accessibility(
+            notes: studentId,
+            name: g,
+          );
+
+          GradesModel gradesModel=new GradesModel();
+          gradesModel.insertGrade(newGrade).then((newGradeId) {
+            if (newGradeId != null) {
+              //Navigator.of(context).pop(newGrade);
+              Navigator.of(context).push(
+                MaterialPageRoute<List<String>>(builder: (BuildContext context) {
+                  return ListGrades();
+                }),
+              );
+            }
+            //ListGradesState();
+          });
+        },
+        child: Icon(Icons.save),
+      ),
+    );
+  }
+}
+*/
+//------------------------------------------------------------------------------
+
+class SASModel{
+
+  //Grade_Model grade_model=Grade_Model();
+  Future<List<Accessibility>> getAll() async {
+    final db = await DBUtils.init();
+    final List<Map<String, dynamic>> gradeMaps = await db.query('accessibility');
+
+    List<Accessibility> grades = [];
+
+    for (var map in gradeMaps) {
+      grades.add(Accessibility.fromMap(map));
+    }
+
+    return grades;
+  }
+
+  Future<int> insertGrade(Accessibility g) async {
+    final db = await DBUtils.init();
+    final id = await db.insert(
+      'accessibility',
+      g.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return id;
+  }
+
+  Future<int> updateGrade(Accessibility g) async {
+    final db = await DBUtils.init();
+    final rowsUpdated = await db.update(
+      'accessibility',
+      g.toMap(),
+      where: 'id = ?',
+      whereArgs: [g.id],
+    );
+    return rowsUpdated;
+  }
+
+  Future<int> deleteGradeById(int? id) async {
+    final db = await DBUtils.init();
+    final rowsDeleted = await db.delete(
+      'accessibility',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return rowsDeleted;
+  }
+}
+
+
+
+//--------------------------------------------------------------------------------
+class Accessibility{
+  Accessibility({this.id, this.name, this.notes});
+  int? id;
+  //String? Student;
+  String? name;
+  String? notes;
+
+  Map<String, Object?> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'sid': notes,
+    };
+  }
+
+  Accessibility.fromMap(Map map) {
+
+    this.id=map['id'];
+    this.name=map['name'];
+    this.notes=map['notes'];
+  }
+
+}
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // TRY THIS: Try running your application with "flutter run". You'll see
+        // the application has a blue toolbar. Then, without quitting the app,
+        // try changing the seedColor in the colorScheme below to Colors.green
+        // and then invoke "hot reload" (save your changes or press the "hot
+        // reload" button in a Flutter-supported IDE, or press "r" if you used
+        // the command line to start the app).
+        //
+        // Notice that the counter didn't reset back to zero; the application
+        // state is not lost during the reload. To reset the state, use hot
+        // restart instead.
+        //
+        // This works for code too, not just values: Most code changes can be
+        // tested with just a hot reload.
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: SampleMain(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          //
+          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+          // action in the IDE, or press "p" in the console), to see the
+          // wireframe for each widget.
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}

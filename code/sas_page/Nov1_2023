@@ -84,9 +84,9 @@ class SASPage extends StatefulWidget {
 
 class SASPageState extends State<SASPage> {
 
-  SASModel grade_model = SASModel();
+  SASModel sas_model = SASModel();
 
-  List<Accessibility> _grades = [];
+  List<Accessibility> _accommodations = [];
 
   @override
   void initState() {
@@ -95,9 +95,9 @@ class SASPageState extends State<SASPage> {
   }
 
   void _refreshList() async {
-    final List<Accessibility> grades = await grade_model.getAll();
+    final List<Accessibility> accommodations = await sas_model.getAll();
     setState(() {
-      _grades = grades;
+      _accommodations = accommodations;
     });
   }
 
@@ -113,18 +113,18 @@ class SASPageState extends State<SASPage> {
         backgroundColor: Colors.blue,
       ),
       body: ListView.builder(
-        itemCount: _grades.length,
+        itemCount: _accommodations.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(_grades[index].name ?? "NA"),
-            subtitle: Text(_grades[index].notes ?? "NA"),
+            title: Text(_accommodations[index].name ?? "NA"),
+            subtitle: Text(_accommodations[index].notes ?? "NA"),
             onTap: () {
-              _editGrade(context, _grades[index]);
+              _editAcmdn(context, _accommodations[index]);
             },
             trailing: IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
-                _deleteGrade(_grades[index].id);
+                _deleteAcmdn(_accommodations[index].id);
               },
             ),
           );
@@ -133,7 +133,7 @@ class SASPageState extends State<SASPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print ("Add button printed");
-          _addGrade(context);
+          _addAcmdn(context);
         },
         child: Icon(Icons.add),
       ),
@@ -141,8 +141,8 @@ class SASPageState extends State<SASPage> {
   }
 
 
-//Note: Using a page bc of how long accessibility names are rip 
-  Future<void> _addGrade(BuildContext context) async {
+//Note: Using a page bc of how long accessibility names are rip
+  Future<void> _addAcmdn(BuildContext context) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute<List<String>>(builder: (BuildContext context) {
         return AddAccommodation();
@@ -153,31 +153,31 @@ class SASPageState extends State<SASPage> {
       // Handle the result, which contains the studentId and grade
       final studentId = result[0];
       final g = result[1];
-      grade_model.insertGrade(Accessibility(name: g, notes: studentId));
+      sas_model.insertAcmdn(Accessibility(name: g, notes: studentId));
       _refreshList();
       // Perform any additional logic, such as adding the new grade to the list or database
     }
   }
 
-  Future<void> _editGrade(BuildContext context, Accessibility grade) async {
-    final editedGrade = await showDialog<Accessibility>(
+  Future<void> _editAcmdn(BuildContext context, Accessibility acmdn) async {
+    final editedAcmdn = await showDialog<Accessibility>(
       context: context,
       builder: (BuildContext context) {
-        final sidController = TextEditingController(text: grade.notes);
-        final gradeController = TextEditingController(text: grade.name);
+        final notesController = TextEditingController(text: acmdn.notes);
+        final nameController = TextEditingController(text: acmdn.name);
 
         return AlertDialog(
-          title: Text('Edit Grade'),
+          title: Text('Edit'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextField(
-                controller: sidController,
-                decoration: InputDecoration(labelText: 'Student ID'),
+                controller: notesController,
+                decoration: InputDecoration(labelText: 'Notes'),
               ),
               TextField(
-                controller: gradeController,
-                decoration: InputDecoration(labelText: 'Grade'),
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
               ),
             ],
           ),
@@ -191,16 +191,16 @@ class SASPageState extends State<SASPage> {
             TextButton(
               child: Text('Save'),
               onPressed: () {
-                final editedSid = sidController.text;
-                final editedGrade = gradeController.text;
+                final editedNotes = notesController.text;
+                final editedName = nameController.text;
 
-                if (editedSid.isNotEmpty && editedGrade.isNotEmpty) {
-                  final updatedGrade = Accessibility(
-                    id: grade.id,
-                    notes: editedSid,
-                    name: editedGrade,
+                if (editedNotes.isNotEmpty && editedName.isNotEmpty) {
+                  final updatedAcmdn = Accessibility(
+                    id: acmdn.id,
+                    notes: editedNotes,
+                    name: editedName,
                   );
-                  Navigator.of(context).pop(updatedGrade);
+                  Navigator.of(context).pop(updatedAcmdn);
                 }
               },
             ),
@@ -209,17 +209,17 @@ class SASPageState extends State<SASPage> {
       },
     );
 
-    if (editedGrade != null) {
-      final rowsUpdated = await grade_model.updateGrade(editedGrade);
+    if (editedAcmdn != null) {
+      final rowsUpdated = await sas_model.updateAcmdn(editedAcmdn);
 
       if (rowsUpdated > 0) {
         // The update was successful, update the list of grades
         _refreshList();
       }
     }}
-  Future<void> _deleteGrade(int? id) async {
+  Future<void> _deleteAcmdn(int? id) async {
     // Delete the grade from the database and get the number of rows deleted
-    final rowsDeleted = await grade_model.deleteGradeById(id);
+    final rowsDeleted = await sas_model.deleteAcmdnById(id);
 
     if (rowsDeleted > 0) {
       // The deletion was successful, update the list of grades
@@ -237,8 +237,8 @@ class AddAccommodation extends StatefulWidget {
 
 }
 class AddAccommodation_State extends State<AddAccommodation> {
-  String selectedGrade = "Not Available";
-  List<String> gradeOptions = ["Not Available", "Deadline Extension", "Accommodated Testing", "Sign Language Interpretation (ASL)", "Extra time", "Computerized Notetaking",
+  String selectedOption = "Not Available";
+  List<String> Options = ["Not Available", "Deadline Extension", "Accommodated Testing", "Sign Language Interpretation (ASL)", "Extra time", "Computerized Notetaking",
     "Alternative Testing space", "Scribe"];
   final studentIdController = TextEditingController();
   @override
@@ -253,13 +253,13 @@ class AddAccommodation_State extends State<AddAccommodation> {
           children: [
 
             DropdownButton<String>(
-              value: selectedGrade,
+              value: selectedOption,
               onChanged: (String? newValue) {
                 setState(() {
-                  selectedGrade = newValue!;
+                  selectedOption = newValue!;
                 });
               },
-              items: gradeOptions.map((String grade) {
+              items: Options.map((String grade) {
                 return DropdownMenuItem<String>(
                   value: grade,
                   child: Text(grade),
@@ -275,16 +275,16 @@ class AddAccommodation_State extends State<AddAccommodation> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          String studentId = studentIdController.text;
-          String g = selectedGrade;
-          final newGrade = Accessibility(
-            notes: studentId,
+          String n = studentIdController.text;
+          String g = selectedOption;
+          final newAcmdn = Accessibility(
+            notes: n,
             name: g,
           );
 
           SASModel gradesModel=new SASModel();
-          gradesModel.insertGrade(newGrade).then((newGradeId) {
-            if (newGradeId != null) {
+          gradesModel.insertAcmdn(newAcmdn).then((newNotes) {
+            if (newNotes != null) {
               //Navigator.of(context).pop(newGrade);
               Navigator.of(context).push(
                 MaterialPageRoute<List<String>>(builder: (BuildContext context) {
@@ -304,13 +304,12 @@ class AddAccommodation_State extends State<AddAccommodation> {
 class DBUtils{
   static Future init() async{
     late Database db;
-    //set up the database
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'accessibility.db');
 
-    // Open the database
+
     db = await openDatabase(path, version: 1, onCreate: (Database db, int version) {
-      // Create the 'grades' table if it doesn't exist
+
       db.execute('''
         CREATE TABLE accessibility (
           id INTEGER PRIMARY KEY,
@@ -404,16 +403,17 @@ class SASModel{
     final db = await DBUtils.init();
     final List<Map<String, dynamic>> gradeMaps = await db.query('accessibility');
 
-    List<Accessibility> grades = [];
+    List<Accessibility> accommodations = [];
 
     for (var map in gradeMaps) {
-      grades.add(Accessibility.fromMap(map));
+
+      accommodations.add(Accessibility.fromMap(map));
     }
 
-    return grades;
+    return accommodations;
   }
 
-  Future<int> insertGrade(Accessibility g) async {
+  Future<int> insertAcmdn(Accessibility g) async {
     final db = await DBUtils.init();
     final id = await db.insert(
       'accessibility',
@@ -423,7 +423,7 @@ class SASModel{
     return id;
   }
 
-  Future<int> updateGrade(Accessibility g) async {
+  Future<int> updateAcmdn(Accessibility g) async {
     final db = await DBUtils.init();
     final rowsUpdated = await db.update(
       'accessibility',
@@ -434,7 +434,7 @@ class SASModel{
     return rowsUpdated;
   }
 
-  Future<int> deleteGradeById(int? id) async {
+  Future<int> deleteAcmdnById(int? id) async {
     final db = await DBUtils.init();
     final rowsDeleted = await db.delete(
       'accessibility',
@@ -459,7 +459,7 @@ class Accessibility{
     return {
       'id': id,
       'name': name,
-      'sid': notes,
+      'notes': notes,
     };
   }
 

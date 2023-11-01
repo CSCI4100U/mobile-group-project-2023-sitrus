@@ -1,0 +1,2 @@
+//view upcoming assessments in a list. user can click on assessment to bring up a pop up (a window) or new page
+// to view their accommodations for that assessment (e.g. double time, a scribe, a different test room, ...)

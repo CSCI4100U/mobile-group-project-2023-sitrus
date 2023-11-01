@@ -1,0 +1,1 @@
+//used for friends and user profiles (friend and user profiles store pretty much same things)

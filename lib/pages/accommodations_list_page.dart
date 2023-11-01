@@ -1,0 +1,1 @@
+//list of the accommodations that the user has

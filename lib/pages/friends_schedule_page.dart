@@ -1,0 +1,1 @@
+//opens up the clicked on friend's schedule (just show the schedule in full screen and have a back button?)

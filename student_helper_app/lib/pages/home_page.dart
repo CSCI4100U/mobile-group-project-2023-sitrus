@@ -3,3 +3,197 @@
 // link to 'OntarioTechMobile' app?, link to 'Canvas Student' App?)
 //have a bottom navigation bar with home page, friends list, and profile/settings
 //or maybe only have list tiles because we don't have that many options for the home page
+
+import 'package:flutter/material.dart';
+import 'schedule_home_page.dart';
+import 'accommodations_home_page.dart';
+import 'friends_list_home_page.dart';
+import 'settings_page.dart';
+import 'map_page.dart';
+import 'profile_page.dart';
+
+void _goto_schedule_home_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ScheduleMakerHomePage()),
+  );
+}
+
+void _goto_SAS_home_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => SASHomePage()),
+  );
+}
+
+void _goto_map_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => MapPage()),
+  );
+}
+
+void _goto_friends_list_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => FriendListPage()),
+  );
+}
+
+void _goto_settings_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => SettingsPage()),
+  );
+}
+
+void _goto_profile_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ProfilePage()),
+  );
+}
+
+class HomePage extends StatelessWidget {
+  HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text("Sitrus Student Aid"),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: 'Settings',
+              onPressed: () {_goto_settings_page(context);},
+            ),
+            IconButton(
+              icon: const Icon(Icons.account_circle),
+              tooltip: 'Profile',
+              onPressed: () {_goto_profile_page(context);},
+            ),
+          ]),
+      body: ListView(
+        padding: EdgeInsets.all(10),
+        children: <Widget>[
+          OutlinedButton.icon(
+              icon: Icon(
+                Icons.calendar_month,
+                size: 60,
+              ),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.indigo,
+                  minimumSize: Size(200, 150),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0)),
+                  textStyle: TextStyle(
+                    fontSize: 36,
+                  )),
+              onPressed: () {
+                _goto_schedule_home_page(context);
+              },
+              label: Text("Schedule Maker")),
+          SizedBox(
+            height: 10,
+          ),
+          OutlinedButton.icon(
+              icon: Icon(
+                Icons.accessibility_new,
+                size: 60,
+              ),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.deepOrange,
+                  minimumSize: Size(200, 150),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0)),
+                  textStyle: TextStyle(
+                    fontSize: 36,
+                  )),
+              onPressed: () {
+                _goto_SAS_home_page(context);
+              },
+              label: Text("SAS Help")),
+          SizedBox(
+            height: 10,
+          ),
+          OutlinedButton.icon(
+              icon: Icon(
+                Icons.map,
+                size: 60,
+              ),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.indigo,
+                  minimumSize: Size(200, 150),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0)),
+                  textStyle: TextStyle(
+                    fontSize: 36,
+                  )),
+              onPressed: () {
+                _goto_map_page(context);
+              },
+              label: Text("Campus Map")),
+          SizedBox(
+            height: 10,
+          ),
+          OutlinedButton.icon(
+              icon: Icon(
+                Icons.person,
+                size: 60,
+              ),
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.deepOrange,
+                  minimumSize: Size(200, 150),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0)),
+                  textStyle: TextStyle(
+                    fontSize: 36,
+                  )),
+              onPressed: () {
+                _goto_friends_list_page(context);
+              },
+              label: Text("Friends List")),
+          SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.indigo,
+                      minimumSize: Size(100, 150),
+                      maximumSize: Size(180, 150),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0.0)),
+                      textStyle: TextStyle(
+                        fontSize: 24,
+                      )),
+                  onPressed: () {},
+                  child: Text("OntarioTechMobile App")),
+              SizedBox(width: 10,),
+              OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.indigo,
+                      minimumSize: Size(100, 150),
+                      maximumSize: Size(180, 150),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0.0)),
+                      textStyle: TextStyle(
+                        fontSize: 24,
+                      )),
+                  onPressed: () {},
+                  child: Text("Canvas Student App")),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}

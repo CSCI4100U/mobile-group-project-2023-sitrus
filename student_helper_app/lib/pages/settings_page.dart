@@ -5,6 +5,15 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:student_helper_project/pages/login_page.dart';
+
+void _goto_login_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => LoginPage()),
+  );
+}
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -70,7 +79,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     textStyle: TextStyle(
                       fontSize: 36,
                     )),
-                onPressed: () {},
+                onPressed: () 
+                {
+                  _goto_login_page(context);
+                },
                 label: Text("Login")),
           )
         ],

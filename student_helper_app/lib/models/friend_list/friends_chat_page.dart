@@ -23,11 +23,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _loadMessages() async {
-    List<Message> loadedMessages = (await DatabaseHelper.instance.queryMessages('user', widget.friendName)).cast<Message>();
+    final List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryMessages('user', widget.friendName);
+    final List<Message> loadedMessages = messageMaps.map((messageMap) => Message.fromMap(messageMap)).toList();
     setState(() {
       messages = loadedMessages;
     });
   }
+
 
   // This method is triggered when the send button is pressed
   void _sendMessage() async {
@@ -62,17 +64,13 @@ class _ChatPageState extends State<ChatPage> {
       print('Error when sending message: $e');
       // Optionally, show an error message to the user
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Failed to send message. Please try again.'),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
-
-
-
-
 
   // This method is used to delete a message
   void _deleteMessage(int id) async {
@@ -103,13 +101,13 @@ class _ChatPageState extends State<ChatPage> {
       mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         if (!isUserMessage) ...[
-          Icon(Icons.account_circle), // Friend's icon
+          const Icon(Icons.account_circle), // Friend's icon
         ],
         GestureDetector(
           onLongPress: () => _showMessageOptions(context, message),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: isUserMessage ? Colors.blue : Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -121,7 +119,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
         if (isUserMessage) ...[
-          Icon(Icons.account_circle), // User's icon
+          const Icon(Icons.account_circle), // User's icon
         ],
       ],
     );
@@ -134,8 +132,8 @@ class _ChatPageState extends State<ChatPage> {
         return Wrap(
           children: <Widget>[
             ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('Edit'),
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
               onTap: () {
                 // TODO: Implement edit logic
                 Navigator.pop(context);
@@ -143,8 +141,8 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.delete),
-              title: Text('Delete'),
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete'),
               onTap: () {
                 // TODO: Implement delete logic
                 Navigator.pop(context);
@@ -163,20 +161,20 @@ class _ChatPageState extends State<ChatPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Message'),
+          title: const Text('Edit Message'),
           content: TextField(
             controller: _editController,
             autofocus: true,
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () {
                 if (_editController.text.trim().isNotEmpty) {
                   _editMessage(message.id!, _editController.text.trim());
@@ -203,7 +201,7 @@ class _ChatPageState extends State<ChatPage> {
         title: Text('${widget.friendName} - ${widget.friendStatus}'),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: () {
               // Settings or delete chat history
               // ...
@@ -233,7 +231,7 @@ class _ChatPageState extends State<ChatPage> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.photo),
+                    icon: const Icon(Icons.photo),
                     onPressed: () {
                       // Implement sending image or video
                     },
@@ -253,7 +251,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.send),
+                    icon: const Icon(Icons.send),
                     onPressed: _sendMessage,
                   ),
                 ],

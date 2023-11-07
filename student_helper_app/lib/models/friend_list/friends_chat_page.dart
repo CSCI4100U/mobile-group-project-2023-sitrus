@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'local_storage.dart';
 import 'message.dart';
@@ -6,20 +7,48 @@ class ChatPage extends StatefulWidget {
   final String friendName;
   final String friendStatus;
 
-  ChatPage({required this.friendName, required this.friendStatus});
+  const ChatPage({super.key,  required this.friendName, required this.friendStatus});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   List<Message> messages = []; // Make sure to use the Message model
+
+  // State variable to hold the background setting
+  Color _backgroundColor = Colors.white; // Default to white
+  String? _backgroundImage; // Will hold the path to the background image
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     _loadMessages();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.atEdge) {
+      if (_scrollController.position.pixels == 0) {
+        // You're at the top of the list
+      } else {
+        // You're at the bottom of the list
+        _scrollToBottom();
+      }
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void _loadMessages() async {
@@ -30,6 +59,91 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  void _showSettings() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete Chat History'),
+              onTap: () async {
+                Navigator.pop(context); // Dismiss the bottom sheet
+                await _deleteChatHistory();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.format_paint),
+              title: const Text('Change Background'),
+              onTap: () {
+                Navigator.pop(context); // Dismiss the bottom sheet
+                _showBackgroundOptions();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method to delete all chat history with the current associate
+  Future<void> _deleteChatHistory() async {
+    await DatabaseHelper.instance.deleteConversation('user', widget.friendName);
+    setState(() {
+      messages.clear();
+    });
+  }
+
+  // Method to show background options
+  void _showBackgroundOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.brightness_1),
+              title: const Text('Light'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _backgroundColor = Colors.white;
+                  _backgroundImage = null;
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.brightness_3),
+              title: const Text('Dark'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _backgroundColor = Colors.blueGrey;
+                  _backgroundImage = null;
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.image),
+              title: const Text('Upload Image'),
+              onTap: () {
+                Navigator.pop(context);
+                _uploadImage();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method to handle image upload
+  void _uploadImage() {
+    // TODO: Implement the logic for uploading an image
+    // For example, using image_picker package to pick an image
+    // and then setting _backgroundImage to the path of the selected image
+  }
 
   // This method is triggered when the send button is pressed
   void _sendMessage() async {
@@ -61,8 +175,11 @@ class _ChatPageState extends State<ChatPage> {
       });
     } catch (e) {
       // Log the error or use a developer tool to help with debugging
-      print('Error when sending message: $e');
+      if (kDebugMode) {
+        print('Error when sending message: $e');
+      }
       // Optionally, show an error message to the user
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to send message. Please try again.'),
@@ -78,6 +195,13 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       messages.removeWhere((message) => message.id == id);
     });
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Message deleted'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
 // This method is used to edit a message
@@ -135,7 +259,7 @@ class _ChatPageState extends State<ChatPage> {
               leading: const Icon(Icons.edit),
               title: const Text('Edit'),
               onTap: () {
-                // TODO: Implement edit logic
+                // Implement edit logic
                 Navigator.pop(context);
                 _showEditDialog(message);
               },
@@ -144,7 +268,7 @@ class _ChatPageState extends State<ChatPage> {
               leading: const Icon(Icons.delete),
               title: const Text('Delete'),
               onTap: () {
-                // TODO: Implement delete logic
+                // Implement delete logic
                 Navigator.pop(context);
                 _deleteMessage(message.id!); // Assuming id is not null here
               },
@@ -156,14 +280,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _showEditDialog(Message message) {
-    TextEditingController _editController = TextEditingController(text: message.content);
+    TextEditingController editController = TextEditingController(text: message.content);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit Message'),
           content: TextField(
-            controller: _editController,
+            controller: editController,
             autofocus: true,
           ),
           actions: <Widget>[
@@ -176,8 +300,8 @@ class _ChatPageState extends State<ChatPage> {
             TextButton(
               child: const Text('Save'),
               onPressed: () {
-                if (_editController.text.trim().isNotEmpty) {
-                  _editMessage(message.id!, _editController.text.trim());
+                if (editController.text.trim().isNotEmpty) {
+                  _editMessage(message.id!, editController.text.trim());
                 }
                 Navigator.of(context).pop();
               },
@@ -188,10 +312,18 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // This is default and can be omitted if not changed before
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
@@ -202,63 +334,72 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Settings or delete chat history
-              // ...
-            },
+            onPressed: _showSettings,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child:
-            ListView.builder(
-              reverse: true,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                // If your messages list is reversed, use this:
-                // Message message = messages[index];
-                // Otherwise, if your list is in chronological order, use this:
-                Message message = messages[messages.length - 1 - index];
-                return _buildMessageItem(message);
-              },
+      body: Container(
+        color: _backgroundImage == null ? _backgroundColor : null,
+        decoration: _backgroundImage != null
+          ? BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(_backgroundImage!),
+              fit: BoxFit.cover,
+              ),
             )
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.photo),
-                    onPressed: () {
-                      // Implement sending image or video
-                    },
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Type a message',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
+          : null,
+        child: Column(
+          children: [
+            Expanded(
+              child:
+              ListView.builder(
+                controller: _scrollController, // Use the ScrollController here
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  // If your messages list is reversed, use this:
+                  // Message message = messages[index];
+                  // Otherwise, if your list is in chronological order, use this:
+                  Message message = messages[messages.length - 1 - index];
+                  return _buildMessageItem(message);
+                },
+              )
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.photo),
+                      onPressed: () {
+                        // Implement sending image or video
+                      },
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Type a message',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: _sendMessage,
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _sendMessage,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

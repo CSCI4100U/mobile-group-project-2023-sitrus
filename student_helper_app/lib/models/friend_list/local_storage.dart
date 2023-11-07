@@ -2,9 +2,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "MyDatabase.db";
-  static final _databaseVersion = 1;
-  static final table = 'messages';
+  static const _databaseName = "MyDatabase.db";
+  static const _databaseVersion = 1;
+  static const table = 'messages';
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();

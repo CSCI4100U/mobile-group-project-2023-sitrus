@@ -1,9 +1,3 @@
-//main home page for friends list. displays all friends in a (list view?) - (list tile?) with profile picture,
-// name, and status (more or less). can click the list tile (friend) to open their profile
-//*have small map initially on 1/3 of the screen or so - displays campus map and location of friends with location
-// sharing on. *save this for later/not high priority
-//small button (in appbar?) to add friends - editing and deleting should be done in friend's profile
-
 // import 'package:flutter/material.dart';
 //
 // class FriendListPage extends StatefulWidget {
@@ -63,10 +57,12 @@ import 'friends_chat_page.dart';
 
 // for test only
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -103,10 +99,12 @@ class FriendListPage extends StatelessWidget {
 
   String userStatus = 'Online';
 
+  FriendListPage({super.key});
+
   Color getStatusColor(String status) {
     switch (status) {
       case 'Online':
-        return Colors.green;
+        return Colors.greenAccent;
       case 'Busy':
         return Colors.red;
       case 'Offline':
@@ -121,15 +119,15 @@ class FriendListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.account_circle, size: 45),
+          icon: const Icon(Icons.account_circle, size: 45),
           onPressed: () {
             // Navigate to user profile page
           },
         ),
-        title: Text('Friend List'),
+        title: const Text('Friend List'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.push(
                 context,
@@ -138,67 +136,74 @@ class FriendListPage extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: Icon(Icons.circle, color: getStatusColor(userStatus)),
+            icon: Icon(Icons.circle, size: 15, color: getStatusColor(userStatus)),
             onPressed: () {
               // Change user status
             },
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: friends.length,
-              itemBuilder: (context, index) {
-                var friend = friends[index];
-                return ListTile(
-                  leading: Icon(Icons.account_circle, size: 40),
-                  title: Text('${friend['name']} - ${friend['status']}'),
-                  subtitle: Text(
-                    '${friend['isLastMessageFromUser'] ? 'Me' : friend['name']}: ${friend['lastMessage']}',
+      body: Stack( // Wrap the entire body in a SafeArea
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: friends.length,
+                itemBuilder: (context, index) {
+                  var friend = friends[index];
+                  return ListTile(
+                    leading: const Icon(Icons.account_circle, size: 40),
+                    title: Text('${friend['name']} - ${friend['status']}'),
+                    subtitle: Text(
+                      '${friend['isLastMessageFromUser'] ? 'Me' : friend['name']}: ${friend['lastMessage']}',
+                    ),
+                    trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend['status'])),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(friendName: friend['name'],friendStatus: friend['status'],),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              right: 10, // Distance from the right edge
+              bottom: 10, // Distance from the bottom edge
+              child: Column(
+                children: <Widget>[
+                  FloatingActionButton(
+                    onPressed: () {
+                      // Add search functionality
+                    },
+                    mini: true,
+                    child: const Icon(Icons.search), // Set mini to true for smaller FABs
                   ),
-                  trailing: Icon(Icons.circle, color: getStatusColor(friend['status'])),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatPage(friendName: friend['name'],friendStatus: friend['status'],),
-                      ),
-                    );
-                  },
-                );
-              },
+                  const SizedBox(height: 10), // Spacing between the buttons
+                  FloatingActionButton(
+                    onPressed: () {
+                      // Add filter functionality
+                    },
+                    mini: true,
+                    child: const Icon(Icons.filter_list), // Set mini to true for smaller FABs
+                  ),
+                  const SizedBox(height: 10), // Spacing between the buttons
+                  // Use FloatingActionButton for the main action
+                  FloatingActionButton(
+
+                    onPressed: () {
+                      // Add settings functionality
+                    },
+                    mini: true,
+                    child: const Icon(Icons.settings), // Set mini to true for smaller FABs
+                  ),
+                ],
+              ),
             ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.search, size: 30),
-                  onPressed: () {
-                    // Add search functionality
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.filter_list, size: 30),
-                  onPressed: () {
-                    // Add filter functionality
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings, size: 30),
-                  onPressed: () {
-                    // Add settings functionality
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }

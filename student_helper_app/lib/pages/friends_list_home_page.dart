@@ -58,6 +58,9 @@
 // }
 import 'package:flutter/material.dart';
 
+import 'friends_add_friend_page.dart';
+import 'friends_chat_page.dart';
+
 // for test only
 void main() {
   runApp(MyApp());
@@ -128,7 +131,10 @@ class FriendListPage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              // Navigate to Add Friend page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddFriendPage()),
+              );
             },
           ),
           IconButton(
@@ -154,7 +160,12 @@ class FriendListPage extends StatelessWidget {
                   ),
                   trailing: Icon(Icons.circle, color: getStatusColor(friend['status'])),
                   onTap: () {
-                    // Navigate to Chat page with the friend
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(friendName: friend['name'],friendStatus: friend['status'],),
+                      ),
+                    );
                   },
                 );
               },

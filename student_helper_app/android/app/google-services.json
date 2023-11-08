@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "505948726540",
+    "project_id": "csci-4100u-final-pg-friendlist",
+    "storage_bucket": "csci-4100u-final-pg-friendlist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505948726540:android:10ddf9ed522639a8025529",
+        "android_client_info": {
+          "package_name": "com.example.student_helper_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSgrBlQbi55hH1ejD7w5dA6N42R3Shmso"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

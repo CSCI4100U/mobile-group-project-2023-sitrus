@@ -32,6 +32,11 @@ dependencies:
     sdk: flutter
   sqflite:  # SQLite plugin for Flutter
   path:     # A string-based path manipulation library
+  firebase_core:
+  firebase_auth:
+  cloud_firestore_odm:
+  provider:
+  firebase_ui_auth:
 
 
   # The following adds the Cupertino Icons font to your application.

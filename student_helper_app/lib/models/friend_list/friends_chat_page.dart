@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'local_storage.dart';
 import 'message.dart';
 
@@ -149,36 +150,50 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage() async {
     final String content = _messageController.text.trim();
     if (content.isEmpty) {
-      // If the input is empty, do nothing or you can show a warning to the user
       return;
     }
 
+    // Create a new message object
+    final Message newMessage = Message(
+      timestamp: DateTime.now(), // Use local timestamp or server-side timestamp
+      sender: 'user', // Replace with actual sender ID or username
+      receiver: widget.friendName, // Replace with actual receiver ID or username
+      content: content,
+      edited: false,
+    );
+
+    // Convert the message to a map before storing it
+    final Map<String, dynamic> messageMap = newMessage.toMap();
+
+    // Store the message locally
     try {
-      // Create a new message object
-      final Message message = Message(
-        timestamp: DateTime.now(),
-        sender: 'user', // In a real application, replace with the actual user identifier
-        receiver: widget.friendName, // The friend's name or identifier
-        content: content, // The user input is set as the content
-        edited: false,
-      );
+      int id = await DatabaseHelper.instance.insert(messageMap);
 
-      // Insert the message into the database and get the auto-generated ID
-      final int id = await DatabaseHelper.instance.insert(message.toMap());
-
-      // Update the UI on the main thread after the message is inserted
-      setState(() {
-        // Add the new message to the messages list
-        messages.insert(0, message.copyWith(id: id)); // Insert at the beginning of the list
-        // Clear the input field for new message
-        _messageController.clear();
+      // Assuming you have a method that converts a map to a Message object
+      Message localStoredMessage = Message.fromMap({
+        ...messageMap,
+        'id': id, // Use the auto-generated ID from the local database
       });
+
+      // Update the local messages list
+      setState(() {
+        messages.insert(0, localStoredMessage);
+        _messageController.clear();
+        _scrollToBottom();
+      });
+
+      // Send the message to Firestore
+      await FirebaseFirestore.instance.collection('messages').add(messageMap);
+
+      // Once the message is sent successfully, update the message in the local database
+      Message sentMessage = localStoredMessage.copyWith(edited: false, deleted: false);
+      await DatabaseHelper.instance.update(sentMessage.toMap());
+
     } catch (e) {
-      // Log the error or use a developer tool to help with debugging
+      // Handle the error, e.g., show a snackbar
       if (kDebugMode) {
         print('Error when sending message: $e');
       }
-      // Optionally, show an error message to the user
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -191,32 +206,84 @@ class _ChatPageState extends State<ChatPage> {
 
   // This method is used to delete a message
   void _deleteMessage(int id) async {
-    await DatabaseHelper.instance.delete(id);
+    // Mark as deleted in local database
+    Message? localMessage = messages.firstWhere((message) => message.id == id);
+    Message deletedMessage = localMessage.copyWith(deleted: true); // Add a 'deleted' field to your Message class
+    await DatabaseHelper.instance.update(deletedMessage.toMap());
+
+    // Mark as deleted in Firestore
+    FirebaseFirestore.instance.collection('messages').doc(id.toString()).update({
+      'deleted': true,
+    });
+
+    // Update UI
     setState(() {
       messages.removeWhere((message) => message.id == id);
     });
-    // ignore: use_build_context_synchronously
+
+    // Show a snackbar message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Message deleted'),
-        duration: Duration(seconds: 2),
-      ),
+      SnackBar(content: Text('Message deleted')),
     );
-  }
+    }
+
 
 // This method is used to edit a message
   void _editMessage(int id, String newContent) async {
-    final int index = messages.indexWhere((message) => message.id == id);
-    if (index != -1) {
-      final Message updatedMessage = messages[index].copyWith(
-        content: newContent,
-        edited: true,
-      );
-      await DatabaseHelper.instance.update(updatedMessage.toMap());
-      setState(() {
+    // Update local database
+    Message? localMessage = messages.firstWhere((message) => message.id == id);
+    Message updatedMessage = localMessage.copyWith(content: newContent, edited: true, deleted: false);
+    await DatabaseHelper.instance.update(updatedMessage.toMap());
+
+    // Update Firestore
+    FirebaseFirestore.instance.collection('messages').doc(id.toString()).update({
+      'content': newContent,
+      'edited': true,
+    });
+
+    // Update UI
+    setState(() {
+      int index = messages.indexWhere((message) => message.id == id);
+      if (index != -1) {
         messages[index] = updatedMessage;
-      });
-    }
+      }
+    });
+
+    // Show a snackbar message
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Message edited')),
+    );
+  }
+
+  // This method is used to load messages from Firestore
+  void _loadMessagesFromCloud() {
+    FirebaseFirestore.instance
+        .collection('messages')
+        .where('receiver', isEqualTo: 'user') // Adjust the query as needed
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen((snapshot) async {
+      for (var doc in snapshot.docs) {
+        Message message = Message.fromMap({
+          'id': doc.id,
+          ...doc.data() as Map<String, dynamic>,
+        });
+
+        // Store message in local database
+        await DatabaseHelper.instance.insert(message.toMap());
+      }
+
+      // Once all messages are stored locally, you can load them into your UI
+      _loadMessagesFromLocal();
+    });
+  }
+
+  void _loadMessagesFromLocal() async {
+    List<Message> localMessages = (await DatabaseHelper.instance.queryAllRows()).cast<Message>();
+    setState(() {
+      messages = localMessages;
+    });
   }
 
   Widget _buildMessageItem(Message message) {
@@ -259,7 +326,7 @@ class _ChatPageState extends State<ChatPage> {
               leading: const Icon(Icons.edit),
               title: const Text('Edit'),
               onTap: () {
-                // TODO:Implement edit logic
+                // edit logic
                 Navigator.pop(context);
                 _showEditDialog(message);
               },
@@ -268,9 +335,18 @@ class _ChatPageState extends State<ChatPage> {
               leading: const Icon(Icons.delete),
               title: const Text('Delete'),
               onTap: () {
-                // TODO:Implement delete logic
+                // delete logic
                 Navigator.pop(context);
                 _deleteMessage(message.id!); // Assuming id is not null here
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.download),
+              title: const Text('Download Chat History from Cloud'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                _loadMessagesFromCloud();
               },
             ),
           ],

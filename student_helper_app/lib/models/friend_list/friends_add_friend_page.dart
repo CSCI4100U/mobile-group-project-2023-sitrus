@@ -11,7 +11,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
 
   // This is the mock function to simulate the search process
   void _search() {
-    // TODO: Replace this with the actual search logic
+    // TODO:Replace this with the actual search logic
     setState(() {
       searchResults = [
         {
@@ -31,11 +31,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Friend'),
+        title: const Text('Add Friend'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -46,13 +47,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
               decoration: InputDecoration(
                 labelText: 'Search by name or student number',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: _search,
                 ),
               ),
               onSubmitted: (value) => _search(),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Expanded(
               child: searchResults.isNotEmpty
                   ? ListView.builder(
@@ -64,7 +65,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                     title: Text(result['name']),
                     subtitle: Text('Student Number: ${result['studentNumber']}'),
                     trailing: ElevatedButton(
-                      child: Text('Add'),
+                      child: const Text('Add'),
                       onPressed: result['isFriend'] ? null : () {
                         // TODO:Implement add friend logic
                       },
@@ -75,7 +76,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                   );
                 },
               )
-                  : Center(child: Text('No result.')),
+                  : const Center(child: Text('No result.')),
             ),
           ],
         ),

@@ -47,7 +47,7 @@ class Message {
     String? sender,
     String? receiver,
     String? content,
-    bool? edited,
+    bool? edited, required bool deleted,
   }) {
     return Message(
       id: id ?? this.id,

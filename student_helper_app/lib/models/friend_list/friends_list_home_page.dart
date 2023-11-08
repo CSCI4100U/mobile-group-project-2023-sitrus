@@ -258,7 +258,7 @@ class _FriendListPageState extends State<FriendListPage> {
         leading: IconButton(
           icon: const Icon(Icons.account_circle, size: 45),
           onPressed: () {
-            // Navigate to user profile page
+            // TODO:Navigate to user profile page
           },
         ),
         title: const Text('Friend List'),

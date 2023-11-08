@@ -28,7 +28,7 @@ class Message {
     };
   }
 
-  // Implement a method to create a message from a Map
+  // method to create a message from a Map
   static Message fromMap(Map<String, dynamic> map) {
     return Message(
       id: map['id'],
@@ -40,7 +40,7 @@ class Message {
     );
   }
 
-  // Implement a copyWith method
+  // copyWith method
   Message copyWith({
     int? id,
     DateTime? timestamp,

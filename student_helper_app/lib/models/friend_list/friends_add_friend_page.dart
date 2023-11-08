@@ -66,7 +66,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                     trailing: ElevatedButton(
                       child: Text('Add'),
                       onPressed: result['isFriend'] ? null : () {
-                        // Implement add friend logic
+                        // TODO:Implement add friend logic
                       },
                       style: ElevatedButton.styleFrom(
                         primary: result['isFriend'] ? Colors.grey : null, // If already friends, button is grey

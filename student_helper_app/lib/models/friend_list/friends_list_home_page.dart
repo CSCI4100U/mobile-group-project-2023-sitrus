@@ -1,57 +1,4 @@
-// import 'package:flutter/material.dart';
-//
-// class FriendListPage extends StatefulWidget {
-//   const FriendListPage({super.key});
-//
-//   @override
-//   State<StatefulWidget> createState() => _FriendListPageState();
-// }
-//
-// class _FriendListPageState extends State<FriendListPage> {
-//
-//   //get list of friends from cloud storage?
-//   // var friends_list = ...
-//   final tempFriendList = ["friend 1", "friend 2", "friend 3", "friend 4"];  //temp example
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-//           title: const Text("Friends List"),
-//         ),
-//         body: Column(
-//           children: <Widget>[
-//             SizedBox(height: 10,),
-//             //temp placement for map if we want to have the map idea
-//             Container(
-//               padding: EdgeInsets.all(10.0),
-//               width: 360,
-//               height: 250,
-//               color: Colors.red,
-//             ),
-//             SizedBox(height: 10,),
-//             Expanded(
-//                 child: ListView.separated(
-//                   //update this with the actual friends list from database
-//                     padding: EdgeInsets.all(10),
-//                     itemCount: tempFriendList.length,
-//                     separatorBuilder: (context, index) => Divider(height: 2),
-//                     itemBuilder: (context, index) {
-//                       final friend = tempFriendList[index];
-//                       return ListTile(
-//                         title: Text(friend),
-//                         tileColor: index % 2 == 0 ? Colors.indigoAccent : Colors.blue,
-//                       );
-//                     }
-//                     )
-//             )
-//           ],
-//         ));
-//   }
-// }
 import 'package:flutter/material.dart';
-
 import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
 
@@ -70,13 +17,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FriendListPage(),
+      home: const FriendListPage(),
     );
   }
 }
 
-class FriendListPage extends StatelessWidget {
-  final List<Map<String, dynamic>> friends = [
+class FriendListPage extends StatefulWidget {
+  const FriendListPage({super.key});
+
+  @override
+  _FriendListPageState createState() => _FriendListPageState();
+}
+
+class _FriendListPageState extends State<FriendListPage> {
+  List<Map<String, dynamic>> friends = [
     {
       'name': 'Alice',
       'status': 'Online',
@@ -99,7 +53,190 @@ class FriendListPage extends StatelessWidget {
 
   String userStatus = 'Online';
 
-  FriendListPage({super.key});
+  List<Map<String, dynamic>> displayedFriends = [];
+
+  @override
+  void initState() {
+    super.initState();
+    displayedFriends = friends;
+  }
+
+  void _searchFriend(String searchQuery) {
+    List<Map<String, dynamic>> results;
+    if (searchQuery.isEmpty) {
+      results = friends;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Search fail - no input'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      results = friends
+          .where((friend) =>
+          friend['name'].toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Search successful'),
+          duration: Duration(seconds: 3),
+          backgroundColor: Colors.blue,
+        ),
+      );
+    }
+
+    setState(() {
+      displayedFriends = results;
+    });
+  }
+
+  void _showSearchDialog() {
+    TextEditingController searchController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Search Friends'),
+          content: TextField(
+            controller: searchController,
+            decoration: const InputDecoration(
+              hintText: 'Enter a friend\'s name',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Reset'),
+              onPressed: () {
+                setState(() {
+                  displayedFriends = friends;
+                });
+                searchController.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Search'),
+              onPressed: () {
+                _searchFriend(searchController.text.trim());
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _filterFriendsByStatus(String status) {
+    List<Map<String, dynamic>> results;
+    if (status == 'All') {
+      results = friends;
+    } else {
+      results = friends.where((friend) {
+        return friend['status'] == status;
+      }).toList();
+    }
+
+    setState(() {
+      displayedFriends = results;
+    });
+  }
+
+  void _showFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Filter Friends'),
+          content: DropdownButtonFormField<String>(
+            value: 'All',
+            items: ['All', 'Online', 'Busy', 'Offline']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              _filterFriendsByStatus(newValue ?? 'All');
+              Navigator.of(context).pop(); // Close the dialog after selection
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Reset'),
+              onPressed: () {
+                setState(() {
+                  displayedFriends = friends; // Reset to the original list
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _changeUserStatus(String status) {
+    setState(() {
+      userStatus = status;
+    });
+  }
+
+  void _showStatusChangeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change Status'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.circle, color: getStatusColor('Online')),
+                title: const Text('Online'),
+                onTap: () {
+                  _changeUserStatus('Online');
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.circle, color: getStatusColor('Busy')),
+                title: const Text('Busy'),
+                onTap: () {
+                  _changeUserStatus('Busy');
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.circle, color: getStatusColor('Offline')),
+                title: const Text('Invisible'),
+                onTap: () {
+                  _changeUserStatus('Offline');
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   Color getStatusColor(String status) {
     switch (status) {
@@ -137,73 +274,65 @@ class FriendListPage extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.circle, size: 15, color: getStatusColor(userStatus)),
-            onPressed: () {
-              // Change user status
-            },
+            onPressed: _showStatusChangeDialog,
           ),
         ],
       ),
-      body: Stack( // Wrap the entire body in a SafeArea
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: friends.length,
-                itemBuilder: (context, index) {
-                  var friend = friends[index];
-                  return ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40),
-                    title: Text('${friend['name']} - ${friend['status']}'),
-                    subtitle: Text(
-                      '${friend['isLastMessageFromUser'] ? 'Me' : friend['name']}: ${friend['lastMessage']}',
+      body: Stack(
+        children: [
+          ListView.builder(
+            itemCount: displayedFriends.length,
+            itemBuilder: (context, index) {
+              var friend = displayedFriends[index];
+              return ListTile(
+                leading: const Icon(Icons.account_circle, size: 40),
+                title: Text('${friend['name']} - ${friend['status']}'),
+                subtitle: Text(
+                  '${friend['isLastMessageFromUser'] ? 'Me' : friend['name']}: ${friend['lastMessage']}',
+                ),
+                trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend['status'])),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatPage(friendName: friend['name'],friendStatus: friend['status'],),
                     ),
-                    trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend['status'])),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(friendName: friend['name'],friendStatus: friend['status'],),
-                        ),
-                      );
-                    },
                   );
                 },
-              ),
+              );
+            },
+          ),
+          Positioned(
+            right: 10,
+            bottom: 10,
+            child: Column(
+              children: <Widget>[
+                FloatingActionButton(
+                  onPressed: _showSearchDialog,
+                  mini: true,
+                  child: const Icon(Icons.search),
+                ),
+                const SizedBox(height: 10), // Spacing between the buttons
+                FloatingActionButton(
+                  onPressed: _showFilterDialog,
+                  mini: true,
+                  child: const Icon(Icons.filter_list), // Set mini to true for smaller FABs
+                ),
+                const SizedBox(height: 10), // Spacing between the buttons
+                // Use FloatingActionButton for the main action
+                FloatingActionButton(
+                  onPressed: () {
+                    // TODO: Add settings functionality
+                  },
+                  mini: true,
+                  child: const Icon(Icons.settings), // Set mini to true for smaller FABs
+                ),
+              ],
             ),
-            Positioned(
-              right: 10, // Distance from the right edge
-              bottom: 10, // Distance from the bottom edge
-              child: Column(
-                children: <Widget>[
-                  FloatingActionButton(
-                    onPressed: () {
-                      // Add search functionality
-                    },
-                    mini: true,
-                    child: const Icon(Icons.search), // Set mini to true for smaller FABs
-                  ),
-                  const SizedBox(height: 10), // Spacing between the buttons
-                  FloatingActionButton(
-                    onPressed: () {
-                      // Add filter functionality
-                    },
-                    mini: true,
-                    child: const Icon(Icons.filter_list), // Set mini to true for smaller FABs
-                  ),
-                  const SizedBox(height: 10), // Spacing between the buttons
-                  // Use FloatingActionButton for the main action
-                  FloatingActionButton(
-
-                    onPressed: () {
-                      // Add settings functionality
-                    },
-                    mini: true,
-                    child: const Icon(Icons.settings), // Set mini to true for smaller FABs
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }
+

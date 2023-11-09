@@ -13,6 +13,9 @@ class _AddFriendPageState extends State<AddFriendPage> {
   currentUserId() {
     return FirebaseAuth.instance.currentUser!.uid;
   }
+  resultId() {
+    return FirebaseFirestore.instance.collection('users').doc().id;
+  }
   List<AppUser> searchResults = []; // Adjusted to use a User model instead of a map
 
   // This is the mock function to simulate the search process
@@ -106,9 +109,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
                         trailing: ElevatedButton(
                           child: const Text('Add'),
                           onPressed: () {
-                            if(currentUserId().id != null) {
-                                _sendFriendRequest(currentUserId(), result.id);
-                              } // Replace currentUserId with the actual current user ID
+                             _sendFriendRequest(currentUserId(), resultId()); // Replace currentUserId with the actual current user ID
                           },
                       // Disable the button if already friends or if a request has been sent
                       style: ElevatedButton.styleFrom(

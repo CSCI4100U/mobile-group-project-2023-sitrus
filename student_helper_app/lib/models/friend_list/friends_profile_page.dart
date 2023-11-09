@@ -8,11 +8,7 @@ import 'appuser.dart';
 
 // Create a 'UserProfilePage' class that extends 'StatefulWidget'
 class UserProfilePage extends StatefulWidget {
-  // Define a required 'userId' parameter for this widget
-  final String userId;
-
-  const UserProfilePage({Key? key, required this.userId}) : super(key: key);
-
+  const UserProfilePage({super.key});
   // Override the createState() method to create a stateful instance
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
@@ -20,6 +16,12 @@ class UserProfilePage extends StatefulWidget {
 
 // Create the state class for the 'UserProfilePage'
 class _UserProfilePageState extends State<UserProfilePage> {
+  currentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+  currentUser() {
+    return FirebaseAuth.instance.currentUser!;
+  }
   // Declare variables for the user data, loading state, and a text controller
   AppUser? _user;
   bool _isLoading = true;
@@ -40,7 +42,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     // Fetch a document from Firestore based on the 'userId'
     DocumentSnapshot userData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(widget.userId)
+        .doc(currentUserId())
         .get();
     if (userData.exists && userData.data() != null) {
       // If the document exists and contains data, update the UI
@@ -94,7 +96,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (_user != null) {
       FirebaseFirestore.instance
           .collection('users')
-          .doc(_user!.id) // Here, _user!.id should be the document ID
+          .doc(currentUserId()) // Update the current user's document
           .update({field: newValue})
           .then((_) {
         // Update local user object and UI (not implemented here)
@@ -125,8 +127,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (_isLoading) {
       // Display a loading indicator while user data is being fetched
       return Scaffold(
-        appBar: AppBar(title: Text('Loading profile...')),
-        body: Center(child: CircularProgressIndicator()),
+        appBar: AppBar(title: const Text('Loading profile...')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -134,17 +136,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Display an error message if user data couldn't be loaded
       return Scaffold(
         appBar: AppBar(
-          leading: BackButton(),
-          title: Text('Profile not found'),
+          leading: const BackButton(),
+          title: const Text('Profile not found'),
         ),
-        body: Center(child: Text('User data could not be loaded.')),
+        body: const Center(child: Text('User data could not be loaded.')),
       );
     }
 
     // Display the user's profile information and options for editing
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
+        leading: const BackButton(),
         title: Text("${_user!.firstName}'s Profile"),
       ),
       body: ListView(
@@ -159,26 +161,26 @@ class _UserProfilePageState extends State<UserProfilePage> {
             child: _user!.icon == null
                 ? Text(
               _user!.getInitials(),
-              style: TextStyle(fontSize: 40),
+              style: const TextStyle(fontSize: 40),
             )
                 : null,
           ),
           ListTile(
             title: Text(_user!.studentNumber),
-            subtitle: Text('Student Number'),
+            subtitle: const Text('Student Number'),
             onTap: () => _editField(
                 'Student Number', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
           ),
           // Include ListTiles for other fields similar to the one above
           ListTile(
             title: Text(_user!.firstName),
-            subtitle: Text('First Name'),
+            subtitle: const Text('First Name'),
             onTap: () => _editField(
                 'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
           ),
           // ... Other profile fields go here ...
           ListTile(
-            title: Text('Logout', style: TextStyle(color: Colors.red)),
+            title: const Text('Logout', style: TextStyle(color: Colors.red)),
             onTap: _logout,
           ),
         ],

@@ -82,6 +82,15 @@ class _ChatPageState extends State<ChatPage> {
                 _showBackgroundOptions();
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.download),
+              title: const Text('Download Chat History from Cloud'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                _loadMessagesFromCloud();
+              },
+            ),
           ],
         );
       },
@@ -258,24 +267,45 @@ class _ChatPageState extends State<ChatPage> {
 
   // This method is used to load messages from Firestore
   void _loadMessagesFromCloud() {
+    // Assuming 'user' is the ID of the current user
+    String currentUserID = 'user'; // Replace with the actual user identifier
+    String friendID = widget.friendName; // Replace with the actual friend identifier
+
     FirebaseFirestore.instance
         .collection('messages')
-        .where('receiver', isEqualTo: 'user') // Adjust the query as needed
+        .where('receiver', isEqualTo: currentUserID)
+        .where('sender', isEqualTo: friendID)
         .orderBy('timestamp', descending: true)
         .snapshots()
         .listen((snapshot) async {
       for (var doc in snapshot.docs) {
+        // Create a Message object from the document
         Message message = Message.fromMap({
-          'id': doc.id,
+          'id': doc.id, // Firestore document ID
           ...doc.data() as Map<String, dynamic>,
         });
 
-        // Store message in local database
+        // Optionally, store the message in the local SQLite database
         await DatabaseHelper.instance.insert(message.toMap());
       }
 
-      // Once all messages are stored locally, you can load them into your UI
+      // Load the messages into the UI
       _loadMessagesFromLocal();
+    });
+
+    // Also listen for messages where the current user is the receiver
+    FirebaseFirestore.instance
+        .collection('messages')
+        .where('sender', isEqualTo: currentUserID)
+        .where('receiver', isEqualTo: friendID)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen((snapshot) async {
+      for (var doc in snapshot.docs) {
+        // Handle the received documents, similar to above
+      }
+
+      // Update the UI, similar to above
     });
   }
 
@@ -338,15 +368,6 @@ class _ChatPageState extends State<ChatPage> {
                 // delete logic
                 Navigator.pop(context);
                 _deleteMessage(message.id!); // Assuming id is not null here
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.download),
-              title: const Text('Download Chat History from Cloud'),
-              onTap: () {
-                // load logic
-                Navigator.pop(context);
-                _loadMessagesFromCloud();
               },
             ),
           ],

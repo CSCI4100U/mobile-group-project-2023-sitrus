@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'appuser.dart';
 
 class AddFriendPage extends StatefulWidget {
   @override
@@ -7,30 +10,66 @@ class AddFriendPage extends StatefulWidget {
 
 class _AddFriendPageState extends State<AddFriendPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> searchResults = [];
+  currentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
+  List<AppUser> searchResults = []; // Adjusted to use a User model instead of a map
 
   // This is the mock function to simulate the search process
-  void _search() {
-    // TODO:Replace this with the actual search logic
-    setState(() {
-      searchResults = [
-        {
-          'icon': Icons.person,
-          'name': 'John Doe',
-          'studentNumber': '123456',
-          'isFriend': false,
-        },
-        {
-          'icon': Icons.person,
-          'name': 'Jane Smith',
-          'studentNumber': '654321',
-          'isFriend': true, // This user is already a friend
-        },
-        // Add more mock results as needed for testing
-      ];
-    });
+  // void _search() {
+  //   // Replace this with the actual search logic
+  //   setState(() {
+  //     searchResults = [
+  //       {
+  //         'icon': Icons.person,
+  //         'name': 'John Doe',
+  //         'studentNumber': '123456',
+  //         'isFriend': false,
+  //       },
+  //       {
+  //         'icon': Icons.person,
+  //         'name': 'Jane Smith',
+  //         'studentNumber': '654321',
+  //         'isFriend': true, // This user is already a friend
+  //       },
+  //       // Add more mock results as needed for testing
+  //     ];
+  //   });
+  // }
+  void _search() async {
+    final queryText = _searchController.text;
+    if (queryText.isNotEmpty) {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('studentNumber', isEqualTo: queryText)
+          .get();
+
+      final List<AppUser> users = (querySnapshot.docs
+          .map((doc) => AppUser.fromMap(
+            {...doc.data() as Map<String, dynamic>},
+            doc.id, // Pass the document ID as the second argument
+          ))
+          .where((user) => user.id != currentUserId()) // Exclude the current user
+              .toList()).cast<AppUser>();
+
+      setState(() {
+        searchResults = users;
+      });
+    }
   }
 
+  void _sendFriendRequest(String currentUserId, String friendId) async {
+    // Add a friend request to the `friendRequests` collection
+    await FirebaseFirestore.instance.collection('friendRequests').add({
+      'from': currentUserId,
+      'to': friendId,
+      'status': 'pending', // Or any default status you want to use
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    // Optionally, update the UI to reflect the sent request
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +84,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Search by name or student number',
+                labelText: 'Search by student number',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: _search,
@@ -57,20 +96,23 @@ class _AddFriendPageState extends State<AddFriendPage> {
             Expanded(
               child: searchResults.isNotEmpty
                   ? ListView.builder(
-                itemCount: searchResults.length,
-                itemBuilder: (context, index) {
-                  var result = searchResults[index];
-                  return ListTile(
-                    leading: Icon(result['icon']),
-                    title: Text(result['name']),
-                    subtitle: Text('Student Number: ${result['studentNumber']}'),
-                    trailing: ElevatedButton(
-                      child: const Text('Add'),
-                      onPressed: result['isFriend'] ? null : () {
-                        // TODO:Implement add friend logic
-                      },
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      var result = searchResults[index];
+                      return ListTile(
+                        leading: Icon(result.icon as IconData?), // You can use initials or a profile picture here
+                        title: Text('${result.firstName} ${result.middleName} ${result.lastName}'),
+                        subtitle: Text(result.studentNumber),
+                        trailing: ElevatedButton(
+                          child: const Text('Add'),
+                          onPressed: () {
+                            if(currentUserId().id != null) {
+                                _sendFriendRequest(currentUserId(), result.id);
+                              } // Replace currentUserId with the actual current user ID
+                          },
+                      // Disable the button if already friends or if a request has been sent
                       style: ElevatedButton.styleFrom(
-                        primary: result['isFriend'] ? Colors.grey : null, // If already friends, button is grey
+                        primary: Colors.blue, // Use your theme color here
                       ),
                     ),
                   );

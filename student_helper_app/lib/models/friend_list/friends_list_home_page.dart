@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../firebase_options.dart';
 import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'friend_login_page.dart';
+import 'friends_profile_page.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 // for test only
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp( options: DefaultFirebaseOptions.currentPlatform, );
   runApp(const MyApp());
 }
 
@@ -12,12 +22,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: 'Friend List',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const FriendListPage(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            User? user = snapshot.data;
+            if (user == null) {
+              return LoginPage();
+            }
+            return const FriendListPage(); // Assume you have a HomePage widget
+          }
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        },
+      ),
     );
   }
 }
@@ -30,6 +55,9 @@ class FriendListPage extends StatefulWidget {
 }
 
 class _FriendListPageState extends State<FriendListPage> {
+  currentUser() {
+    return FirebaseAuth.instance.currentUser;
+  }
   List<Map<String, dynamic>> friends = [
     {
       'name': 'Alice',
@@ -251,6 +279,18 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
+  Future<void> _logout() async {
+    // Clear the "Remember Me" flag from SharedPreferences
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('remember_me');
+
+    // Sign out from Firebase Auth
+    await FirebaseAuth.instance.signOut();
+
+    // Navigate to the login screen
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,7 +298,11 @@ class _FriendListPageState extends State<FriendListPage> {
         leading: IconButton(
           icon: const Icon(Icons.account_circle, size: 45),
           onPressed: () {
-            // TODO:Navigate to user profile page
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => UserProfilePage(userId: currentUser().id), // Replace with the actual user ID
+              ),
+            );
           },
         ),
         title: const Text('Friend List'),
@@ -322,7 +366,7 @@ class _FriendListPageState extends State<FriendListPage> {
                 // Use FloatingActionButton for the main action
                 FloatingActionButton(
                   onPressed: () {
-                    // TODO: Add settings functionality
+                    _logout();// TODO: Add settings functionality
                   },
                   mini: true,
                   child: const Icon(Icons.settings), // Set mini to true for smaller FABs

@@ -2,16 +2,22 @@
 
 import 'package:flutter/material.dart';
 
-class SASPage extends StatefulWidget {
+//import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'models/sas_model/Accommodation.dart';
+import 'models/sas_model/Sas_ModelSQLite.dart';
+import 'pages/AddAccommodation.dart';
+class ViewAccommodations extends StatefulWidget {
   @override
-  SASPageState createState() => SASPageState();
+  ViewAccommodationsState createState() => ViewAccommodationsState();
 }
 
-class SASPageState extends State<SASPage> {
+class ViewAccommodationsState extends State<ViewAccommodations> {
 
   SASModel sas_model = SASModel();
 
-  List<Accessibility> _accommodations = [];
+  List<Accommodation> _accommodations = [];
 
   @override
   void initState() {
@@ -20,7 +26,7 @@ class SASPageState extends State<SASPage> {
   }
 
   void _refreshList() async {
-    final List<Accessibility> accommodations = await sas_model.getAll();
+    final List<Accommodation> accommodations = await sas_model.getAll();
     setState(() {
       _accommodations = accommodations;
     });
@@ -41,7 +47,7 @@ class SASPageState extends State<SASPage> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(_accommodations[index].name ?? "NA"),
-            subtitle: Text(_accommodations[index].notes ?? "NA"),
+            subtitle: Text(_accommodations[index].desc ?? "NA"),
             onTap: () {
               _editAcmdn(context, _accommodations[index]);
             },
@@ -77,17 +83,17 @@ class SASPageState extends State<SASPage> {
       // Handle the result, which contains the studentId and grade
       final studentId = result[0];
       final g = result[1];
-      sas_model.insertAcmdn(Accessibility(name: g, notes: studentId));
+      sas_model.insertAcmdn(Accommodation(name: g, desc: studentId));
       _refreshList();
       // Perform any additional logic, such as adding the new grade to the list or database
     }
   }
 
-  Future<void> _editAcmdn(BuildContext context, Accessibility acmdn) async {
-    final editedAcmdn = await showDialog<Accessibility>(
+  Future<void> _editAcmdn(BuildContext context, Accommodation acmdn) async {
+    final editedAcmdn = await showDialog<Accommodation>(
       context: context,
       builder: (BuildContext context) {
-        final notesController = TextEditingController(text: acmdn.notes);
+        final notesController = TextEditingController(text: acmdn.desc);
         final nameController = TextEditingController(text: acmdn.name);
 
         return AlertDialog(
@@ -119,9 +125,9 @@ class SASPageState extends State<SASPage> {
                 final editedName = nameController.text;
 
                 if (editedNotes.isNotEmpty && editedName.isNotEmpty) {
-                  final updatedAcmdn = Accessibility(
+                  final updatedAcmdn = Accommodation(
                     id: acmdn.id,
-                    notes: editedNotes,
+                    desc: editedNotes,
                     name: editedName,
                   );
                   Navigator.of(context).pop(updatedAcmdn);
@@ -149,152 +155,5 @@ class SASPageState extends State<SASPage> {
       // The deletion was successful, update the list of grades
       _refreshList();
     }
-  }
-}
-
-class AddAccommodation extends StatefulWidget {
-  AddAccommodation();
-
-  @override
-  AddAccommodation_State createState() => AddAccommodation_State();
-
-
-}
-class AddAccommodation_State extends State<AddAccommodation> {
-  String selectedOption = "Not Available";
-  List<String> Options = ["Not Available", "Deadline Extension", "Accommodated Testing", "Sign Language Interpretation (ASL)", "Extra time", "Computerized Notetaking",
-    "Alternative Testing space", "Scribe"];
-  final studentIdController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-
-            DropdownButton<String>(
-              value: selectedOption,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedOption = newValue!;
-                });
-              },
-              items: Options.map((String grade) {
-                return DropdownMenuItem<String>(
-                  value: grade,
-                  child: Text(grade),
-                );
-              }).toList(),
-            ),
-            TextField(
-              controller: studentIdController,
-              decoration: InputDecoration(labelText: 'notes'),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          String n = studentIdController.text;
-          String g = selectedOption;
-          final newAcmdn = Accessibility(
-            notes: n,
-            name: g,
-          );
-
-          SASModel gradesModel=new SASModel();
-          gradesModel.insertAcmdn(newAcmdn).then((newNotes) {
-            if (newNotes != null) {
-              //Navigator.of(context).pop(newGrade);
-              Navigator.of(context).push(
-                MaterialPageRoute<List<String>>(builder: (BuildContext context) {
-                  return SASPage();
-                }),
-              );
-            }
-          });
-        },
-        child: Icon(Icons.save),
-      ),
-    );
-  }
-}
-
-//-----------------------------------------------------------------
-class DBUtils{
-  static Future init() async{
-    late Database db;
-    final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'accessibility.db');
-
-
-    db = await openDatabase(path, version: 1, onCreate: (Database db, int version) {
-
-      db.execute('''
-        CREATE TABLE accessibility (
-          id INTEGER PRIMARY KEY,
-          name TEXT,
-          notes TEXT
-        )
-      ''');
-    });
-
-
-    return db;
-  }
-}
-
-//------------------------------------------------------------------------------
-
-class SASModel{
-
-  //Grade_Model grade_model=Grade_Model();
-  Future<List<Accessibility>> getAll() async {
-    final db = await DBUtils.init();
-    final List<Map<String, dynamic>> gradeMaps = await db.query('accessibility');
-
-    List<Accessibility> accommodations = [];
-
-    for (var map in gradeMaps) {
-
-      accommodations.add(Accessibility.fromMap(map));
-    }
-
-    return accommodations;
-  }
-
-  Future<int> insertAcmdn(Accessibility g) async {
-    final db = await DBUtils.init();
-    final id = await db.insert(
-      'accessibility',
-      g.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    return id;
-  }
-
-  Future<int> updateAcmdn(Accessibility g) async {
-    final db = await DBUtils.init();
-    final rowsUpdated = await db.update(
-      'accessibility',
-      g.toMap(),
-      where: 'id = ?',
-      whereArgs: [g.id],
-    );
-    return rowsUpdated;
-  }
-
-  Future<int> deleteAcmdnById(int? id) async {
-    final db = await DBUtils.init();
-    final rowsDeleted = await db.delete(
-      'accessibility',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    return rowsDeleted;
   }
 }

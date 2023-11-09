@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/schedule_model.dart';
 
 class ScheduleSavedListPage extends StatefulWidget {
   const ScheduleSavedListPage({super.key});
@@ -9,7 +10,7 @@ class ScheduleSavedListPage extends StatefulWidget {
 
 class _ScheduleSavedListPageState extends State<ScheduleSavedListPage> {
   //get list of schedules from database...
-
+  List<Schedule>? schedules;
   //not sure how to handle cloud storage yet, but probably want to
   // check local and cloud data and update local? if there are changes
   //or make it manual instead, so the user has to click a button - "upload schedules to cloud" and "download schedules to cloud"

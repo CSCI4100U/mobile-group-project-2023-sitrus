@@ -4,6 +4,8 @@
 //also buttons leading to external site (university website) for renewing accommodations and potential other things
 
 import 'package:flutter/material.dart';
+import 'accommodations_list_page.dart';
+import 'accommodations_letter_email_page.dart';
 
 class SASHomePage extends StatelessWidget {
   SASHomePage({super.key});
@@ -38,7 +40,12 @@ class SASHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  ViewAccommodations()),
+                );
+              },
               label: Text("View Accommodations")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
@@ -74,8 +81,14 @@ class SASHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
-              label: Text("Email Professors")),
+              onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
+                );
+              },
+              label: Text("Send Accommodation Letters")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
               icon: Icon(

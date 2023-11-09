@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'models/sas_model/Accommodation.dart';
 import 'models/sas_model/Sas_ModelSQLite.dart';
-import 'pages/AddAccommodation.dart';
+import 'pages/accommodations_add_page.dart';
 class ViewAccommodations extends StatefulWidget {
   @override
   ViewAccommodationsState createState() => ViewAccommodationsState();

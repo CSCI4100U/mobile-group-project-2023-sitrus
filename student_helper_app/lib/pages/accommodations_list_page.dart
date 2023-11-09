@@ -298,30 +298,3 @@ class SASModel{
     return rowsDeleted;
   }
 }
-
-
-
-//--------------------------------------------------------------------------------
-class Accessibility{
-  Accessibility({this.id, this.name, this.notes});
-  int? id;
-  //String? Student;
-  String? name;
-  String? notes;
-
-  Map<String, Object?> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'notes': notes,
-    };
-  }
-
-  Accessibility.fromMap(Map map) {
-
-    this.id=map['id'];
-    this.name=map['name'];
-    this.notes=map['notes'];
-  }
-
-}

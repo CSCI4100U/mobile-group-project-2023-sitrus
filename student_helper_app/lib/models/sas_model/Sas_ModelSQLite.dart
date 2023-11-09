@@ -2,6 +2,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'Accommodation.dart';
 
+
+//will add firebase version later
 class SASModel{
 
   Future<List<Accommodation>> getAll() async {

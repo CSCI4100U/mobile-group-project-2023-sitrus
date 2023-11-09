@@ -1,5 +1,7 @@
 //list of the accommodations that the user has
 
+import 'package:flutter/material.dart';
+
 class SASPage extends StatefulWidget {
   @override
   SASPageState createState() => SASPageState();

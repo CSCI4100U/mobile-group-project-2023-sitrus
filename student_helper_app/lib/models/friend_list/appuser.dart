@@ -72,9 +72,12 @@ class AppUser {
     };
   }
 
-
   // Method to generate an initial-based avatar if no icon is provided
   String getInitials() {
     return ((firstName.isNotEmpty ? firstName[0] : '') + (lastName.isNotEmpty ? lastName[0] : '')).toUpperCase();
+  }
+
+  String getFullName() {
+    return [firstName, if (middleName?.isNotEmpty ?? false) middleName, lastName].join(" ").trim();
   }
 }

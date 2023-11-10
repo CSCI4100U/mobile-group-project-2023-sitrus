@@ -127,7 +127,6 @@ class _FriendListPageState extends State<FriendListPage> {
           return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          // Debug: Print the error to the console
           print('Error loading friends: ${snapshot.error}');
           return Center(child: Text('Error: ${snapshot.error.toString()}'));
         }
@@ -136,7 +135,6 @@ class _FriendListPageState extends State<FriendListPage> {
         }
 
         List<AppUser> friendsList = snapshot.data!;
-        // Debug: Print the number of friends to build
         print('Building list for ${friendsList.length} friends');
 
         return ListView.builder(
@@ -147,37 +145,37 @@ class _FriendListPageState extends State<FriendListPage> {
             return FutureBuilder<String>(
               future: _getLastMessage(currentUserId, friend.uid, friendFullName),
               builder: (context, snapshot) {
-                String lastMessage = snapshot.data ?? 'No messages';
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  lastMessage = 'Loading...';
+                  return ListTile(
+                    leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
+                    title: Text('${friendFullName} - ${friend.status}'),
+                    subtitle: const Text('Loading...'),
+                    trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
+                  );
                 }
+                if (snapshot.hasError) {
+                  return ListTile(
+                    leading: const Icon(Icons.account_circle, size: 40),
+                    title: Text('${friendFullName} - ${friend.status}'),
+                    subtitle: Text('Error: ${snapshot.error}'),
+                  );
+                }
+                String lastMessage = snapshot.data ?? 'No messages';
                 return ListTile(
-                  leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
-                  title: Text('${"${friend.firstName} ${friend.middleName} ${friend.lastName}"} - ${friend.status}'),
-                  subtitle: Text(
-                    '${friend.uid == currentUserUid ? 'Me' : friend.firstName}: $lastMessage',
-                  ),
+                  leading: const Icon(Icons.account_circle, size: 40),
+                  title: Text('${friendFullName} - ${friend.status}'),
+                  subtitle: Text(lastMessage),
                   trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   onTap: () async {
-                    // Navigate to chat page (needs to be implemented accordingly)
                     final AppUser user = await _fetchCurrentUser();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChatPage(
-                          userName: [
-                            user.firstName,
-                            if (user.middleName?.isNotEmpty ?? false) user.middleName,
-                            user.lastName
-                          ].join(" "),
-                          // The name of the friend
-                          friendName: [
-                            friend.firstName,
-                            if (friend.middleName?.isNotEmpty ?? false) friend.middleName,
-                            friend.lastName
-                          ].join(" "),
-                          friendStatus: friend.status, // The status of the friend
-                          friendUid: friend.uid, // The UID of the friend
+                          userName: user.getFullName(),
+                          friendName: friend.getFullName(),
+                          friendStatus: friend.status,
+                          friendUid: friend.uid,
                         ),
                       ),
                     );
@@ -191,7 +189,9 @@ class _FriendListPageState extends State<FriendListPage> {
     );
   }
 
-  late Future<AppUser> _currentUserFuture;
+
+
+late Future<AppUser> _currentUserFuture;
 
   @override
   void initState() {
@@ -410,80 +410,68 @@ class _FriendListPageState extends State<FriendListPage> {
   }
 
   Future<String> _getLastMessage(String currentUserId, String friendUid, String friendFullName) async {
-    try {
-      // Debug: Print the UIDs being used for the query
-      print('Getting last message for:');
-      print('Current User ID: $currentUserId');
-      print('Friend User ID: $friendUid');
+    print('Debug: Starting _getLastMessage');
+    print('Debug: Current User ID: $currentUserId');
+    print('Debug: Friend User ID: $friendUid');
+    print('Debug: Friend Full Name: $friendFullName');
 
+    try {
+      // Perform the queries
       final querySnapshotSender = await FirebaseFirestore.instance
           .collection('messages')
-          .where('sender', isEqualTo: currentUserId)
-          .where('receiver', isEqualTo: friendUid)
+          .where('senderUid', isEqualTo: currentUserId)
+          .where('receiverUid', isEqualTo: friendUid)
           .orderBy('timestamp', descending: true)
           .limit(1)
           .get();
 
       final querySnapshotReceiver = await FirebaseFirestore.instance
           .collection('messages')
-          .where('sender', isEqualTo: friendUid)
-          .where('receiver', isEqualTo: currentUserId)
+          .where('senderUid', isEqualTo: friendUid)
+          .where('receiverUid', isEqualTo: currentUserId)
           .orderBy('timestamp', descending: true)
           .limit(1)
           .get();
-      // Then compare the timestamps of querySnapshotSender.docs.first and querySnapshotReceiver.docs.first
-      // and take the most recent one.
 
-      QuerySnapshot querySnapshot;
+      // Log the results of the queries
+      print('Debug: Sender querySnapshot data: ${querySnapshotSender.docs}');
+      print('Debug: Receiver querySnapshot data: ${querySnapshotReceiver.docs}');
+      print('Debug: Sender messages count: ${querySnapshotSender.docs.length}');
+      print('Debug: Receiver messages count: ${querySnapshotReceiver.docs.length}');
+
+      // Determine which message is the latest
+      DocumentSnapshot? latestMessageSnapshot;
       if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
-        // If both sender and receiver have sent messages to each other, compare the timestamps
-        final senderTimestamp = querySnapshotSender.docs.first.data()['timestamp'];
-        final receiverTimestamp = querySnapshotReceiver.docs.first.data()['timestamp'];
-        querySnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0
-            ? querySnapshotSender
-            : querySnapshotReceiver;
+        final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
+        final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
+        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
       } else if (querySnapshotSender.docs.isNotEmpty) {
-        // If only the sender has sent a message, use that
-        querySnapshot = querySnapshotSender;
+        latestMessageSnapshot = querySnapshotSender.docs.first;
       } else if (querySnapshotReceiver.docs.isNotEmpty) {
-        // If only the receiver has sent a message, use that
-        querySnapshot = querySnapshotReceiver;
-      } else {
-        // If neither the sender nor receiver has sent a message, return null
+        latestMessageSnapshot = querySnapshotReceiver.docs.first;
+      }
+
+      // If no latest message, return 'No messages'
+      if (latestMessageSnapshot == null) {
+        print('Debug: No messages found');
         return 'No messages';
       }
-      if (querySnapshot.docs.isNotEmpty) {
-        // Debug: Print the document snapshot
-        if (kDebugMode) {
-          print('Last message document snapshot: ${querySnapshot.docs.first.data()}');
-        }
 
-        final messageData = querySnapshot.docs.first.data() as Map<String, dynamic>;
-        final senderUid = messageData['senderUid'];
-        final content = messageData['content'];
-        final prefix = senderUid == currentUserId ? 'Me: ' : '$friendFullName: ';
-
-        // Debug: Print the last message details
-        if (kDebugMode) {
-          print('Last message: $prefix$content');
-        }
-
-        return '$prefix$content';
-      } else {
-        // Debug: Print if no messages were found
-        if (kDebugMode) {
-          print('No messages found between $currentUserId and $friendUid');
-        }
-        return 'No messages';
-      }
+      final messageData = latestMessageSnapshot.data() as Map<String, dynamic>;
+      final messageContent = messageData['content'] ?? 'No message content';
+      final messageSenderUid = messageData['senderUid'] ?? 'No sender UID';
+      final messagePrefix = messageSenderUid == currentUserId ? 'Me: ' : '$friendFullName: ';
+      final lastMessage = '$messagePrefix$messageContent';
+      print('Debug: Last message: $lastMessage');
+      return lastMessage;
     } catch (e) {
-      // Debug: Print any errors that occur during the process
-      if (kDebugMode) {
-        print('Error fetching last message: $e');
-      }
+      print('An error occurred while fetching the last message: $e');
       return 'Error fetching messages';
     }
   }
+
+
+
 
 
   Widget _buildFloatingActionButtons() {

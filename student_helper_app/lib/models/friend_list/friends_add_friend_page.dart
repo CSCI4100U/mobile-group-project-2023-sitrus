@@ -10,35 +10,10 @@ class AddFriendPage extends StatefulWidget {
 
 class _AddFriendPageState extends State<AddFriendPage> {
   final TextEditingController _searchController = TextEditingController();
-  currentUserId() {
-    return FirebaseAuth.instance.currentUser!.uid;
-  }
-  resultId() {
-    return FirebaseFirestore.instance.collection('users').doc().id;
-  }
+  final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
   List<AppUser> searchResults = []; // Adjusted to use a User model instead of a map
 
-  // This is the mock function to simulate the search process
-  // void _search() {
-  //   // Replace this with the actual search logic
-  //   setState(() {
-  //     searchResults = [
-  //       {
-  //         'icon': Icons.person,
-  //         'name': 'John Doe',
-  //         'studentNumber': '123456',
-  //         'isFriend': false,
-  //       },
-  //       {
-  //         'icon': Icons.person,
-  //         'name': 'Jane Smith',
-  //         'studentNumber': '654321',
-  //         'isFriend': true, // This user is already a friend
-  //       },
-  //       // Add more mock results as needed for testing
-  //     ];
-  //   });
-  // }
   void _search() async {
     final queryText = _searchController.text;
     if (queryText.isNotEmpty) {
@@ -47,13 +22,13 @@ class _AddFriendPageState extends State<AddFriendPage> {
           .where('studentNumber', isEqualTo: queryText)
           .get();
 
-      final List<AppUser> users = (querySnapshot.docs
+      final List<AppUser> users = querySnapshot.docs
           .map((doc) => AppUser.fromMap(
-            {...doc.data() as Map<String, dynamic>},
-            doc.id, // Pass the document ID as the second argument
-          ))
-          .where((user) => user.id != currentUserId()) // Exclude the current user
-              .toList()).cast<AppUser>();
+        doc.data() as Map<String, dynamic>,
+        doc.id, // 'doc.id' is the 'uid' of the user document
+      ))
+          .where((user) => user.uid != currentUserUid) // Exclude the current user by their 'uid'
+          .toList();
 
       setState(() {
         searchResults = users;
@@ -61,21 +36,153 @@ class _AddFriendPageState extends State<AddFriendPage> {
     }
   }
 
-  void _sendFriendRequest(String currentUserId, String friendId) async {
-    // Add a friend request to the `friendRequests` collection
+  void _acceptFriendRequest(String requestId, String fromUserUid) async {
+
+    await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({
+      'status': 'accepted',
+    });
+
+    // Add the friend UID to the current user's friends list
+    await FirebaseFirestore.instance.collection('users').doc(currentUserUid).collection('friends').doc(fromUserUid).set({
+      'friendUid': fromUserUid,
+      'addedOn': FieldValue.serverTimestamp(),
+    });
+
+    // Also update the friend's list for the other user, if necessary
+    await FirebaseFirestore.instance.collection('users').doc(fromUserUid).collection('friends').doc(currentUserUid).set({
+      'friendUid': currentUserUid,
+      'addedOn': FieldValue.serverTimestamp(),
+    });
+  }
+
+  void _rejectFriendRequest(String requestId) async {
+    await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({
+      'status': 'rejected',
+    });
+
+    // Provide feedback to the user that the request has been rejected
+  }
+
+  void _sendFriendRequest(String currentUserUid, String friendUid) async {
     await FirebaseFirestore.instance.collection('friendRequests').add({
-      'from': currentUserId,
-      'to': friendId,
-      'status': 'pending', // Or any default status you want to use
+      'fromUid': currentUserUid,
+      'toUid': friendUid,
+      'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // Optionally, update the UI to reflect the sent request
+    // Update the UI to reflect the sent request
+  }
 
+  Future<bool> _isAlreadyRequested(String friendUid) async {
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    final requests = await FirebaseFirestore.instance
+        .collection('friendRequests')
+        .where('fromUid', isEqualTo: currentUserId)
+        .where('toUid', isEqualTo: friendUid)
+        .where('status', isEqualTo: 'pending')
+        .get();
+    return requests.docs.isNotEmpty;
+  }
+
+  Future<bool> _isAlreadyFriend(String friendUid) async {
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    final friends = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .collection('friends')
+        .doc(friendUid)
+        .get();
+    return friends.exists;
+  }
+
+  Stream<QuerySnapshot> _friendRequestsStream() {
+    final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('friendRequests')
+        .where('toUid', isEqualTo: currentUserId)
+        .where('status', isEqualTo: 'pending')
+        .snapshots();
+  }
+
+  Widget _buildFriendRequests() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _friendRequestsStream(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text('No friend requests'));
+        }
+
+        // Map the documents to widgets
+        List<Widget> friendRequestWidgets = [];
+        for (var document in snapshot.data!.docs) {
+          Map<String, dynamic> request = document.data() as Map<String, dynamic>;
+
+          // Use a FutureBuilder to fetch and display the sender's name
+          Widget tile = FutureBuilder<DocumentSnapshot>(
+            future: FirebaseFirestore.instance.collection('users').doc(request['fromUid']).get(),
+            builder: (context, senderSnapshot) {
+              if (senderSnapshot.connectionState == ConnectionState.waiting) {
+                return ListTile(
+                  leading: Icon(Icons.person_add),
+                  title: Text('Loading sender info...'),
+                );
+              }
+              if (senderSnapshot.hasError) {
+                return ListTile(
+                  leading: Icon(Icons.person_add),
+                  title: Text('Error loading sender info'),
+                );
+              }
+              if (!senderSnapshot.hasData) {
+                return ListTile(
+                  leading: Icon(Icons.person_add),
+                  title: Text('Sender info not found'),
+                );
+              }
+              var senderData = senderSnapshot.data!.data() as Map<String, dynamic>;
+              var senderName = senderData['firstName'] ?? 'Unknown';
+
+              return ListTile(
+                leading: Icon(Icons.person_add),
+                title: Text('Friend Request from: $senderName'),
+                subtitle: Text('Received at: ${request['timestamp']?.toDate().toString() ?? 'Unknown time'}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      child: Text('Accept'),
+                      onPressed: () => _acceptFriendRequest(document.id, request['fromUid']),
+                    ),
+                    TextButton(
+                      child: Text('Reject'),
+                      onPressed: () => _rejectFriendRequest(document.id),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+
+          friendRequestWidgets.add(tile);
+        }
+
+        return ListView(
+          children: friendRequestWidgets,
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Friend'),
@@ -84,6 +191,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Search box
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -96,30 +204,46 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onSubmitted: (value) => _search(),
             ),
             const SizedBox(height: 20),
+            // Results from search
             Expanded(
+              flex: 2, // Adjust the flex factor to control how much space this part should take
               child: searchResults.isNotEmpty
                   ? ListView.builder(
-                    itemCount: searchResults.length,
-                    itemBuilder: (context, index) {
-                      var result = searchResults[index];
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  var result = searchResults[index];
+                  return FutureBuilder<bool>(
+                    // Combining both checks into a single Future
+                    future: Future.any([
+                      _isAlreadyRequested(result.uid),
+                      _isAlreadyFriend(result.uid),
+                    ]),
+                    builder: (context, snapshot) {
+                      bool alreadyInteracted = snapshot.data ?? false;
                       return ListTile(
-                        leading: Icon(result.icon as IconData?), // You can use initials or a profile picture here
-                        title: Text('${result.firstName} ${result.middleName} ${result.lastName}'),
+                        leading: Icon(Icons.person), // Adjust as necessary
+                        title: Text('${result.firstName} ${result.middleName ?? ""} ${result.lastName}'),
                         subtitle: Text(result.studentNumber),
                         trailing: ElevatedButton(
                           child: const Text('Add'),
-                          onPressed: () {
-                             _sendFriendRequest(currentUserId(), resultId()); // Replace currentUserId with the actual current user ID
+                          onPressed: alreadyInteracted ? null : () {
+                            _sendFriendRequest(currentUserUid, result.uid); // Use the actual UID
                           },
-                      // Disable the button if already friends or if a request has been sent
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.blue, // Use your theme color here
-                      ),
-                    ),
+                          style: ElevatedButton.styleFrom(
+                            primary: alreadyInteracted ? Colors.grey : Colors.blue, // Grey out if already interacted
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               )
-                  : const Center(child: Text('No result.')),
+                  : const Center(child: Text('No results')),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              flex: 1, // Adjust the flex factor to control how much space this part should take
+              child: _buildFriendRequests(), // This will display the friend requests
             ),
           ],
         ),

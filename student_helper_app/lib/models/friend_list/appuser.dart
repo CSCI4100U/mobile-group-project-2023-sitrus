@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppUser {
-  final String? id;
-  final String studentNumber;
-  final String firstName;
+  final String uid;
+  late final String studentNumber;
+  late final String firstName;
   final String? middleName;
   final String lastName;
   final String email;
@@ -14,9 +14,10 @@ class AppUser {
   final String? major;
   final String? description;
   final String? icon;
+  final List<String>? friendList;
 
   AppUser({
-    this.id,
+    required this.uid,
     required this.studentNumber,
     required this.firstName,
     this.middleName,
@@ -29,12 +30,13 @@ class AppUser {
     this.major,
     this.description,
     this.icon,
+    this.friendList,
   });
 
   // Helper method to create a User object from a map
-  factory AppUser.fromMap(Map<String, dynamic> data, String documentId) {
+  factory AppUser.fromMap(Map<String, dynamic> data, String uid) {
     return AppUser(
-      id: documentId,
+      uid: uid, // Use the document UID from Firestore
       studentNumber: data['studentNumber'] ?? '',
       firstName: data['firstName'] ?? '',
       middleName: data['middleName'],
@@ -47,6 +49,7 @@ class AppUser {
       major: data['major'],
       description: data['description'],
       icon: data['icon'],
+      friendList: data['friendList'] != null ? List<String>.from(data['friendList']) : null,
     );
   }
 
@@ -65,6 +68,7 @@ class AppUser {
       'major': major,
       'description': description,
       'icon': icon,
+      'friendList': friendList,
     };
   }
 

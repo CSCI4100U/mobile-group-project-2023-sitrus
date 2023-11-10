@@ -12,79 +12,84 @@ class DatabaseHelper {
   static Database? _database;
   Future<Database> get database async {
     if (_database != null) return _database!;
-    // Lazily instantiate the db the first time it is accessed.
     _database = await _initDatabase();
     return _database!;
   }
 
-  // Open the database and create it if it doesn't exist
-  _initDatabase() async {
-    String path = join(await getDatabasesPath(), _databaseName);
-    return await openDatabase(path,
-        version: _databaseVersion,
-        onCreate: _onCreate);
-  }
-
-  // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid TEXT,
             timestamp TEXT NOT NULL,
             sender TEXT NOT NULL,
+            senderUid TEXT NOT NULL,
             receiver TEXT NOT NULL,
+            receiverUid TEXT NOT NULL,
             content TEXT NOT NULL,
-            edited INTEGER NOT NULL
+            edited INTEGER NOT NULL,
+            deleted INTEGER NOT NULL DEFAULT 0
           )
           ''');
   }
 
-  // Method to insert a message into the database
+  Future<Database> _initDatabase() async {
+    String path = join(await getDatabasesPath(), _databaseName);
+    return await openDatabase(path,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade); // Add the onUpgrade parameter here
+  }
+
+  // This is called when the database version is incremented.
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // If you are moving from version 1 to version 2
+    if (oldVersion < 2) {
+      // Add a new 'uid' column of type TEXT
+      await db.execute('ALTER TABLE $table ADD COLUMN uid TEXT');
+    }
+    // Handle any other upgrades here...
+  }
+
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
     return await db.insert(table, row);
   }
 
-  // Method to query all rows (messages) from the database
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
     return await db.query(table);
   }
 
-  // Method to delete a message from the database by id
-  Future<int> delete(int id) async {
+  Future<int> delete(int uid) async {
     Database db = await instance.database;
-    return await db.delete(table, where: 'id = ?', whereArgs: [id]);
+    return await db.delete(table, where: 'uid = ?', whereArgs: [uid]);
   }
 
-  // Method to update a message in the database
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    int id = row['id'];
-    return await db.update(table, row, where: 'id = ?', whereArgs: [id]);
+    int uid = row['uid'];
+    return await db.update(table, row, where: 'uid = ?', whereArgs: [uid]);
   }
 
-  // Method to query messages for a specific conversation
-  Future<List<Map<String, dynamic>>> queryMessages(String sender, String receiver) async {
+  Future<List<Map<String, dynamic>>> queryMessages(String senderUid, String receiverUid) async {
     Database db = await instance.database;
     return await db.query(
       table,
-      where: '(sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)',
-      whereArgs: [sender, receiver, receiver, sender],
+      where: '(senderUid = ? AND receiverUid = ?) OR (senderUid = ? AND receiverUid = ?)',
+      whereArgs: [senderUid, receiverUid, receiverUid, senderUid],
     );
   }
 
-  // Method to delete all messages in a specific conversation
-  Future<int> deleteConversation(String sender, String receiver) async {
+  Future<int> deleteConversation(String senderUid, String receiverUid) async {
     Database db = await instance.database;
     return await db.delete(
       table,
-      where: '(sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)',
-      whereArgs: [sender, receiver, receiver, sender],
+      where: '(senderUid = ? AND receiverUid = ?) OR (senderUid = ? AND receiverUid = ?)',
+      whereArgs: [senderUid, receiverUid, receiverUid, senderUid],
     );
   }
 
-  // Method to delete all messages from the database
   Future<int> deleteAllMessages() async {
     Database db = await instance.database;
     return await db.delete(table);

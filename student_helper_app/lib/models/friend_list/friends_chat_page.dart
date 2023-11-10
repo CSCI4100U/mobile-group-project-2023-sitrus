@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,20 +6,27 @@ import 'local_storage.dart';
 import 'message.dart';
 
 class ChatPage extends StatefulWidget {
+  final String userName;
   final String friendName;
   final String friendStatus;
+  final String friendUid; // Add this line
 
-  const ChatPage({super.key,  required this.friendName, required this.friendStatus});
+  const ChatPage({
+    Key? key,
+    required this.userName,
+    required this.friendName,
+    required this.friendStatus,
+    required this.friendUid, // Add this line
+  }) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<Message> messages = []; // Make sure to use the Message model
+  List<Message> messages = []; // Use the Message model
 
   // State variable to hold the background setting
   Color _backgroundColor = Colors.white; // Default to white
@@ -53,8 +61,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _loadMessages() async {
-    final List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryMessages('user', widget.friendName);
+    // Assuming 'userUid' is the UID of the current logged-in user.
+    final String userUid = FirebaseAuth.instance.currentUser!.uid;
+    // 'friendUid' needs to be provided to this widget.
+    final String friendUid = widget.friendUid; // You need to add this variable to your widget.
+
+    final List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryMessages(userUid, friendUid);
     final List<Message> loadedMessages = messageMaps.map((messageMap) => Message.fromMap(messageMap)).toList();
+
     setState(() {
       messages = loadedMessages;
     });
@@ -99,7 +113,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // Method to delete all chat history with the current associate
   Future<void> _deleteChatHistory() async {
-    await DatabaseHelper.instance.deleteConversation('user', widget.friendName);
+    await DatabaseHelper.instance.deleteConversation(widget.userName, widget.friendName);
     setState(() {
       messages.clear();
     });
@@ -162,31 +176,32 @@ class _ChatPageState extends State<ChatPage> {
       return;
     }
 
-    // Create a new message object
+    // Assuming 'userUid' is the UID of the current logged-in user and 'friendUid' is provided to the widget.
+    final String userUid = FirebaseAuth.instance.currentUser!.uid;
+    final String friendUid = widget.friendUid; // You need to add this variable to your widget.
+
+    // Create a new message object with UIDs
     final Message newMessage = Message(
-      timestamp: DateTime.now(), // Use local timestamp or server-side timestamp
-      sender: 'user', // Replace with actual sender ID or username
-      receiver: widget.friendName, // Replace with actual receiver ID or username
+      timestamp: DateTime.now(),
+      sender: widget.userName, // Replace with the actual sender's name or username
+      senderUid: userUid,
+      receiver: widget.friendName,
+      receiverUid: friendUid,
       content: content,
       edited: false,
+      deleted: false, // Include the 'deleted' field
     );
 
     // Convert the message to a map before storing it
     final Map<String, dynamic> messageMap = newMessage.toMap();
 
-    // Store the message locally
+    // Store the message locally and send to Firestore
     try {
-      int id = await DatabaseHelper.instance.insert(messageMap);
-
-      // Assuming you have a method that converts a map to a Message object
-      Message localStoredMessage = Message.fromMap({
-        ...messageMap,
-        'id': id, // Use the auto-generated ID from the local database
-      });
+      int uid = await DatabaseHelper.instance.insert(messageMap);
 
       // Update the local messages list
       setState(() {
-        messages.insert(0, localStoredMessage);
+        messages.insert(0, newMessage);
         _messageController.clear();
         _scrollToBottom();
       });
@@ -194,16 +209,13 @@ class _ChatPageState extends State<ChatPage> {
       // Send the message to Firestore
       await FirebaseFirestore.instance.collection('messages').add(messageMap);
 
-      // Once the message is sent successfully, update the message in the local database
-      Message sentMessage = localStoredMessage.copyWith(edited: false, deleted: false);
-      await DatabaseHelper.instance.update(sentMessage.toMap());
+      // Handle message sent successfully...
 
     } catch (e) {
       // Handle the error, e.g., show a snackbar
       if (kDebugMode) {
         print('Error when sending message: $e');
       }
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to send message. Please try again.'),
@@ -214,20 +226,20 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // This method is used to delete a message
-  void _deleteMessage(int id) async {
+  void _deleteMessage(int uid) async {
     // Mark as deleted in local database
-    Message? localMessage = messages.firstWhere((message) => message.id == id);
+    Message? localMessage = messages.firstWhere((message) => message.uid == uid);
     Message deletedMessage = localMessage.copyWith(deleted: true); // Add a 'deleted' field to your Message class
     await DatabaseHelper.instance.update(deletedMessage.toMap());
 
     // Mark as deleted in Firestore
-    FirebaseFirestore.instance.collection('messages').doc(id.toString()).update({
+    FirebaseFirestore.instance.collection('messages').doc(uid.toString()).update({
       'deleted': true,
     });
 
     // Update UI
     setState(() {
-      messages.removeWhere((message) => message.id == id);
+      messages.removeWhere((message) => message.uid == uid);
     });
 
     // Show a snackbar message
@@ -238,21 +250,21 @@ class _ChatPageState extends State<ChatPage> {
 
 
 // This method is used to edit a message
-  void _editMessage(int id, String newContent) async {
+  void _editMessage(int uid, String newContent) async {
     // Update local database
-    Message? localMessage = messages.firstWhere((message) => message.id == id);
+    Message? localMessage = messages.firstWhere((message) => message.uid == uid);
     Message updatedMessage = localMessage.copyWith(content: newContent, edited: true, deleted: false);
     await DatabaseHelper.instance.update(updatedMessage.toMap());
 
     // Update Firestore
-    FirebaseFirestore.instance.collection('messages').doc(id.toString()).update({
+    FirebaseFirestore.instance.collection('messages').doc(uid.toString()).update({
       'content': newContent,
       'edited': true,
     });
 
     // Update UI
     setState(() {
-      int index = messages.indexWhere((message) => message.id == id);
+      int index = messages.indexWhere((message) => message.uid == uid);
       if (index != -1) {
         messages[index] = updatedMessage;
       }
@@ -267,8 +279,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // This method is used to load messages from Firestore
   void _loadMessagesFromCloud() {
-    // Assuming 'user' is the ID of the current user
-    String currentUserID = 'user'; // Replace with the actual user identifier
+    String currentUserID = widget.userName; // Replace with the actual user identifier
     String friendID = widget.friendName; // Replace with the actual friend identifier
 
     FirebaseFirestore.instance
@@ -306,18 +317,21 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       // Update the UI, similar to above
+
     });
   }
 
   void _loadMessagesFromLocal() async {
-    List<Message> localMessages = (await DatabaseHelper.instance.queryAllRows()).cast<Message>();
+    List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryAllRows();
+    List<Message> localMessages = messageMaps.map((messageMap) => Message.fromMap(messageMap)).toList();
     setState(() {
       messages = localMessages;
     });
   }
 
+
   Widget _buildMessageItem(Message message) {
-    bool isUserMessage = message.sender == 'user';
+    bool isUserMessage = message.sender == widget.userName;
     return Row(
       mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
@@ -367,7 +381,7 @@ class _ChatPageState extends State<ChatPage> {
               onTap: () {
                 // delete logic
                 Navigator.pop(context);
-                _deleteMessage(message.id!); // Assuming id is not null here
+                _deleteMessage(message.uid! as int); // Assuming id is not null here
               },
             ),
           ],
@@ -398,7 +412,7 @@ class _ChatPageState extends State<ChatPage> {
               child: const Text('Save'),
               onPressed: () {
                 if (editController.text.trim().isNotEmpty) {
-                  _editMessage(message.id!, editController.text.trim());
+                  _editMessage(message.uid! as int, editController.text.trim());
                 }
                 Navigator.of(context).pop();
               },

@@ -2,17 +2,22 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Import the 'AppUser' class from a separate file
+import 'friend_login_page.dart';
 import 'appuser.dart';
 
 // Create a 'UserProfilePage' class that extends 'StatefulWidget'
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({super.key});
-  // Override the createState() method to create a stateful instance
+  final String userId; // Add this line
+
+  const UserProfilePage({super.key, required this.userId}); // Modify this line to include the userId
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
+
 
 // Create the state class for the 'UserProfilePage'
 class _UserProfilePageState extends State<UserProfilePage> {
@@ -42,7 +47,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     // Fetch a document from Firestore based on the 'userId'
     DocumentSnapshot userData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(currentUserId())
+        .doc(widget.userId)  // Use widget.userId
         .get();
     if (userData.exists && userData.data() != null) {
       // If the document exists and contains data, update the UI
@@ -96,22 +101,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (_user != null) {
       FirebaseFirestore.instance
           .collection('users')
-          .doc(currentUserId()) // Update the current user's document
+          .doc(_user!.uid) // Use _user!.id instead of currentUserId()
           .update({field: newValue})
           .then((_) {
-        // Update local user object and UI (not implemented here)
-      })
-          .catchError((error) {
-        // Handle errors (not implemented here)
+        setState(() {
+          // Update the local user object
+          if (field == 'firstName') {
+            _user!.firstName = newValue;
+          } else if (field == 'studentNumber') {
+            _user!.studentNumber = newValue;
+          }
+          // Add else if branches for other fields as necessary
+        });
+        // Optionally, show a snackbar to confirm the update
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$field updated successfully.'), backgroundColor: Colors.green),
+        );
+      }).catchError((error) {
+        // Handle errors, possibly show a snackbar with the error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update $field.'), backgroundColor: Colors.red),
+        );
       });
     }
   }
 
   // Define a method to handle user logout
-  void _logout() async {
+  Future<void> _logout() async {
+    // Clear the "Remember Me" flag from SharedPreferences
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('remember_me');
+
+    // Sign out from Firebase Auth
     await FirebaseAuth.instance.signOut();
-    // Navigate to the login page after logout
-    Navigator.of(context).pushReplacementNamed('/login');
+
+    // Navigate to the login screen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   }
 
   // Override the 'dispose()' method to release resources
@@ -178,9 +205,52 @@ class _UserProfilePageState extends State<UserProfilePage> {
             onTap: () => _editField(
                 'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
           ),
-          // ... Other profile fields go here ...
           ListTile(
-            title: const Text('Logout', style: TextStyle(color: Colors.red)),
+            title: Text(_user!.lastName),
+            subtitle: const Text('Last Name'),
+            onTap: () => _editField(
+                'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.email),
+            subtitle: const Text('Email'),
+          ),
+          ListTile(
+            title: Text(_user!.phoneNumber ?? 'Not provided'),
+            subtitle: const Text('Phone Number'),
+            onTap: () => _editField(
+                'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.birthday != null
+                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                : 'Not provided'),
+            subtitle: const Text('Birthday'),
+            onTap: () => _editField(
+                'Birthday', _user!.birthday != null
+                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                : '', (newValue) => _saveProfile('birthday', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.grade ?? 'Not provided'),
+            subtitle: const Text('Grade'),
+            onTap: () => _editField(
+                'Grade', _user!.grade ?? '', (newValue) => _saveProfile('grade', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.major ?? 'Not provided'),
+            subtitle: const Text('Major'),
+            onTap: () => _editField(
+                'Major', _user!.major ?? '', (newValue) => _saveProfile('major', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.description ?? 'Not provided'),
+            subtitle: const Text('Description'),
+            onTap: () => _editField(
+                'Description', _user!.description ?? '', (newValue) => _saveProfile('description', newValue)),
+          ),
+          ListTile(
+            title: const Text('Logout', style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
             onTap: _logout,
           ),
         ],

@@ -1,18 +1,42 @@
 import 'package:flutter/material.dart';
+import 'course_model.dart';
 
 class ScheduleFormsWidget {
-  int? courseNum;
+
+  Course getCourse() {
+    ClassTime classTime = ClassTime(
+        HourMinute(startHour.value, startMinute.value),
+        HourMinute(endHour.value, endMinute.value));
+    Course course = Course("${courseNameController.text}", [classTime]);
+    return course;
+  }
+
+  final ValueNotifier<int> startHour = ValueNotifier<int>(0);
+  final ValueNotifier<int> startMinute = ValueNotifier<int>(0);
+  final ValueNotifier<int> endHour = ValueNotifier<int>(0);
+  final ValueNotifier<int> endMinute = ValueNotifier<int>(0);
+  final ValueNotifier<String> selectedDay = ValueNotifier<String>('Monday');
+  final TextEditingController courseNameController = TextEditingController();
 
   List<int> hours = List.generate(24, (index) => index);
   List<int> minutes = List.generate(60, (index) => index);
-  final ValueNotifier<int> selectedHour = ValueNotifier<int>(0);
-  final ValueNotifier<int> selectedMinute = ValueNotifier<int>(0);
+  List<String> daysOfWeek = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+  ];
+
+  int? courseNum;
 
   //
-  int? numClasses;
-  int? numDependencies;
-
-  ScheduleFormsWidget(this.courseNum, this.numClasses, this.numDependencies);
+  // int? numClasses;
+  // int? numDependencies;
+  //
+  // ScheduleFormsWidget(this.courseNum, this.numClasses, this.numDependencies);
 
   Widget build(BuildContext context) {
 
@@ -21,9 +45,12 @@ class ScheduleFormsWidget {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              TextFormField(
-                decoration:
-                    InputDecoration(labelText: 'Course ${courseNum! + 1} Name:'),
+              Text('Course ${courseNum! + 1}'),
+              TextField(
+                controller: courseNameController,
+                decoration: InputDecoration(
+                  labelText: 'Enter course name',
+                ),
               ),
               Container(
                 color: Colors.blue[400],
@@ -32,24 +59,40 @@ class ScheduleFormsWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text("Class Meeting Time"),
-                          //NEED TO FIGURE OUT HOW TO MAKE THE DROPDOWN ACTUALLY WORK
+                          ValueListenableBuilder<String>(
+                            valueListenable: selectedDay,
+                            builder: (context, value, child) {
+                              return DropdownButton<String>(
+                                value: value,
+                                items: daysOfWeek.map((day) {
+                                  return DropdownMenuItem<String>(
+                                    value: day,
+                                    child: Text(day),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  selectedDay.value = value!;
+                                },
+                              );
+                            },
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Start Time: ", style: TextStyle(fontSize: 18.0)),
                               ValueListenableBuilder<int>(
-                                valueListenable: selectedHour,
+                                valueListenable: startHour,
                                 builder: (context, value, child) {
                                   return DropdownButton<int>(
                                     value: value,
                                     items: hours.map((hour) {
                                       return DropdownMenuItem<int>(
                                         value: hour,
-                                        child: Text('$hour' + 'h'),
+                                        child: Text('$hour'.padLeft(2, '0')),
                                       );
                                     }).toList(),
                                     onChanged: (int? value) {
-                                      selectedHour.value = value!;
+                                      startHour.value = value!;
                                     },
                                   );
                                 },
@@ -67,6 +110,41 @@ class ScheduleFormsWidget {
                                     }).toList(),
                                     onChanged: (int? value) {
                                       selectedMinute.value = value!;
+                                    },
+                                  );
+                                },
+                              ),
+                              Text("End Time: ", style: TextStyle(fontSize: 18.0)),
+                              ValueListenableBuilder<int>(
+                                valueListenable: endHour,
+                                builder: (context, value, child) {
+                                  return DropdownButton<int>(
+                                    value: value,
+                                    items: hours.map((hour) {
+                                      return DropdownMenuItem<int>(
+                                        value: hour,
+                                        child: Text('$hour'.padLeft(2, '0')),
+                                      );
+                                    }).toList(),
+                                    onChanged: (int? value) {
+                                      endHour.value = value!;
+                                    },
+                                  );
+                                },
+                              ),
+                              ValueListenableBuilder<int>(
+                                valueListenable: endMinute,
+                                builder: (context, value, child) {
+                                  return DropdownButton<int>(
+                                    value: value,
+                                    items: minutes.map((minute) {
+                                      return DropdownMenuItem<int>(
+                                        value: minute,
+                                        child: Text('$minute'.padLeft(2, '0')),
+                                      );
+                                    }).toList(),
+                                    onChanged: (int? value) {
+                                      endMinute.value = value!;
                                     },
                                   );
                                 },

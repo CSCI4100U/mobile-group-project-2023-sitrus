@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'schedule_display_generated_page.dart';
+import '../models/course_model.dart';
 import '../models/schedule_formsWidget.dart';
 
 class CreateNewSchedulePage extends StatefulWidget {
@@ -9,8 +11,17 @@ class CreateNewSchedulePage extends StatefulWidget {
 }
 
 class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
+
   @override
   Widget build(BuildContext context) {
+
+    List<ScheduleFormsWidget> courseWidgets = [
+      ScheduleFormsWidget(),
+      ScheduleFormsWidget(),
+      ScheduleFormsWidget(),
+    ];
+    List<Course> courses = [];
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -18,18 +29,27 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
           //TEMPORARY BUTTON TO RELOAD PAGE VIA SETSTATE, WILL NEED TO CREATE A FUNCTION OR SOMETHING TO RELOAD SPECIFIC WIDGETS
           actions: [
             IconButton(
-                onPressed: () {setState(() {
-
-                });},
-                icon: Icon(Icons.change_circle))
+              onPressed: () {
+                for (int i = 0; i < courseWidgets.length; i++) {
+                  // print("${courseWidgets[i].getCourse().className} start time: ${courseWidgets[i].getCourse().times![0].startTime!.convertToInt()}");
+                  courses.add(courseWidgets[i].getCourse());
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DisplayGeneratedSchedulesPage(courses: courses)),
+                );
+              },
+              icon: Icon(Icons.navigate_next),
+            )
           ],
         ),
         body: ListView.separated(
             padding: EdgeInsets.all(10.0),
-            itemCount: 5, // temp
+            itemCount: courseWidgets.length, // temp
             separatorBuilder: (context, index) => Divider(height: 2),
             itemBuilder: (context, index) {
-              return ScheduleFormsWidget(index, 1, 1).build(context);
+              return courseWidgets[index].build(context);
             })
     );
   }

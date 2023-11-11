@@ -105,7 +105,12 @@ class SASHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
+                );
+              },
               label: Text("Renew Accommodations")),
         ],
       ),

@@ -3,9 +3,16 @@
 
 //some notes... potential notifications: friend request received and accepted, accommodations renewal reminder
 
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, PhoneAuthProvider;
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'package:student_helper_project/pages/login_page.dart';
+
+import 'app_state.dart';
+import 'authentication.dart';
+import 'guest_book.dart';
+import 'widgets.dart';
 
 void _goto_login_page(context) {
   Navigator.push(
@@ -63,28 +70,24 @@ class _SettingsPageState extends State<SettingsPage> {
               });
             },
           ),
-          Container(
-            padding: EdgeInsets.all(10.0),
-            child: OutlinedButton.icon(
-                icon: Icon(
-                  Icons.login,
-                  size: 40,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 100),
+                child: Consumer<ApplicationState>(
+                  builder: (context, appState, _) => AuthFunc(
+                      loggedIn: appState.loggedIn,
+                      signOut: () {
+                        FirebaseAuth.instance.signOut();
+                      }),
                 ),
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.deepOrange,
-                    minimumSize: Size(200, 70),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0)),
-                    textStyle: TextStyle(
-                      fontSize: 36,
-                    )),
-                onPressed: () 
-                {
-                  _goto_login_page(context);
-                },
-                label: Text("Login")),
-          )
+              ),
+            ],
+          ),
+
+
+
         ],
       ),
     );

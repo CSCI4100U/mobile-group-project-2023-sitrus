@@ -8,38 +8,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'friend_login_page.dart';
 import 'appuser.dart';
 
-// Create a 'UserProfilePage' class that extends 'StatefulWidget'
+/// UserProfilePage allows viewing and editing the user profile.
 class UserProfilePage extends StatefulWidget {
-  final String userId; // Add this line
+  final String userId;
 
-  const UserProfilePage({super.key, required this.userId}); // Modify this line to include the userId
+  const UserProfilePage({super.key, required this.userId});
 
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-
-// Create the state class for the 'UserProfilePage'
 class _UserProfilePageState extends State<UserProfilePage> {
-  currentUserId() {
-    return FirebaseAuth.instance.currentUser!.uid;
-  }
-  currentUser() {
-    return FirebaseAuth.instance.currentUser!;
-  }
-  // Declare variables for the user data, loading state, and a text controller
-  AppUser? _user;
-  bool _isLoading = true;
-  TextEditingController? _controller;
+  AppUser? _user; // User data object
+  bool _isLoading = true; // Loading state indicator
+  TextEditingController? _controller; // Controller for text fields in edit dialogs
+  currentUserId() {return FirebaseAuth.instance.currentUser!.uid;}
+  currentUser() {return FirebaseAuth.instance.currentUser!;}
 
-  // Override the 'initState()' method to perform initialization tasks
   @override
   void initState() {
     super.initState();
-    // Initialize the text controller
-    _controller = TextEditingController();
-    // Fetch user data asynchronously when the widget is initialized
-    _fetchUserData();
+    _controller = TextEditingController(); // Initialize the text controller
+    _fetchUserData(); // Fetch user data when the widget is initialized
   }
 
   // Define a method to fetch user data from Firestore
@@ -96,9 +86,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Define a method to save the updated profile data to Firestore
+  // Save updated profile data to Firestore
   void _saveProfile(String field, String newValue) {
     if (_user != null) {
+      // Update Firestore document with new field value
+      // Show success or error message based on operation result
       FirebaseFirestore.instance
           .collection('users')
           .doc(_user!.uid) // Use _user!.id instead of currentUserId()
@@ -126,7 +118,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  // Define a method to handle user logout
+  // Handle user logout, clear SharedPreferences and navigate to login screen
   Future<void> _logout() async {
     // Clear the "Remember Me" flag from SharedPreferences
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -177,7 +169,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       );
     }
 
-    // Display the user's profile information and options for editing
+    // Display user profile information and provide options for editing
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),

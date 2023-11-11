@@ -2,15 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+// RegistrationPage allows a new user to register in the system.
 class RegistrationPage extends StatefulWidget {
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final _formKey = GlobalKey<FormState>();
-  DateTime? _selectedBirthday;
+  final _formKey = GlobalKey<FormState>(); // Key for the form to validate inputs
+  DateTime? _selectedBirthday; // Variable to hold the selected birthday date
 
+  // Controllers for text fields to retrieve input values
   final TextEditingController _studentNumberController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
@@ -19,20 +21,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _gradeController = TextEditingController();
   final TextEditingController _majorController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Add TextEditingControllers for each field
-
+  // Method to handle user registration
   void _register() async {
+    // Validate form fields and perform registration if valid
     if (_formKey.currentState!.validate()) {
       try {
+        // Create user with email and password
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
-
+        // Store user information in Firestore
         await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
           'studentNumber': _studentNumberController.text,
           'firstName': _firstNameController.text,
@@ -56,8 +58,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         );
 
         // Navigate to the login page after showing the Snackbar
-        Navigator.of(context).pop(); // Assuming the LoginPage is the previous page on the stack
+        Navigator.of(context).pop(); // ONLY WORK WHEN the LoginPage is the previous page on the stack
       } on FirebaseAuthException catch (e) {
+        // Handle registration error and show message to user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Registration failed: ${e.message}'),
@@ -68,6 +71,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  // Method to show date picker and select birthday
   Future<void> _selectBirthday(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -91,16 +95,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Replace with actual navigation logic
+            // Navigate back to the previous page
             Navigator.of(context).pop();
           },
         ),
       ),
       body: SingleChildScrollView(
+        // Use SingleChildScrollView to prevent overflow when keyboard appears
         child: Padding(
           padding: const EdgeInsets.all(20.0), // Add padding around the form
           child: Form(
             key: _formKey,
+            // Use Form widget to validate input
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

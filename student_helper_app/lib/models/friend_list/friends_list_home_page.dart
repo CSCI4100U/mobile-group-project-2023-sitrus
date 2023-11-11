@@ -17,32 +17,35 @@ class FriendListPage extends StatefulWidget {
 }
 
 class _FriendListPageState extends State<FriendListPage> {
-
+  // UID for the current user, obtained from Firebase Authentication
   final currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+  // Current user's status, defaulting to 'Online'
   String userStatus = 'Online';
+  // Controller for the search text field
   final searchController = TextEditingController();
+  // Boolean to track whether a search is active
   bool isSearching = false;
+  // Results from the search
   List<AppUser> searchResults = [];
+  // All messages for the current user
   List<Message> messages = [];
-
-  // Add a property to hold the list of all friends (unfiltered)
+  // A complete list of all friends, unfiltered
   List<AppUser> allFriends = [];
 
+  // Fetches the current Firebase user and converts their data to an AppUser object
   Future<AppUser> _fetchCurrentUser() async {
     User? firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
       throw Exception('Not logged in');
     }
     DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('users').doc(firebaseUser.uid).get();
-
     if (!userSnapshot.exists) {
       throw Exception('User does not exist in Firestore');
     }
-
     return AppUser.fromMap(userSnapshot.data() as Map<String, dynamic>, firebaseUser.uid);
   }
 
-
+  // Stream that listens for changes in the friends list for the current user
   Stream<List<AppUser>> _friendsStream() {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
     return FirebaseFirestore.instance
@@ -63,13 +66,13 @@ class _FriendListPageState extends State<FriendListPage> {
     });
   }
 
+  // Fetches data for a friend based on their UID
   Future<AppUser?> _fetchFriendData(String friendUid) async {
     try {
       DocumentSnapshot friendDocSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(friendUid)
           .get();
-
       if (friendDocSnapshot.exists) {
         return AppUser.fromMap(friendDocSnapshot.data() as Map<String, dynamic>, friendDocSnapshot.id);
       } else {
@@ -82,10 +85,9 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
-  // Method to delete all chat history with the current associate
+  // Deletes all chat history for the current user from Firestore
   Future<void> _deleteAllChatHistory() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
-
     // Delete messages sent by the current user
     QuerySnapshot sentMessages = await FirebaseFirestore.instance
         .collection('messages')
@@ -94,7 +96,6 @@ class _FriendListPageState extends State<FriendListPage> {
     for (var doc in sentMessages.docs) {
       await doc.reference.delete();
     }
-
     // Delete messages received by the current user
     QuerySnapshot receivedMessages = await FirebaseFirestore.instance
         .collection('messages')
@@ -103,7 +104,6 @@ class _FriendListPageState extends State<FriendListPage> {
     for (var doc in receivedMessages.docs) {
       await doc.reference.delete();
     }
-
     // Provide feedback to the user
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -117,8 +117,10 @@ class _FriendListPageState extends State<FriendListPage> {
     });
   }
 
+  // Local database helper instance for storing messages
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
+  // Backs up chat messages to local storage
   Future<void> backupChatToLocal() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -129,7 +131,7 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
-
+  // Uploads local backup of chat messages to the cloud
   Future<void> uploadLocalBackupToCloud() async {
     // Fetch messages from local storage
     List<Message> localMessages = (await _databaseHelper.queryAllMessages()).cast<Message>();
@@ -149,6 +151,7 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
+  // Shows a bottom sheet with settings options
   void _showSettings() {
     showModalBottomSheet(
       context: context,
@@ -187,6 +190,7 @@ class _FriendListPageState extends State<FriendListPage> {
     );
   }
 
+  // Builds a list of friends along with the last message sent or received
   Widget _buildFriendListWithLastMessage() {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
     List<AppUser> friendsToDisplay = isSearching ? searchResults : allFriends;
@@ -259,7 +263,7 @@ class _FriendListPageState extends State<FriendListPage> {
     );
   }
 
-  // Call this method to refresh the friends list after applying a filter
+  // Refreshes the friend list UI
   void _refreshFriendsList() {
     _friendsStream().first.then((friendsList) {
       setState(() {
@@ -271,11 +275,13 @@ class _FriendListPageState extends State<FriendListPage> {
     });
   }
 
-late Future<AppUser> _currentUserFuture;
+  late Future<AppUser> _currentUserFuture;
 
+  // Initializes the state and fetches the current user and friend list
   @override
   void initState() {
     super.initState();
+    // Fetches the current user and stores it in a Future for later use
     _currentUserFuture = _fetchCurrentUser();
     // Fetch the initial list of friends and assign it to allFriends
     _friendsStream().first.then((friendsList) {
@@ -285,6 +291,7 @@ late Future<AppUser> _currentUserFuture;
     });
   }
 
+  // Function to search for friends based on a query
   void _searchFriend(String searchQuery) async {
     if (searchQuery.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -315,6 +322,7 @@ late Future<AppUser> _currentUserFuture;
     });
   }
 
+  // Dialog to allow searching for friends
   void _showSearchDialog() {
     showDialog(
       context: context,
@@ -349,34 +357,7 @@ late Future<AppUser> _currentUserFuture;
     );
   }
 
-  // Modified method to filter friends by status
-  // void _filterFriendsByStatus(String status) {
-  //   if (status == 'All') {
-  //     setState(() {
-  //       searchResults = allFriends; // Display all friends if no filter is applied
-  //       isSearching = false;
-  //     });
-  //   } else {
-  //       final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-  //       FirebaseFirestore.instance
-  //           .collection('users')
-  //           .doc(currentUserId)
-  //           .collection('friends')
-  //           .where('status', isEqualTo: status)
-  //           .get()
-  //           .then((querySnapshot) {
-  //         final List<AppUser> filteredFriends = querySnapshot.docs
-  //             .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-  //             .toList();
-  //
-  //         setState(() {
-  //           // Filter based on the status
-  //           searchResults = allFriends.where((friend) => friend.status == status).toList();
-  //           isSearching = searchResults.isNotEmpty;
-  //         });
-  //       });
-  //     }
-  // }
+  // Filters the friends list based on status
   void _filterFriendsByStatus(String status) {
     if (status == 'All') {
       // Display all friends if no filter is applied.
@@ -393,6 +374,7 @@ late Future<AppUser> _currentUserFuture;
     }
   }
 
+  // Dialog to allow filtering friends by status
   void _showFilterDialog() {
     // Initial filter selection
     String selectedStatus = 'All';
@@ -455,6 +437,7 @@ late Future<AppUser> _currentUserFuture;
     });
   }
 
+  // Changes the user's status and updates Firestore
   void _changeUserStatus(String status) {
     setState(() {
       userStatus = status;
@@ -477,6 +460,7 @@ late Future<AppUser> _currentUserFuture;
     });
   }
 
+  // Dialog to change the current user's status
   void _showStatusChangeDialog() {
     showDialog(
       context: context,
@@ -517,6 +501,7 @@ late Future<AppUser> _currentUserFuture;
     );
   }
 
+  // Fetches the last message exchanged between the current user and a friend
   Future<String> _getLastMessage(String currentUserId, String friendUid, String friendFullName) async {
     print('Debug: Starting _getLastMessage');
     print('Debug: Current User ID: $currentUserId');
@@ -578,6 +563,7 @@ late Future<AppUser> _currentUserFuture;
     }
   }
 
+  // Builds the floating action buttons for search and settings
   Widget _buildFloatingActionButtons() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -605,6 +591,7 @@ late Future<AppUser> _currentUserFuture;
     );
   }
 
+  // Returns a color based on the user's status
   Color getStatusColor(String status) {
     switch (status) {
       case 'Online':
@@ -618,6 +605,7 @@ late Future<AppUser> _currentUserFuture;
     }
   }
 
+  // Builds the entire UI for the FriendListPage
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -655,4 +643,3 @@ late Future<AppUser> _currentUserFuture;
     );
   }
 }
-

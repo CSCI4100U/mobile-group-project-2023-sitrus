@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'local_storage.dart';
 import 'message.dart';
 
+// ChatPage widget allows users to chat with a specific friend.
 class ChatPage extends StatefulWidget {
   final String userName;
   final String friendName;
@@ -24,17 +25,18 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // Controllers for message input and scrolling
+  // Controllers for managing message input and scrolling the chat view.
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // List to hold messages
+  // List to store and display messages.
   List<Message> messages = [];
 
-  // Background color and image for chat
+  // Variables to customize chat background.
   Color _backgroundColor = Colors.white;
   String? _backgroundImage;
 
+  // Initialize state, set up scroll listener and load messages from the cloud.
   @override
   void initState() {
     super.initState();
@@ -42,7 +44,7 @@ class _ChatPageState extends State<ChatPage> {
     _loadMessagesFromCloud();
   }
 
-  // Listener for scroll events
+  // Listens to the scroll events to enable auto-scrolling functionality.
   void _scrollListener() {
     // Auto-scroll to the bottom of the chat when new message arrives
     if (_scrollController.position.atEdge) {
@@ -54,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // Method to scroll to the bottom of the chat
+  // Scrolls the chat to the latest message.
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -65,7 +67,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // Method to load messages from Firestore
+  // Loads messages from Firebase Firestore, combining both sent and received messages.
   void _loadMessagesFromCloud() {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
     String friendUid = widget.friendUid;
@@ -102,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-
+  // Shows a modal bottom sheet for chat settings.
   void _showSettings() {
     showModalBottomSheet(
       context: context,
@@ -149,7 +151,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Method to delete all chat history with the current associate
+  // Deletes the chat history between the user and their friend from Firestore.
   Future<void> _deleteChatHistory() async {
     // Delete chat history from Firestore
     QuerySnapshot sentMessages = await FirebaseFirestore.instance
@@ -177,7 +179,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // Method to show background options
+  // Shows a modal bottom sheet to allow the user to change the chat background.
   void _showBackgroundOptions() {
     showModalBottomSheet(
       context: context,
@@ -220,15 +222,14 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Method to handle image upload
+  // Handles the image upload process.
   void _uploadImage() {
     // TODO: Implement the logic for uploading an image
     // For example, using image_picker package to pick an image
     // and then setting _backgroundImage to the path of the selected image
   }
 
-  // This method is triggered when the send button is pressed
-  // Method to send a new message
+  // Sends a new message to the Firestore collection.
   void _sendMessage() async {
     final String content = _messageController.text.trim();
     if (content.isEmpty) {
@@ -261,7 +262,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // Method to delete a message
+  // Deletes a single message identified by its messageId.
   void _deleteMessage(String messageId) async {
     // Directly delete the message from Firestore
     await FirebaseFirestore.instance.collection('messages').doc(messageId).delete();
@@ -277,7 +278,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Method to edit a message
+  // Allows the user to edit a message.
   void _editMessage(String messageId, String newContent) async {
     // Update Firestore
     await FirebaseFirestore.instance.collection('messages').doc(messageId).update({
@@ -299,7 +300,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Building each message item
+  // Constructs a UI element for each message.
   Widget _buildMessageItem(Message message) {
     bool isUserMessage = message.senderUid == FirebaseAuth.instance.currentUser!.uid;
     return Row(
@@ -330,7 +331,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Message options (edit, delete)
+  // Shows options to edit or delete a message.
   void _showMessageOptions(BuildContext context, Message message) {
     showModalBottomSheet(
       context: context,
@@ -361,7 +362,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // Edit dialog
+  // Displays a dialog for editing the content of a message.
   void _showEditDialog(Message message) {
     TextEditingController editController = TextEditingController(text: message.content);
     showDialog(
@@ -398,8 +399,9 @@ class _ChatPageState extends State<ChatPage> {
   // Assume DatabaseHelper is a class that handles local database operations
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
-  // Method to backup chat history to local storage
+  // Methods for backing up and uploading chat history related to a specific friend.
   Future<void> backupChatToLocalForSpecificFriend(String friendUid) async {
+    // Saves messages with the specific friend to local storage.
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
     for (var message in messages) {
@@ -416,6 +418,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // Method to upload local backup to the cloud, only for messages between the current user and the specified friend
   Future<void> uploadLocalBackupToCloudForSpecificFriend(String friendUid) async {
+    // Uploads messages with the specific friend to the cloud.
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
 
     // Fetch messages from local storage
@@ -436,7 +439,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-
+  // Disposes controllers when the widget is disposed.
   @override
   void dispose() {
     // Dispose controllers
@@ -446,10 +449,13 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
+  // Builds the chat page UI.
   @override
   Widget build(BuildContext context) {
+    // The layout includes an AppBar, a list to display messages, and an input field to type new messages.
+    // FloatingActionButton is used for additional chat-related actions.
     return Scaffold(
-      resizeToAvoidBottomInset: true, // This is default and can be omitted if not changed before
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
@@ -483,9 +489,9 @@ class _ChatPageState extends State<ChatPage> {
                 reverse: true,
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
-                  // If your messages list is reversed, use this:
+                  // If you want to messages list is reversed, use this:
                   // Message message = messages[index];
-                  // Otherwise, if your list is in chronological order, use this:
+                  // Otherwise, if you want to list is in chronological order, use this:
                   Message message = messages[messages.length - 1 - index];
                   return _buildMessageItem(message);
                 },

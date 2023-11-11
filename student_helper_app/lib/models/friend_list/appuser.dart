@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Defines a user model for an application with fields for user details.
 class AppUser {
   final String uid;
   late final String studentNumber;
@@ -15,9 +16,10 @@ class AppUser {
   final String? description;
   final String? icon;
   final List<String>? friendList;
-  bool isFriend;
-  bool isRequested;
+  bool isFriend; // Indicates if the user is a friend
+  bool isRequested; // Indicates if a friend request has been sent
 
+  // Constructor for creating a new AppUser object with required and optional fields.
   AppUser({
     required this.uid,
     required this.studentNumber,
@@ -37,10 +39,10 @@ class AppUser {
     this.isRequested = false,
   });
 
-  // Helper method to create a User object from a map
+  // Creates a new AppUser instance from a map of key/value pairs, typically from Firestore.
   factory AppUser.fromMap(Map<String, dynamic> data, String uid) {
     return AppUser(
-      uid: uid, // Use the document UID from Firestore
+      uid: uid,
       studentNumber: data['studentNumber'] ?? '',
       firstName: data['firstName'] ?? '',
       middleName: data['middleName'],
@@ -57,7 +59,7 @@ class AppUser {
     );
   }
 
-  // Helper method to convert a User object to a map
+  // Converts the AppUser instance into a map, which is useful for uploading user data to Firestore.
   Map<String, dynamic> toMap() {
     return {
       'studentNumber': studentNumber,
@@ -76,11 +78,12 @@ class AppUser {
     };
   }
 
-  // Method to generate an initial-based avatar if no icon is provided
+  // Generates user initials from first and last name, used for displaying a default avatar.
   String getInitials() {
     return ((firstName.isNotEmpty ? firstName[0] : '') + (lastName.isNotEmpty ? lastName[0] : '')).toUpperCase();
   }
 
+  // Constructs a full name string from the first, middle, and last names.
   String getFullName() {
     return [firstName, if (middleName?.isNotEmpty ?? false) middleName, lastName].join(" ").trim();
   }

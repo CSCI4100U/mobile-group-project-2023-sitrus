@@ -109,8 +109,6 @@ class DatabaseHelper {
     return await db.update(tableUserInfo, row, where: 'email = ?', whereArgs: [email]);
   }
 
-  // In DatabaseHelper class
-
   // Method to query messages between two specific users
   Future<List<Message>> queryMessagesBetween(String userUid, String friendUid) async {
     Database db = await instance.database;

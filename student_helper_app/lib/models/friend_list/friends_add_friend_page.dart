@@ -4,32 +4,40 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'appuser.dart';
 
+// This page allows users to search for other users by their student number and manage friend requests.
 class AddFriendPage extends StatefulWidget {
   @override
   _AddFriendPageState createState() => _AddFriendPageState();
 }
 
 class _AddFriendPageState extends State<AddFriendPage> {
+  // Text editing controller for the search field.
   final TextEditingController _searchController = TextEditingController();
+  // The UID of the currently logged-in user.
   final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+  // List of users that result from a search query.
   List<AppUser> searchResults = [];
+  // Plugin instance for local notifications.
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-
+  // Initializes the page's state.
   @override
   void initState() {
     super.initState();
+    // Additional initialization if required.
   }
 
-
+  // Searches for users based on the input student number.
   void _search() async {
     final queryText = _searchController.text;
     if (queryText.isNotEmpty) {
+      // Fetch users where the 'studentNumber' field matches the query text.
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('studentNumber', isEqualTo: queryText)
           .get();
 
+      // Process each user document to determine friendship and request status.
       List<AppUser> users = await Future.wait(querySnapshot.docs.map((doc) async {
         var user = AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id);
         user.isFriend = await _isAlreadyFriend(user.uid);
@@ -37,12 +45,14 @@ class _AddFriendPageState extends State<AddFriendPage> {
         return user;
       }).toList());
 
+      // Update the state to reflect the new search results.
       setState(() {
         searchResults = users;
       });
     }
   }
 
+  // Checks if a user is already a friend.
   Future<bool> _isAlreadyFriend(String friendUid) async {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
     final friendDoc = await FirebaseFirestore.instance
@@ -54,8 +64,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
     return friendDoc.exists;
   }
 
+  // Accepts a friend request.
   void _acceptFriendRequest(String requestId, String fromUserUid) async {
 
+    // Update the request status to 'accepted' and add users to each other's friends collection.
     await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({
       'status': 'accepted',
     });
@@ -73,15 +85,20 @@ class _AddFriendPageState extends State<AddFriendPage> {
     });
   }
 
+  // Rejects a friend request.
   void _rejectFriendRequest(String requestId) async {
+    // Update the request status to 'rejected'.
     await FirebaseFirestore.instance.collection('friendRequests').doc(requestId).update({
       'status': 'rejected',
     });
 
     // Provide feedback to the user that the request has been rejected
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Rejected friend request'), backgroundColor: Colors.lime));
   }
 
+  // Sends a friend request.
   void _sendFriendRequest(String currentUserUid, String friendUid) async {
+    // Create a new friend request document in Firestore with status 'pending'.
     await FirebaseFirestore.instance.collection('friendRequests').add({
       'fromUid': currentUserUid,
       'toUid': friendUid,
@@ -90,8 +107,12 @@ class _AddFriendPageState extends State<AddFriendPage> {
     });
 
     // Update the UI to reflect the sent request
+    setState(() {
+      searchResults.firstWhere((user) => user.uid == friendUid).isRequested = true;
+    });
   }
 
+  // Checks if a friend request has already been sent to a user.
   Future<bool> _isAlreadyRequested(String friendUid) async {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
     final requests = await FirebaseFirestore.instance
@@ -103,8 +124,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
     return requests.docs.isNotEmpty;
   }
 
+  // Stream to listen for incoming friend requests.
   Stream<QuerySnapshot> _friendRequestsStream() {
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    // Listen to friend requests addressed to the current user with status 'pending'.
     return FirebaseFirestore.instance
         .collection('friendRequests')
         .where('toUid', isEqualTo: currentUserId)
@@ -112,6 +135,7 @@ class _AddFriendPageState extends State<AddFriendPage> {
         .snapshots();
   }
 
+  // Builds a list of incoming friend requests.
   Widget _buildFriendRequests() {
     return StreamBuilder<QuerySnapshot>(
       stream: _friendRequestsStream(),
@@ -187,9 +211,10 @@ class _AddFriendPageState extends State<AddFriendPage> {
     );
   }
 
+  // Builds the main widget for the Add Friend page.
   @override
   Widget build(BuildContext context) {
-
+    // The UI includes a search box, a list of search results, and a list of friend requests.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Friend'),

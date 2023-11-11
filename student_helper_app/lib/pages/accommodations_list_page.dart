@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 //import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
 import 'package:student_helper_project/models/sas_model/Sas_ModelSQLite.dart';
 import 'accommodations_add_page.dart';
@@ -83,7 +84,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       // Handle the result, which contains the studentId and grade
       final studentId = result[0];
       final g = result[1];
-      sas_model.insertAcmdn(Accommodation(name: g, desc: studentId));
+      sas_model.insertAcmdn(Accommodation(name: g, desc: studentId, assessments: ['']));
       _refreshList();
       // Perform any additional logic, such as adding the new grade to the list or database
     }
@@ -129,6 +130,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
                     id: acmdn.id,
                     desc: editedNotes,
                     name: editedName,
+                    assessments: ['']
                   );
                   Navigator.of(context).pop(updatedAcmdn);
                 }

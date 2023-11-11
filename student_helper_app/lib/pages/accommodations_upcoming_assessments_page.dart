@@ -1,7 +1,13 @@
-//view upcoming assessments in a list. user can click on assessment to bring up a pop up (a window) or new page
-// to view their accommodations for that assessment (e.g. double time, a scribe, a different test room, ...)
+
+
+// main.dart
+
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
+import 'package:student_helper_project/models/sas_model/Assessments.dart';
+
+
+
 class UpcomingPage extends StatefulWidget {
   const UpcomingPage({super.key});
 
@@ -10,14 +16,15 @@ class UpcomingPage extends StatefulWidget {
 }
 
 class UpcomingPageState extends State<UpcomingPage> {
-  final List<Accommodation> events = [
-    //These are just here for now to prove that this works 
+  final List<Accommodation> amdtns = [
+    //These are just here for now to prove that this works
     //The plan is for the user to be able to tell what accommodations they'll have acess to
-    Accommodation(name: 'Test 1', desc: 'Test'),
-    Accommodation(name: 'Quiz 1', desc: 'Quiz'),
-    Accommodation(name: 'Presentation 1', desc: 'Presentation'),
+    Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz']),
+    Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe', assessments: ['Test', 'Quiz', 'Written Work']),
+
   ];
-  List<Accommodation> filteredEvents = [];
+
+  List<Accommodation> filteredAccommodations = [];
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,43 +44,58 @@ class UpcomingPageState extends State<UpcomingPage> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: EventSearch(events),
+                delegate: EventSearch(amdtns),
               );
             },
           ),
         ],
       ),
-      body: EventList(accommodations: filteredEvents.isNotEmpty ? filteredEvents : events),
+      body: EventList(accommodations: filteredAccommodations.isNotEmpty ? filteredAccommodations : amdtns),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddEventDialog(context);
         },
-        tooltip: 'Add Assessment',
+        tooltip: 'Add Event',
         child: Icon(Icons.add),
       ),
     );
   }
 
   void _showAddEventDialog(BuildContext context) {
+    String eventName = '';
+    String eventType = '';
+    String? Acmdtn;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add event'),
+          title: Text('Add Event'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 TextField(
                   decoration: InputDecoration(labelText: 'Assessment'),
                   onChanged: (value) {
-                    
+                    setState(() {
+                      eventName = value;
+                    });
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextField(
-                  decoration: InputDecoration(labelText: 'Assessment Type'),
+                  decoration: const InputDecoration(labelText: 'Type'),
                   onChanged: (value) {
-                    // Handle changes in the text field
+                    setState(() {
+                      eventType = value;
+                      if (amdtns.any((e) => e.assessments.contains(value))) {
+                        var temp = (amdtns.where((e) => e.assessments.contains(value)));
+                        Acmdtn = temp.first.desc;
+                        print (Acmdtn);
+                      }
+                    });
+
+
+
                   },
                 ),
               ],
@@ -88,9 +110,13 @@ class UpcomingPageState extends State<UpcomingPage> {
             ),
             TextButton(
               onPressed: () {
+
                 setState(() {
-                  events.add(Accommodation(name: 'name', desc: 'desc'));
+                  print ("Add");
+                  amdtns.add(Accommodation(name: eventName, desc: Acmdtn ?? eventType, assessments: ['']));
+
                 });
+
                 Navigator.of(context).pop();
               },
               child: Text('Add'),
@@ -104,7 +130,7 @@ class UpcomingPageState extends State<UpcomingPage> {
 
 class EventList extends StatelessWidget {
   final List<Accommodation> accommodations;
-
+  //final List<Assessments> assessments;
   EventList({required this.accommodations});
 
   @override
@@ -116,20 +142,18 @@ class EventList extends StatelessWidget {
           title: Text(accommodations[index].name as String),
           subtitle: Text(accommodations[index].desc as String),
           onTap: () {
-            //tba 
           },
         );
       },
     );
   }
 }
-// ...
 
 
 class EventSearch extends SearchDelegate<String> {
-  final List<Accommodation> events;
+  final List<Accommodation> accommodations;
 
-  EventSearch(this.events);
+  EventSearch(this.accommodations);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -161,10 +185,10 @@ class EventSearch extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     final suggestionList = query.isEmpty
-        ? events
-        : events
+        ? accommodations
+        : accommodations
         .where((event) =>
-    (event.name as String).toLowerCase().startsWith(query.toLowerCase()))
+        (event.name as String).toLowerCase().startsWith(query.toLowerCase()))
         .toList();
 
     return EventList(accommodations: suggestionList);

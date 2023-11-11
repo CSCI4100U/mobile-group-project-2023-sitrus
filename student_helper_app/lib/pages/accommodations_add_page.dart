@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
-import 'models/sas_model/Accommodation.dart';
-import 'models/sas_model/Sas_ModelSQLite.dart';
+
+import 'package:student_helper_project/models/sas_model/Accommodation.dart';
+import 'package:student_helper_project/models/sas_model/Sas_ModelSQLite.dart';
 import 'accommodations_list_page.dart';
 
 class AddAccommodation extends StatefulWidget {

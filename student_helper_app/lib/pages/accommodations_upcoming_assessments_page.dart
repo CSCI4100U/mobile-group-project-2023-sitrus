@@ -1,7 +1,7 @@
 //view upcoming assessments in a list. user can click on assessment to bring up a pop up (a window) or new page
 // to view their accommodations for that assessment (e.g. double time, a scribe, a different test room, ...)
 import 'package:flutter/material.dart';
-import 'models/sas_model/Accommodation.dart';
+import 'package:student_helper_project/models/sas_model/Accommodation.dart';
 class UpcomingPage extends StatefulWidget {
   const UpcomingPage({super.key});
 

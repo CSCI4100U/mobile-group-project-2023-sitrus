@@ -63,6 +63,7 @@ class AddAccommodation_State extends State<AddAccommodation> {
           final newAcmdn = Accommodation(
             desc: n,
             name: g,
+            assessments: ['Test']
           );
 
           SASModel gradesModel=new SASModel();

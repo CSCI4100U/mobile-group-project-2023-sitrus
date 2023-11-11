@@ -1,10 +1,13 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import 'message.dart';
+
 class DatabaseHelper {
   static const _databaseName = "MyDatabase.db";
   static const _databaseVersion = 1;
-  static const table = 'messages';
+  static const tableMessages = 'messages';
+  static const tableUserInfo = 'userInfo'; // New table for user login info
 
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
@@ -17,8 +20,9 @@ class DatabaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
+    // Create messages table
     await db.execute('''
-          CREATE TABLE $table (
+          CREATE TABLE $tableMessages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uid TEXT,
             timestamp TEXT NOT NULL,
@@ -29,6 +33,15 @@ class DatabaseHelper {
             content TEXT NOT NULL,
             edited INTEGER NOT NULL,
             deleted INTEGER NOT NULL DEFAULT 0
+          )
+          ''');
+
+    // Create userInfo table
+    await db.execute('''
+          CREATE TABLE $tableUserInfo (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL
           )
           ''');
   }
@@ -43,55 +56,70 @@ class DatabaseHelper {
 
   // This is called when the database version is incremented.
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // If you are moving from version 1 to version 2
-    if (oldVersion < 2) {
-      // Add a new 'uid' column of type TEXT
-      await db.execute('ALTER TABLE $table ADD COLUMN uid TEXT');
-    }
-    // Handle any other upgrades here...
+    // Handle any upgrades here...
   }
 
-  Future<int> insert(Map<String, dynamic> row) async {
+  // Insert message into the database
+  Future<int> insertMessage(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.insert(table, row);
+    return await db.insert(tableMessages, row);
   }
 
-  Future<List<Map<String, dynamic>>> queryAllRows() async {
+  // Insert user login info into the database
+  Future<int> insertUserInfo(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.query(table);
+    return await db.insert(tableUserInfo, row);
   }
 
-  Future<int> delete(int uid) async {
+  // Query all messages
+  Future<List<Map<String, dynamic>>> queryAllMessages() async {
     Database db = await instance.database;
-    return await db.delete(table, where: 'uid = ?', whereArgs: [uid]);
+    return await db.query(tableMessages);
   }
 
-  Future<int> update(Map<String, dynamic> row) async {
+  // Query all user info
+  Future<List<Map<String, dynamic>>> queryAllUserInfo() async {
     Database db = await instance.database;
-    int uid = row['uid'];
-    return await db.update(table, row, where: 'uid = ?', whereArgs: [uid]);
+    return await db.query(tableUserInfo);
   }
 
-  Future<List<Map<String, dynamic>>> queryMessages(String senderUid, String receiverUid) async {
+  // Delete specific message
+  Future<int> deleteMessage(String uid) async {
     Database db = await instance.database;
-    return await db.query(
-      table,
+    return await db.delete(tableMessages, where: 'uid = ?', whereArgs: [uid]);
+  }
+
+  // Delete specific user info
+  Future<int> deleteUserInfo(String email) async {
+    Database db = await instance.database;
+    return await db.delete(tableUserInfo, where: 'email = ?', whereArgs: [email]);
+  }
+
+  // Update message in the database
+  Future<int> updateMessage(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String uid = row['uid'];
+    return await db.update(tableMessages, row, where: 'uid = ?', whereArgs: [uid]);
+  }
+
+  // Update user info in the database
+  Future<int> updateUserInfo(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    String email = row['email'];
+    return await db.update(tableUserInfo, row, where: 'email = ?', whereArgs: [email]);
+  }
+
+  // In DatabaseHelper class
+
+  // Method to query messages between two specific users
+  Future<List<Message>> queryMessagesBetween(String userUid, String friendUid) async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> messageMaps = await db.query(
+      tableMessages,
       where: '(senderUid = ? AND receiverUid = ?) OR (senderUid = ? AND receiverUid = ?)',
-      whereArgs: [senderUid, receiverUid, receiverUid, senderUid],
+      whereArgs: [userUid, friendUid, friendUid, userUid],
     );
-  }
 
-  Future<int> deleteConversation(String senderUid, String receiverUid) async {
-    Database db = await instance.database;
-    return await db.delete(
-      table,
-      where: '(senderUid = ? AND receiverUid = ?) OR (senderUid = ? AND receiverUid = ?)',
-      whereArgs: [senderUid, receiverUid, receiverUid, senderUid],
-    );
-  }
-
-  Future<int> deleteAllMessages() async {
-    Database db = await instance.database;
-    return await db.delete(table);
+    return messageMaps.map((map) => Message.fromMap(map)).toList();
   }
 }

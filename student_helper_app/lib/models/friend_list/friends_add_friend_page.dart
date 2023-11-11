@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'appuser.dart';
 
 class AddFriendPage extends StatefulWidget {
@@ -11,8 +12,15 @@ class AddFriendPage extends StatefulWidget {
 class _AddFriendPageState extends State<AddFriendPage> {
   final TextEditingController _searchController = TextEditingController();
   final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+  List<AppUser> searchResults = [];
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  List<AppUser> searchResults = []; // Adjusted to use a User model instead of a map
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
 
   void _search() async {
     final queryText = _searchController.text;
@@ -22,18 +30,28 @@ class _AddFriendPageState extends State<AddFriendPage> {
           .where('studentNumber', isEqualTo: queryText)
           .get();
 
-      final List<AppUser> users = querySnapshot.docs
-          .map((doc) => AppUser.fromMap(
-        doc.data() as Map<String, dynamic>,
-        doc.id, // 'doc.id' is the 'uid' of the user document
-      ))
-          .where((user) => user.uid != currentUserUid) // Exclude the current user by their 'uid'
-          .toList();
+      List<AppUser> users = await Future.wait(querySnapshot.docs.map((doc) async {
+        var user = AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+        user.isFriend = await _isAlreadyFriend(user.uid);
+        user.isRequested = await _isAlreadyRequested(user.uid);
+        return user;
+      }).toList());
 
       setState(() {
         searchResults = users;
       });
     }
+  }
+
+  Future<bool> _isAlreadyFriend(String friendUid) async {
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    final friendDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .collection('friends')
+        .doc(friendUid)
+        .get();
+    return friendDoc.exists;
   }
 
   void _acceptFriendRequest(String requestId, String fromUserUid) async {
@@ -83,17 +101,6 @@ class _AddFriendPageState extends State<AddFriendPage> {
         .where('status', isEqualTo: 'pending')
         .get();
     return requests.docs.isNotEmpty;
-  }
-
-  Future<bool> _isAlreadyFriend(String friendUid) async {
-    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-    final friends = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUserId)
-        .collection('friends')
-        .doc(friendUid)
-        .get();
-    return friends.exists;
   }
 
   Stream<QuerySnapshot> _friendRequestsStream() {
@@ -212,29 +219,19 @@ class _AddFriendPageState extends State<AddFriendPage> {
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   var result = searchResults[index];
-                  return FutureBuilder<bool>(
-                    // Combining both checks into a single Future
-                    future: Future.any([
-                      _isAlreadyRequested(result.uid),
-                      _isAlreadyFriend(result.uid),
-                    ]),
-                    builder: (context, snapshot) {
-                      bool alreadyInteracted = snapshot.data ?? false;
-                      return ListTile(
-                        leading: Icon(Icons.person), // Adjust as necessary
-                        title: Text('${result.firstName} ${result.middleName ?? ""} ${result.lastName}'),
-                        subtitle: Text(result.studentNumber),
-                        trailing: ElevatedButton(
-                          child: const Text('Add'),
-                          onPressed: alreadyInteracted ? null : () {
-                            _sendFriendRequest(currentUserUid, result.uid); // Use the actual UID
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: alreadyInteracted ? Colors.grey : Colors.blue, // Grey out if already interacted
-                          ),
-                        ),
-                      );
-                    },
+                  return ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('${result.firstName} ${result.middleName ?? ""} ${result.lastName}'),
+                    subtitle: Text(result.studentNumber),
+                    trailing: ElevatedButton(
+                      child: const Text('Add'),
+                      onPressed: (result.isFriend || result.isRequested) ? null : () {
+                        _sendFriendRequest(currentUserUid, result.uid);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: (result.isFriend || result.isRequested) ? Colors.grey : Colors.blue,
+                      ),
+                    ),
                   );
                 },
               )

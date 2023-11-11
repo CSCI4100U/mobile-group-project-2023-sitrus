@@ -1,53 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'appuser.dart';
+import 'message.dart';
+import 'local_storage.dart';
 import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'friend_login_page.dart';
 import 'friends_profile_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-
-
-// for test only
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp( options: DefaultFirebaseOptions.currentPlatform, );
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-
-    return MaterialApp(
-      title: 'Friend List',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            User? user = snapshot.data;
-            if (user == null) {
-              return LoginPage();
-            }
-            return const FriendListPage(); // Assume you have a HomePage widget
-          }
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class FriendListPage extends StatefulWidget {
   const FriendListPage({super.key});
@@ -63,6 +23,10 @@ class _FriendListPageState extends State<FriendListPage> {
   final searchController = TextEditingController();
   bool isSearching = false;
   List<AppUser> searchResults = [];
+  List<Message> messages = [];
+
+  // Add a property to hold the list of all friends (unfiltered)
+  List<AppUser> allFriends = [];
 
   Future<AppUser> _fetchCurrentUser() async {
     User? firebaseUser = FirebaseAuth.instance.currentUser;
@@ -118,8 +82,114 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
+  // Method to delete all chat history with the current associate
+  Future<void> _deleteAllChatHistory() async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    // Delete messages sent by the current user
+    QuerySnapshot sentMessages = await FirebaseFirestore.instance
+        .collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .get();
+    for (var doc in sentMessages.docs) {
+      await doc.reference.delete();
+    }
+
+    // Delete messages received by the current user
+    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
+        .collection('messages')
+        .where('receiverUid', isEqualTo: currentUserUid)
+        .get();
+    for (var doc in receivedMessages.docs) {
+      await doc.reference.delete();
+    }
+
+    // Provide feedback to the user
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Chat history deleted'),
+        duration: Duration(seconds: 3)
+      ),
+    );
+
+    setState(() {
+      _buildFriendListWithLastMessage();
+    });
+  }
+
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+
+  Future<void> backupChatToLocal() async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    for (var message in messages) {
+      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+        await _databaseHelper.insertMessage(message.toMap());
+      }
+    }
+  }
+
+
+  Future<void> uploadLocalBackupToCloud() async {
+    // Fetch messages from local storage
+    List<Message> localMessages = (await _databaseHelper.queryAllMessages()).cast<Message>();
+
+    for (var localMessage in localMessages) {
+      // Check if the message already exists in the cloud
+      var existingDoc = await FirebaseFirestore.instance.collection('messages')
+          .doc(localMessage.uid)
+          .get();
+
+      // If the message doesn't exist in the cloud, upload it
+      if (!existingDoc.exists) {
+        await FirebaseFirestore.instance.collection('messages')
+            .doc(localMessage.uid)
+            .set(localMessage.toMap());
+      }
+    }
+  }
+
+  void _showSettings() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Delete All Chat History on Cloud'),
+              onTap: () async {
+                Navigator.pop(context); // Dismiss the bottom sheet
+                await _deleteAllChatHistory();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.download),
+              title: const Text('Back up All Chat History from Cloud'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                backupChatToLocal();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.upload),
+              title: const Text('Up load All Chat History from Local'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                uploadLocalBackupToCloud();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildFriendListWithLastMessage() {
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    List<AppUser> friendsToDisplay = isSearching ? searchResults : allFriends;
     return StreamBuilder<List<AppUser>>(
       stream: _friendsStream(),
       builder: (context, snapshot) {
@@ -138,7 +208,7 @@ class _FriendListPageState extends State<FriendListPage> {
         print('Building list for ${friendsList.length} friends');
 
         return ListView.builder(
-          itemCount: friendsList.length,
+          itemCount: friendsToDisplay.length,
           itemBuilder: (context, index) {
             AppUser friend = friendsList[index];
             String friendFullName = "${friend.firstName} ${friend.middleName ?? ''} ${friend.lastName}".trim();
@@ -148,7 +218,7 @@ class _FriendListPageState extends State<FriendListPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
                     leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
-                    title: Text('${friendFullName} - ${friend.status}'),
+                    title: Text('$friendFullName - ${friend.status}'),
                     subtitle: const Text('Loading...'),
                     trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   );
@@ -156,14 +226,14 @@ class _FriendListPageState extends State<FriendListPage> {
                 if (snapshot.hasError) {
                   return ListTile(
                     leading: const Icon(Icons.account_circle, size: 40),
-                    title: Text('${friendFullName} - ${friend.status}'),
+                    title: Text('$friendFullName - ${friend.status}'),
                     subtitle: Text('Error: ${snapshot.error}'),
                   );
                 }
                 String lastMessage = snapshot.data ?? 'No messages';
                 return ListTile(
                   leading: const Icon(Icons.account_circle, size: 40),
-                  title: Text('${friendFullName} - ${friend.status}'),
+                  title: Text('$friendFullName - ${friend.status}'),
                   subtitle: Text(lastMessage),
                   trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   onTap: () async {
@@ -189,7 +259,17 @@ class _FriendListPageState extends State<FriendListPage> {
     );
   }
 
-
+  // Call this method to refresh the friends list after applying a filter
+  void _refreshFriendsList() {
+    _friendsStream().first.then((friendsList) {
+      setState(() {
+        allFriends = friendsList;
+        if (!isSearching) {
+          searchResults = allFriends;
+        }
+      });
+    });
+  }
 
 late Future<AppUser> _currentUserFuture;
 
@@ -197,7 +277,12 @@ late Future<AppUser> _currentUserFuture;
   void initState() {
     super.initState();
     _currentUserFuture = _fetchCurrentUser();
-    // Initial state setup if necessary
+    // Fetch the initial list of friends and assign it to allFriends
+    _friendsStream().first.then((friendsList) {
+      setState(() {
+        allFriends = friendsList;
+      });
+    });
   }
 
   void _searchFriend(String searchQuery) async {
@@ -264,46 +349,59 @@ late Future<AppUser> _currentUserFuture;
     );
   }
 
-  void _filterFriendsByStatus(String status) async {
+  // Modified method to filter friends by status
+  // void _filterFriendsByStatus(String status) {
+  //   if (status == 'All') {
+  //     setState(() {
+  //       searchResults = allFriends; // Display all friends if no filter is applied
+  //       isSearching = false;
+  //     });
+  //   } else {
+  //       final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  //       FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(currentUserId)
+  //           .collection('friends')
+  //           .where('status', isEqualTo: status)
+  //           .get()
+  //           .then((querySnapshot) {
+  //         final List<AppUser> filteredFriends = querySnapshot.docs
+  //             .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+  //             .toList();
+  //
+  //         setState(() {
+  //           // Filter based on the status
+  //           searchResults = allFriends.where((friend) => friend.status == status).toList();
+  //           isSearching = searchResults.isNotEmpty;
+  //         });
+  //       });
+  //     }
+  // }
+  void _filterFriendsByStatus(String status) {
     if (status == 'All') {
+      // Display all friends if no filter is applied.
       setState(() {
-        isSearching = false; // Display all friends if no filter is applied
+        searchResults = allFriends;
+        isSearching = false;
       });
-      return;
+    } else {
+      // Filter the friends locally based on the status.
+      setState(() {
+        searchResults = allFriends.where((friend) => friend.status == status).toList();
+        isSearching = true;
+      });
     }
-
-    // Display a loading indicator while filtering
-    setState(() {
-      isSearching = true; // Signal that we're in search/filter mode
-    });
-
-    // Filter the friends list by status
-    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUserId)
-        .collection('friends')
-        .where('status', isEqualTo: status)
-        .get()
-        .then((querySnapshot) {
-      final List<AppUser> filteredFriends = querySnapshot.docs
-          .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-          .toList();
-
-      setState(() {
-        searchResults = filteredFriends; // Update the searchResults with the filtered list
-      });
-    });
   }
 
   void _showFilterDialog() {
-    String selectedStatus = 'All'; // This will be the current filter selection
+    // Initial filter selection
+    String selectedStatus = 'All';
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
             return AlertDialog(
               title: const Text('Filter Friends'),
               content: DropdownButtonFormField<String>(
@@ -316,11 +414,10 @@ late Future<AppUser> _currentUserFuture;
                   );
                 }).toList(),
                 onChanged: (newValue) {
-                  setState(() {
+                  // This updates the state inside the dialog
+                  setDialogState(() {
                     selectedStatus = newValue!;
-                    isSearching = false; // Reset searching when filtering
                   });
-                  _filterFriendsByStatus(newValue!);
                 },
               ),
               actions: <Widget>[
@@ -331,12 +428,20 @@ late Future<AppUser> _currentUserFuture;
                 TextButton(
                   child: const Text('Reset'),
                   onPressed: () {
-                    setState(() {
+                    // Reset the filter inside the dialog
+                    setDialogState(() {
                       selectedStatus = 'All';
-                      isSearching = false; // Reset searching when resetting filter
                     });
+                    // Apply the reset filter
                     _filterFriendsByStatus('All');
+                  },
+                ),
+                TextButton(
+                  child: const Text('Apply'),
+                  onPressed: () {
+                    // Close the dialog and apply the selected filter
                     Navigator.of(context).pop();
+                    _filterFriendsByStatus(selectedStatus);
                   },
                 ),
               ],
@@ -344,7 +449,10 @@ late Future<AppUser> _currentUserFuture;
           },
         );
       },
-    );
+    ).then((_) {
+      // This ensures that the UI updates happen after the dialog is closed.
+      setState(() {});
+    });
   }
 
   void _changeUserStatus(String status) {
@@ -470,10 +578,6 @@ late Future<AppUser> _currentUserFuture;
     }
   }
 
-
-
-
-
   Widget _buildFloatingActionButtons() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -492,7 +596,7 @@ late Future<AppUser> _currentUserFuture;
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
           onPressed: () {
-            // TODO: Add settings functionality
+            _showSettings();
           },
           mini: true,
           child: const Icon(Icons.settings),

@@ -1,16 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Message {
-  final String? uid; // Nullable to allow auto-generation by the database
-  final DateTime timestamp;
+  final String? uid; // Nullable for auto-generation by the database
+  final Timestamp timestamp; // Changed to Timestamp type for Firestore compatibility
   final String sender;
   final String senderUid;
   final String receiver;
   final String receiverUid;
   final String content;
   final bool edited;
-  final bool deleted; // Assuming you want to track if a message is deleted
+  final bool deleted;
 
   Message({
-    this.uid, // Nullable
+    this.uid,
     required this.timestamp,
     required this.sender,
     required this.senderUid,
@@ -18,40 +20,40 @@ class Message {
     required this.receiverUid,
     required this.content,
     this.edited = false,
-    this.deleted = false, // Default to false
+    this.deleted = false,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid, // Can be null
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': timestamp,
       'sender': sender,
       'senderUid': senderUid,
       'receiver': receiver,
       'receiverUid': receiverUid,
       'content': content,
-      'edited': edited ? 1 : 0,
-      'deleted': deleted ? 1 : 0, // Assuming you are using 1 and 0 to represent true and false
+      'edited': edited,
+      'deleted': deleted,
     };
   }
 
   static Message fromMap(Map<String, dynamic> map) {
     return Message(
       uid: map['uid'],
-      timestamp: DateTime.parse(map['timestamp']),
+      timestamp: map['timestamp'] as Timestamp,
       sender: map['sender'],
       senderUid: map['senderUid'],
       receiver: map['receiver'],
       receiverUid: map['receiverUid'],
       content: map['content'],
-      edited: map['edited'] == 1,
-      deleted: map['deleted'] == 1, // Handle the 'deleted' field
+      edited: map['edited'] ?? false,
+      deleted: map['deleted'] ?? false,
     );
   }
 
   Message copyWith({
     String? uid,
-    DateTime? timestamp,
+    Timestamp? timestamp,
     String? sender,
     String? senderUid,
     String? receiver,

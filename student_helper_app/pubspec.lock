@@ -18,7 +18,7 @@ packages:
     source: hosted
     version: "2.4.2"
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       sha256: "947bfcf187f74dbc5e146c9eb9c0f10c9f8b30743e341481c1e2ed3ecc18c20c"
@@ -263,7 +263,7 @@ packages:
     source: hosted
     version: "2.0.3"
   flutter_local_notifications:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_local_notifications
       sha256: "6d11ea777496061e583623aaf31923f93a9409ef8fcaeeefdd6cd78bf4fe5bb3"

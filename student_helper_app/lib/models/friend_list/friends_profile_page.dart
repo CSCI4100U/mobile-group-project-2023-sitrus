@@ -132,6 +132,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('remember_me');
 
+    // Update the user's status to 'Offline' in Firestore
+    final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection('users').doc(currentUserUid).update({
+      'status': 'Offline',
+    });
+
     // Sign out from Firebase Auth
     await FirebaseAuth.instance.signOut();
 
@@ -140,6 +146,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
+
 
   // Override the 'dispose()' method to release resources
   @override

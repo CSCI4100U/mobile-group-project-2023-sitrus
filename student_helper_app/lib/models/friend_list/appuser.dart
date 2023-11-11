@@ -15,6 +15,8 @@ class AppUser {
   final String? description;
   final String? icon;
   final List<String>? friendList;
+  bool isFriend;
+  bool isRequested;
 
   AppUser({
     required this.uid,
@@ -31,6 +33,8 @@ class AppUser {
     this.description,
     this.icon,
     this.friendList,
+    this.isFriend = false,
+    this.isRequested = false,
   });
 
   // Helper method to create a User object from a map

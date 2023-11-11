@@ -1,5 +1,5 @@
+import 'package:async/async.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'local_storage.dart';
@@ -9,14 +9,14 @@ class ChatPage extends StatefulWidget {
   final String userName;
   final String friendName;
   final String friendStatus;
-  final String friendUid; // Add this line
+  final String friendUid;
 
   const ChatPage({
     Key? key,
     required this.userName,
     required this.friendName,
     required this.friendStatus,
-    required this.friendUid, // Add this line
+    required this.friendUid,
   }) : super(key: key);
 
   @override
@@ -24,32 +24,37 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  // Controllers for message input and scrolling
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<Message> messages = []; // Use the Message model
 
-  // State variable to hold the background setting
-  Color _backgroundColor = Colors.white; // Default to white
-  String? _backgroundImage; // Will hold the path to the background image
+  // List to hold messages
+  List<Message> messages = [];
+
+  // Background color and image for chat
+  Color _backgroundColor = Colors.white;
+  String? _backgroundImage;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    _loadMessages();
+    _loadMessagesFromCloud();
   }
 
+  // Listener for scroll events
   void _scrollListener() {
+    // Auto-scroll to the bottom of the chat when new message arrives
     if (_scrollController.position.atEdge) {
       if (_scrollController.position.pixels == 0) {
-        // You're at the top of the list
+        // Top of the list
       } else {
-        // You're at the bottom of the list
         _scrollToBottom();
       }
     }
   }
 
+  // Method to scroll to the bottom of the chat
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -60,19 +65,43 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _loadMessages() async {
-    // Assuming 'userUid' is the UID of the current logged-in user.
-    final String userUid = FirebaseAuth.instance.currentUser!.uid;
-    // 'friendUid' needs to be provided to this widget.
-    final String friendUid = widget.friendUid; // You need to add this variable to your widget.
+  // Method to load messages from Firestore
+  void _loadMessagesFromCloud() {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    String friendUid = widget.friendUid;
 
-    final List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryMessages(userUid, friendUid);
-    final List<Message> loadedMessages = messageMaps.map((messageMap) => Message.fromMap(messageMap)).toList();
+    var sentMessagesStream = FirebaseFirestore.instance
+        .collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .where('receiverUid', isEqualTo: friendUid)
+        .orderBy('timestamp', descending: false)
+        .snapshots();
 
-    setState(() {
-      messages = loadedMessages;
+    var receivedMessagesStream = FirebaseFirestore.instance
+        .collection('messages')
+        .where('senderUid', isEqualTo: friendUid)
+        .where('receiverUid', isEqualTo: currentUserUid)
+        .orderBy('timestamp', descending: false)
+        .snapshots();
+
+    StreamZip([sentMessagesStream, receivedMessagesStream]).listen((snapshots) {
+      List<DocumentSnapshot> combined = [];
+      for (var snapshot in snapshots) {
+        combined.addAll(snapshot.docs);
+      }
+
+      combined.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
+
+      List<Message> newMessages = combined
+          .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      setState(() {
+        messages = newMessages;
+      });
     });
   }
+
 
   void _showSettings() {
     showModalBottomSheet(
@@ -98,11 +127,20 @@ class _ChatPageState extends State<ChatPage> {
             ),
             ListTile(
               leading: const Icon(Icons.download),
-              title: const Text('Download Chat History from Cloud'),
+              title: const Text('Back up Chat History from Cloud'),
               onTap: () {
                 // load logic
                 Navigator.pop(context);
-                _loadMessagesFromCloud();
+                backupChatToLocalForSpecificFriend(widget.friendUid);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.upload),
+              title: const Text('Upload Local Backup Chat History To Cloud'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                uploadLocalBackupToCloudForSpecificFriend(widget.friendUid);
               },
             ),
           ],
@@ -113,7 +151,27 @@ class _ChatPageState extends State<ChatPage> {
 
   // Method to delete all chat history with the current associate
   Future<void> _deleteChatHistory() async {
-    await DatabaseHelper.instance.deleteConversation(widget.userName, widget.friendName);
+    // Delete chat history from Firestore
+    QuerySnapshot sentMessages = await FirebaseFirestore.instance
+        .collection('messages')
+        .where('senderUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where('receiverUid', isEqualTo: widget.friendUid)
+        .get();
+
+    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
+        .collection('messages')
+        .where('senderUid', isEqualTo: widget.friendUid)
+        .where('receiverUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    for (var doc in sentMessages.docs) {
+      await doc.reference.delete();
+    }
+
+    for (var doc in receivedMessages.docs) {
+      await doc.reference.delete();
+    }
+
     setState(() {
       messages.clear();
     });
@@ -170,168 +228,80 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // This method is triggered when the send button is pressed
+  // Method to send a new message
   void _sendMessage() async {
     final String content = _messageController.text.trim();
     if (content.isEmpty) {
       return;
     }
 
-    // Assuming 'userUid' is the UID of the current logged-in user and 'friendUid' is provided to the widget.
     final String userUid = FirebaseAuth.instance.currentUser!.uid;
-    final String friendUid = widget.friendUid; // You need to add this variable to your widget.
+    final String friendUid = widget.friendUid;
 
-    // Create a new message object with UIDs
     final Message newMessage = Message(
-      timestamp: DateTime.now(),
-      sender: widget.userName, // Replace with the actual sender's name or username
+      timestamp: Timestamp.now(),
+      sender: widget.userName,
       senderUid: userUid,
       receiver: widget.friendName,
       receiverUid: friendUid,
       content: content,
       edited: false,
-      deleted: false, // Include the 'deleted' field
+      deleted: false,
     );
 
-    // Convert the message to a map before storing it
-    final Map<String, dynamic> messageMap = newMessage.toMap();
-
-    // Store the message locally and send to Firestore
     try {
-      int uid = await DatabaseHelper.instance.insert(messageMap);
-
-      // Update the local messages list
+      await FirebaseFirestore.instance.collection('messages').add(newMessage.toMap());
       setState(() {
         messages.insert(0, newMessage);
         _messageController.clear();
         _scrollToBottom();
       });
-
-      // Send the message to Firestore
-      await FirebaseFirestore.instance.collection('messages').add(messageMap);
-
-      // Handle message sent successfully...
-
     } catch (e) {
-      // Handle the error, e.g., show a snackbar
-      if (kDebugMode) {
-        print('Error when sending message: $e');
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to send message. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // Error handling for message send failure
     }
   }
 
-  // This method is used to delete a message
-  void _deleteMessage(int uid) async {
-    // Mark as deleted in local database
-    Message? localMessage = messages.firstWhere((message) => message.uid == uid);
-    Message deletedMessage = localMessage.copyWith(deleted: true); // Add a 'deleted' field to your Message class
-    await DatabaseHelper.instance.update(deletedMessage.toMap());
-
-    // Mark as deleted in Firestore
-    FirebaseFirestore.instance.collection('messages').doc(uid.toString()).update({
-      'deleted': true,
-    });
+  // Method to delete a message
+  void _deleteMessage(String messageId) async {
+    // Directly delete the message from Firestore
+    await FirebaseFirestore.instance.collection('messages').doc(messageId).delete();
 
     // Update UI
     setState(() {
-      messages.removeWhere((message) => message.uid == uid);
+      messages.removeWhere((message) => message.uid == messageId);
     });
 
     // Show a snackbar message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Message deleted')),
     );
-    }
+  }
 
-
-// This method is used to edit a message
-  void _editMessage(int uid, String newContent) async {
-    // Update local database
-    Message? localMessage = messages.firstWhere((message) => message.uid == uid);
-    Message updatedMessage = localMessage.copyWith(content: newContent, edited: true, deleted: false);
-    await DatabaseHelper.instance.update(updatedMessage.toMap());
-
+  // Method to edit a message
+  void _editMessage(String messageId, String newContent) async {
     // Update Firestore
-    FirebaseFirestore.instance.collection('messages').doc(uid.toString()).update({
+    await FirebaseFirestore.instance.collection('messages').doc(messageId).update({
       'content': newContent,
       'edited': true,
     });
 
-    // Update UI
-    setState(() {
-      int index = messages.indexWhere((message) => message.uid == uid);
-      if (index != -1) {
-        messages[index] = updatedMessage;
-      }
-    });
+    // Update the local message list
+    int index = messages.indexWhere((message) => message.uid == messageId);
+    if (index != -1) {
+      setState(() {
+        messages[index] = messages[index].copyWith(content: newContent, edited: true);
+      });
+    }
 
     // Show a snackbar message
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Message edited')),
     );
   }
 
-  // This method is used to load messages from Firestore
-  void _loadMessagesFromCloud() {
-    String currentUserID = widget.userName; // Replace with the actual user identifier
-    String friendID = widget.friendName; // Replace with the actual friend identifier
-
-    FirebaseFirestore.instance
-        .collection('messages')
-        .where('receiver', isEqualTo: currentUserID)
-        .where('sender', isEqualTo: friendID)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .listen((snapshot) async {
-      for (var doc in snapshot.docs) {
-        // Create a Message object from the document
-        Message message = Message.fromMap({
-          'id': doc.id, // Firestore document ID
-          ...doc.data() as Map<String, dynamic>,
-        });
-
-        // Optionally, store the message in the local SQLite database
-        await DatabaseHelper.instance.insert(message.toMap());
-      }
-
-      // Load the messages into the UI
-      _loadMessagesFromLocal();
-    });
-
-    // Also listen for messages where the current user is the receiver
-    FirebaseFirestore.instance
-        .collection('messages')
-        .where('sender', isEqualTo: currentUserID)
-        .where('receiver', isEqualTo: friendID)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .listen((snapshot) async {
-      for (var doc in snapshot.docs) {
-        // Handle the received documents, similar to above
-      }
-
-      // Update the UI, similar to above
-
-    });
-  }
-
-  void _loadMessagesFromLocal() async {
-    List<Map<String, dynamic>> messageMaps = await DatabaseHelper.instance.queryAllRows();
-    List<Message> localMessages = messageMaps.map((messageMap) => Message.fromMap(messageMap)).toList();
-    setState(() {
-      messages = localMessages;
-    });
-  }
-
-
+  // Building each message item
   Widget _buildMessageItem(Message message) {
-    bool isUserMessage = message.sender == widget.userName;
+    bool isUserMessage = message.senderUid == FirebaseAuth.instance.currentUser!.uid;
     return Row(
       mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
@@ -360,6 +330,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // Message options (edit, delete)
   void _showMessageOptions(BuildContext context, Message message) {
     showModalBottomSheet(
       context: context,
@@ -381,7 +352,7 @@ class _ChatPageState extends State<ChatPage> {
               onTap: () {
                 // delete logic
                 Navigator.pop(context);
-                _deleteMessage(message.uid! as int); // Assuming id is not null here
+                _deleteMessage(message.uid!); // Assuming id is not null here
               },
             ),
           ],
@@ -390,6 +361,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // Edit dialog
   void _showEditDialog(Message message) {
     TextEditingController editController = TextEditingController(text: message.content);
     showDialog(
@@ -412,7 +384,7 @@ class _ChatPageState extends State<ChatPage> {
               child: const Text('Save'),
               onPressed: () {
                 if (editController.text.trim().isNotEmpty) {
-                  _editMessage(message.uid! as int, editController.text.trim());
+                  _editMessage(message.uid!, editController.text.trim());
                 }
                 Navigator.of(context).pop();
               },
@@ -423,8 +395,51 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  // Assume DatabaseHelper is a class that handles local database operations
+  final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
+
+  // Method to backup chat history to local storage
+  Future<void> backupChatToLocalForSpecificFriend(String friendUid) async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    for (var message in messages) {
+      // Check if the current user is involved in the message
+      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+        if (message.senderUid == friendUid || message.receiverUid == friendUid) {
+          // Save the message to local storage
+          await _databaseHelper.insertMessage(message.toMap());
+        }
+      }
+    }
+  }
+
+
+  // Method to upload local backup to the cloud, only for messages between the current user and the specified friend
+  Future<void> uploadLocalBackupToCloudForSpecificFriend(String friendUid) async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    // Fetch messages from local storage
+    List<Message> localMessages = await _databaseHelper.queryMessagesBetween(currentUserUid, friendUid);
+
+    for (var localMessage in localMessages) {
+      // Check if the message already exists in the cloud
+      var existingDoc = await FirebaseFirestore.instance.collection('messages')
+          .doc(localMessage.uid)
+          .get();
+
+      // If the message doesn't exist in the cloud, upload it
+      if (!existingDoc.exists) {
+        await FirebaseFirestore.instance.collection('messages')
+            .doc(localMessage.uid)
+            .set(localMessage.toMap());
+      }
+    }
+  }
+
+
   @override
   void dispose() {
+    // Dispose controllers
     _messageController.dispose();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();

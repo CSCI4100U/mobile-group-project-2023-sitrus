@@ -52,7 +52,7 @@ Future<void> _goto_friends_list_page(context) async {
   await initializeFirebase(); // Initialize Firebase
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => MyApp()), // Go to the friend list page
+    MaterialPageRoute(builder: (context) => FriendList()), // Go to the friend list page
   );
 }
 

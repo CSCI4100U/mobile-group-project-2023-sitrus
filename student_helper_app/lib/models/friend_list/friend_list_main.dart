@@ -29,11 +29,11 @@ Future<void> main() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   // Run the app
-  runApp(const MyApp());
+  runApp(const FriendList());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FriendList extends StatelessWidget {
+  const FriendList({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,8 @@
-
-
 import 'package:flutter/material.dart';
 import 'schedule_display_generated_page.dart';
-import '../models/course_model.dart';
-import '../models/schedule_formsWidget.dart';
+import '../models/schedule_course_model.dart';
+import '../models/schedule_input_course_widget.dart';
 
-/*
 class CreateNewSchedulePage extends StatefulWidget {
   const CreateNewSchedulePage({super.key});
 
@@ -17,30 +14,41 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    List<ScheduleFormsWidget> courseWidgets = [
-      ScheduleFormsWidget(),
-      ScheduleFormsWidget(),
-      ScheduleFormsWidget(),
+    //todo (for final): change this so that a CourseWidget is added when a button is pressed
+    // instead of having a fixed amount (currently 7 - allows you to test all the functionality so far)
+    List<InputCourseWidget> courseWidgets = [
+      InputCourseWidget(),
+      InputCourseWidget(),
+      InputCourseWidget(),
+      InputCourseWidget(),
+      InputCourseWidget(),
+      InputCourseWidget(),
+      InputCourseWidget(),
     ];
+
     List<Course> courses = [];
+
+    //todo (for final): change Colors list so that it's based on the number of courses entered
+    // loop through courseWidgets.length and generate a random (no overlap) list
+    // of Colors of equal length
+    List<Color> colors = [Colors.redAccent, Colors.blue, Colors.green, Colors.yellow, Colors.purpleAccent, Colors.orange, Colors.cyan];
 
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text("Make New Schedules"),
-          //TEMPORARY BUTTON TO RELOAD PAGE VIA SETSTATE, WILL NEED TO CREATE A FUNCTION OR SOMETHING TO RELOAD SPECIFIC WIDGETS
+          //todo (for final): add a better button? for when the user finishes inputting course info
           actions: [
             IconButton(
               onPressed: () {
                 for (int i = 0; i < courseWidgets.length; i++) {
-                  // print("${courseWidgets[i].getCourse().className} start time: ${courseWidgets[i].getCourse().times![0].startTime!.convertToInt()}");
-                  courses.add(courseWidgets[i].getCourse());
+                  courses.add(courseWidgets[i].getCourse(colors[i]));
+                  // courses.add(courseWidgets[i].getCourse());
                 }
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DisplayGeneratedSchedulesPage(courses: courses)),
+                      builder: (context) => DisplayGeneratedSchedulesPage(coursesFromInput: courses)),
                 );
               },
               icon: Icon(Icons.navigate_next),
@@ -57,5 +65,3 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
     );
   }
 }
-
- */

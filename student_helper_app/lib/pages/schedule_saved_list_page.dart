@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/schedule_model.dart';
+import '../models/schedule_schedule_model.dart';
 
 class ScheduleSavedListPage extends StatefulWidget {
   const ScheduleSavedListPage({super.key});

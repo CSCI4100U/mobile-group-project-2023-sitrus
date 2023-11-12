@@ -9,6 +9,8 @@ import 'local_storage.dart';
 import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
 import 'friends_profile_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FriendListPage extends StatefulWidget {
   const FriendListPage({super.key});
@@ -32,6 +34,11 @@ class _FriendListPageState extends State<FriendListPage> {
   List<Message> messages = [];
   // A complete list of all friends, unfiltered
   List<AppUser> allFriends = [];
+
+  String _weatherDescription = 'Loading weather...';
+  String _apiKey = '30c17ef9cc1cd4397ee2239f09434073'; // Replace with your actual API key from OpenWeatherMap
+  String location = 'Oshawa'; // Example location
+
 
   // Fetches the current Firebase user and converts their data to an AppUser object
   Future<AppUser> _fetchCurrentUser() async {
@@ -301,7 +308,44 @@ class _FriendListPageState extends State<FriendListPage> {
         allFriends = friendsList;
       });
     });
+    _fetchWeather();
   }
+
+  // Fetches weather data from the Weatherstack API
+  Future<Map<String, dynamic>> fetchWeather(String apiKey, String location) async {
+    String url = 'http://api.weatherstack.com/current?access_key=$apiKey&query=$location';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseJson = json.decode(response.body);
+      if (responseJson['error'] != null) {
+        throw Exception('Weather API error: ${responseJson['error']['info']}');
+      }
+      return responseJson;
+    } else {
+      throw Exception('Failed to load weather data with status code: ${response.statusCode}');
+    }
+  }
+
+  // Fetches the weather description and updates the UI
+  void _fetchWeather() async {
+    try {
+      // Make sure to use https if you're on a paid plan for Weatherstack
+      final weatherData = await fetchWeather(_apiKey, location);
+      setState(() {
+        _weatherDescription = '${weatherData['current']['temperature']}°C, ${weatherData['current']['weather_descriptions'][0]}';
+      });
+    } catch (e) {
+      setState(() {
+        _weatherDescription = 'Weather unavailable';
+      });
+      if (kDebugMode) {
+        print('Error fetching weather: $e');
+      }
+    }
+  }
+
 
   // Function to search for friends based on a query
   void _searchFriend(String searchQuery) async {
@@ -634,6 +678,7 @@ class _FriendListPageState extends State<FriendListPage> {
         ),
         title: const Text('Friend List'),
         actions: <Widget>[
+          Center(child: Text(_weatherDescription)),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {

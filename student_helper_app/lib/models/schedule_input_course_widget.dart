@@ -159,36 +159,42 @@ class InputCourseWidget {
                           ),
                         ],
                       ),
-                    ]),
-              ),
-              ValueListenableBuilder<int>(
-                  valueListenable: startHour,
-                  builder: (context, startHourValue, child) {
-                    return ValueListenableBuilder<int>(
-                      valueListenable: startMinute,
-                      builder: (context, startMinuteValue, child) {
-                        return ValueListenableBuilder<int>(
-                            valueListenable: endHour,
-                            builder: (context, endHourValue, child) {
-                              return ValueListenableBuilder<int>(
-                                valueListenable: endMinute,
-                                builder: (context, endMinuteValue, child) {
-                                  return ValueListenableBuilder<String>(
-                                    valueListenable: selectedDay,
-                                    builder:
-                                        (context, selectedDayValue, child) {
-                                      return Text(
-                                        '${startHourValue.toString().padLeft(2, '0')}:${startMinuteValue.toString().padLeft(2, '0')} to ${endHourValue.toString().padLeft(2, '0')}:${endMinuteValue.toString().padLeft(2, '0')} on $selectedDayValue',
-                                        style: TextStyle(fontSize: 18),
+                      ValueListenableBuilder<int>(
+                          valueListenable: startHour,
+                          builder: (context, startHourValue, child) {
+                            return ValueListenableBuilder<int>(
+                              valueListenable: startMinute,
+                              builder: (context, startMinuteValue, child) {
+                                return ValueListenableBuilder<int>(
+                                    valueListenable: endHour,
+                                    builder: (context, endHourValue, child) {
+                                      return ValueListenableBuilder<int>(
+                                        valueListenable: endMinute,
+                                        builder:
+                                            (context, endMinuteValue, child) {
+                                          return ValueListenableBuilder<String>(
+                                            valueListenable: selectedDay,
+                                            builder: (context, selectedDayValue,
+                                                child) {
+                                              return Text(
+                                                '${startHourValue.toString().padLeft(2, '0')}:${startMinuteValue.toString().padLeft(2, '0')} to ${endHourValue.toString().padLeft(2, '0')}:${endMinuteValue.toString().padLeft(2, '0')} on $selectedDayValue',
+                                                style: TextStyle(fontSize: 18),
+                                              );
+                                            },
+                                          );
+                                        },
                                       );
-                                    },
-                                  );
-                                },
-                              );
-                            });
-                      },
-                    );
-                  }),
-            ]));
+                                    });
+                              },
+                            );
+                          }
+                      ),
+                    ]
+                ),
+              ),
+              SizedBox(height: 10.0,),
+            ]
+        )
+    );
   }
 }

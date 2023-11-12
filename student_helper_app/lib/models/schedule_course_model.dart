@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Course {
-  String? className;
+  String? courseName;
   List<ClassTime>? times;
   Color? color;
 
-  Course(this.className, this.times, this.color);
+  Course(this.courseName, this.times, this.color);
 
   //maybe have a setColor function?
 }

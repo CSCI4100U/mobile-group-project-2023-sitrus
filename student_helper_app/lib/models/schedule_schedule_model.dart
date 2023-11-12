@@ -94,7 +94,7 @@ class Schedule {
   bool containsCourse(String className) {
     //or maybe pass it a Course object? and do if paramCourse.clasName = course.className
     for (Course course in courses!) {
-      if (course.className == className) {
+      if (course.courseName == className) {
         return true;
       }
     }

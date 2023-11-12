@@ -15,21 +15,18 @@ import '../models/friend_list/friend_list_main.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../../firebase_options.dart';
 
-/*
-void _goto_schedule_home_page(context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => ScheduleMakerHomePage()),
-  );
-}
-
- */
-
 // Initialize Firebase
 Future<void> initializeFirebase() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+}
+
+void _goto_schedule_home_page(context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ScheduleMakerHomePage()),
   );
 }
 
@@ -109,7 +106,7 @@ class HomePage extends StatelessWidget {
                     fontSize: 36,
                   )),
               onPressed: () {
-                _goto_settings_page(context);
+                _goto_schedule_home_page(context);
               },
               label: Text("Schedule Maker")),
           SizedBox(

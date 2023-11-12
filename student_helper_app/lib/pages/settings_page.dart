@@ -20,7 +20,7 @@ void _goto_login_page(context) {
     MaterialPageRoute(builder: (context) => LoginPage()),
   );
 }
-
+//test github comment
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -36,14 +36,14 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: ListView(
         children: <Widget>[
           SwitchListTile(
-            title: Text('Friend Request Notifications'),
+            title: const Text('Friend Request Notifications (In progress)'),
             subtitle:
-                Text('When receiving requests and upon accepted requests'),
+                const Text('When receiving requests and upon accepted requests'),
             value: notificationsEnabled,
             onChanged: (value) {
               setState(() {
@@ -52,8 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: Text('SAS Notifications'),
-            subtitle: Text('Reminders for renewal and upcoming assessments'),
+            title: const Text('SAS Notifications (In progress)'),
+            subtitle: const Text('Reminders for renewal and upcoming assessments'),
             value: notificationsEnabled,
             onChanged: (value) {
               setState(() {
@@ -62,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           SwitchListTile(
-            title: Text('Enable Dark Mode'),
+            title: const Text('Enable Dark Mode (In progress)'),
             value: darkModeEnabled,
             onChanged: (value) {
               setState(() {

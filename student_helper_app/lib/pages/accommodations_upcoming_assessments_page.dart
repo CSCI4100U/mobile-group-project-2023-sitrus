@@ -1,11 +1,10 @@
 
 
 // main.dart
-/*
+
 
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
-import 'package:student_helper_project/models/sas_model/Assessments.dart';
 
 
 
@@ -19,7 +18,7 @@ class UpcomingPage extends StatefulWidget {
 class UpcomingPageState extends State<UpcomingPage> {
   final List<Accommodation> amdtns = [
     //These are just here for now to prove that this works
-    //The plan is for the user to be able to tell what accommodations they'll have acess to
+    //The plan is for the user to be able to tell what accommodations they'll have access to
     Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz']),
     Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe', assessments: ['Test', 'Quiz', 'Written Work']),
 
@@ -197,4 +196,3 @@ class EventSearch extends SearchDelegate<String> {
 }
 
 
- */

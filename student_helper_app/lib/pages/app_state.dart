@@ -6,7 +6,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';                                     // new
 
-import 'firebase_options.dart';
+import '../firebase_options.dart';
 import 'guest_book_message.dart';
 
 

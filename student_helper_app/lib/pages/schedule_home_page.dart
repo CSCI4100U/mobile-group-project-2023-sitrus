@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'schedule_saved_list_page.dart';
 import 'schedule_create_new_page.dart';
 
+
+/*
 void _goto_scheduleSavedList_page(context) {
   Navigator.push(
     context,
@@ -119,3 +121,6 @@ class ScheduleMakerHomePage extends StatelessWidget {
     );
   }
 }
+
+
+ */

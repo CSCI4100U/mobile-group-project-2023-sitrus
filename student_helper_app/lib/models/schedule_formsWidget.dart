@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'schedule_course_model.dart';
 //courseWidget.dart
+import 'schedule_course_model.dart';
+
 class ScheduleFormsWidget {
 
   Course getCourse() {
@@ -98,7 +100,7 @@ class ScheduleFormsWidget {
                                 },
                               ),
                               ValueListenableBuilder<int>(
-                                valueListenable: selectedMinute,
+                                valueListenable: startMinute,
                                 builder: (context, value, child) {
                                   return DropdownButton<int>(
                                     value: value,
@@ -109,7 +111,7 @@ class ScheduleFormsWidget {
                                       );
                                     }).toList(),
                                     onChanged: (int? value) {
-                                      selectedMinute.value = value!;
+                                      startMinute.value = value!;
                                     },
                                   );
                                 },
@@ -152,7 +154,7 @@ class ScheduleFormsWidget {
                               ],
                           ),
                           Text(
-                    'Selected Time: ${selectedHour.toString().padLeft(2, '0')}:${selectedMinute.toString().padLeft(2, '0')}',
+                    'Selected Time: ${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}',
                     style: TextStyle(fontSize: 18),
                   ),
             ]),

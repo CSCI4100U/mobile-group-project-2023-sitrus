@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:student_helper_project/pages/home_page.dart';
 import 'friend_registration_page.dart';
 import 'friends_list_home_page.dart';
 
@@ -160,7 +161,11 @@ class _LoginPageState extends State<LoginPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             // Navigate to the HomePage for now
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+            // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
           },
         ),
         title: Text('Login'),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../pages/home_page.dart';
 import 'appuser.dart';
 import 'message.dart';
 import 'local_storage.dart';
@@ -182,6 +183,17 @@ class _FriendListPageState extends State<FriendListPage> {
                 // load logic
                 Navigator.pop(context);
                 uploadLocalBackupToCloud();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.arrow_back),
+              title: const Text('Back to Home Page'),
+              onTap: () {
+                // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()), // Go to the home page
+                );
               },
             ),
           ],

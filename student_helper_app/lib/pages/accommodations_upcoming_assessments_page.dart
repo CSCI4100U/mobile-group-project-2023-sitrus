@@ -1,6 +1,7 @@
 
 
 // main.dart
+/*
 
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
@@ -194,3 +195,6 @@ class EventSearch extends SearchDelegate<String> {
     return EventList(accommodations: suggestionList);
   }
 }
+
+
+ */

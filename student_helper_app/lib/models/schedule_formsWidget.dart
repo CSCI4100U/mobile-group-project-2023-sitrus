@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'course_model.dart';
 
+/*
 class ScheduleFormsWidget {
 
   Course getCourse() {
@@ -160,3 +161,4 @@ class ScheduleFormsWidget {
         ]));
   }
 }
+*/

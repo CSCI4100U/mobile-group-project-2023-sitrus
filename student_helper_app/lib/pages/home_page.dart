@@ -12,12 +12,15 @@ import 'settings_page.dart';
 import 'map_page.dart';
 import 'profile_page.dart';
 
+/*
 void _goto_schedule_home_page(context) {
   Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => ScheduleMakerHomePage()),
   );
 }
+
+ */
 
 void _goto_SAS_home_page(context) {
   Navigator.push(
@@ -93,7 +96,7 @@ class HomePage extends StatelessWidget {
                     fontSize: 36,
                   )),
               onPressed: () {
-                _goto_schedule_home_page(context);
+                _goto_settings_page(context);
               },
               label: Text("Schedule Maker")),
           SizedBox(

@@ -11,6 +11,9 @@ import '../models/friend_list/friends_list_home_page.dart';
 import 'settings_page.dart';
 import 'map_page.dart';
 import 'profile_page.dart';
+import '../models/friend_list/friend_list_main.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../../firebase_options.dart';
 
 /*
 void _goto_schedule_home_page(context) {
@@ -21,6 +24,14 @@ void _goto_schedule_home_page(context) {
 }
 
  */
+
+// Initialize Firebase
+Future<void> initializeFirebase() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+}
 
 void _goto_SAS_home_page(context) {
   Navigator.push(
@@ -36,10 +47,12 @@ void _goto_map_page(context) {
   );
 }
 
-void _goto_friends_list_page(context) {
+// Initialize Firebase and go to the friend list page
+Future<void> _goto_friends_list_page(context) async {
+  await initializeFirebase(); // Initialize Firebase
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => FriendListPage()),
+    MaterialPageRoute(builder: (context) => MyApp()), // Go to the friend list page
   );
 }
 

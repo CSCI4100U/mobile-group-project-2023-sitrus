@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/course_model.dart';
-
+import '../models/schedule_course_model.dart';
+//display_generated.dart
 class DisplayGeneratedSchedulesPage extends StatelessWidget {
   DisplayGeneratedSchedulesPage({super.key, required this.courses});
 

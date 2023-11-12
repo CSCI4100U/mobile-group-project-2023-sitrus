@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'schedule_display_generated_page.dart';
-import '../models/course_model.dart';
+import '../models/schedule_course_model.dart';
 import '../models/schedule_formsWidget.dart';
-
+//main.dart
 class CreateNewSchedulePage extends StatefulWidget {
   const CreateNewSchedulePage({super.key});
 

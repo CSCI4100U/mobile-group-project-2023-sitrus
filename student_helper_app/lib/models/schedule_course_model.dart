@@ -1,3 +1,4 @@
+//course.dart
 class Course {
   String? className;
   String? dayOfWeek;

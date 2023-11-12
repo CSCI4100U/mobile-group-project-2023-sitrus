@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'course_model.dart';
-
+import 'schedule_course_model.dart';
+//courseWidget.dart
 class ScheduleFormsWidget {
 
   Course getCourse() {

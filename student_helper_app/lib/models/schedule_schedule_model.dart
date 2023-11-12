@@ -1,5 +1,5 @@
-import 'course_model.dart';
-
+import 'schedule_course_model.dart';
+//schedule.dart
 class Schedule {
   List<Course>? courses;
 

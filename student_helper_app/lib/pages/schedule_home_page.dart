@@ -36,6 +36,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.all(10),
         children: <Widget>[
+          /*
           Container(
             color: Colors.red,
             width: 200,
@@ -97,11 +98,15 @@ class ScheduleMakerHomePage extends StatelessWidget {
               onPressed: () {},
               label: Text("Program Map")),
           SizedBox(height: buttonSpacing),
+          
+           */
           OutlinedButton.icon(
               icon: Icon(
                 Icons.add,
                 size: iconSize,
               ),
+
+
               style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.indigo,

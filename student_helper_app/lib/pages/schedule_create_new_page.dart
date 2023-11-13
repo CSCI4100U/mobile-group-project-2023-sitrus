@@ -46,17 +46,17 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
                 courseInfoFilled = true;
                 for (int i = 0; i < courseWidgets.length; i++) {
                   //todo: implement better error checking/handling
-                  // if (courseWidgets[i].endHour.value < courseWidgets[i].startHour.value
-                  //     ||
-                  //     courseWidgets[i].endHour.value == courseWidgets[i].startHour.value && courseWidgets[i].endMinute.value < courseWidgets[i].startMinute.value) {
-                  //   courseInfoFilled = false;
-                  //   break;
-                  // } else if (courseWidgets[i].courseNameController.text.isEmpty) {
-                  //   courseInfoFilled = false;
-                  //   break;
-                  // } else {
+                  if (courseWidgets[i].endHour.value < courseWidgets[i].startHour.value
+                      ||
+                      courseWidgets[i].endHour.value == courseWidgets[i].startHour.value && courseWidgets[i].endMinute.value <= courseWidgets[i].startMinute.value) {
+                    courseInfoFilled = false;
+                    break;
+                  } else if (courseWidgets[i].courseNameController.text.isEmpty) {
+                    courseInfoFilled = false;
+                    break;
+                  } else {
                     courses.add(courseWidgets[i].getCourse(colors[i]));
-                  // }
+                  }
                 }
                 if (courseInfoFilled) {
                   Navigator.push(
@@ -65,6 +65,12 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
                         builder: (context) =>
                             DisplayGeneratedSchedulesPage(
                                 coursesFromInput: courses)),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill in all fields'),
+                    ),
                   );
                 }
               },

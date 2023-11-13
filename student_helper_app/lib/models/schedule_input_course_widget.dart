@@ -31,7 +31,7 @@ class InputCourseWidget {
     'Saturday'
   ];
 
-  int? courseNum;
+  // int? courseNum;
 
   //todo (for final): add in dependencies input form inside this widget
   //todo (for final): add buttons in each input form to allow the user to add \
@@ -48,7 +48,7 @@ class InputCourseWidget {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text('Course ${courseNum! + 1}'),
+              // Text('Course ${courseNum! + 1}'),
               TextField(
                 controller: courseNameController,
                 decoration: InputDecoration(
@@ -81,7 +81,7 @@ class InputCourseWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Start Time: ",
+                          Text("Start",
                               style: TextStyle(fontSize: 18.0)),
                           ValueListenableBuilder<int>(
                             valueListenable: startHour,
@@ -121,7 +121,7 @@ class InputCourseWidget {
                               );
                             },
                           ),
-                          Text("End Time: ", style: TextStyle(fontSize: 18.0)),
+                          Text("End", style: TextStyle(fontSize: 18.0)),
                           ValueListenableBuilder<int>(
                             valueListenable: endHour,
                             builder: (context, value, child) {
@@ -139,7 +139,6 @@ class InputCourseWidget {
                               );
                             },
                           ),
-                          Text("End Time: ", style: TextStyle(fontSize: 18.0)),
                           ValueListenableBuilder<int>(
                             valueListenable: endMinute,
                             builder: (context, value, child) {

@@ -43,7 +43,6 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
               onPressed: () {
                 for (int i = 0; i < courseWidgets.length; i++) {
                   courses.add(courseWidgets[i].getCourse(colors[i]));
-                  // courses.add(courseWidgets[i].getCourse());
                 }
                 Navigator.push(
                   context,

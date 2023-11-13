@@ -38,7 +38,7 @@ class DisplayGeneratedSchedulesPage extends StatelessWidget {
   // schedule represented by the rectangles that are needed to draw the schedule
   List<List<CourseRectangle>> schedulesAsRectanglesList = [];
 
-  static const double timeFontSize = 17.0;
+  static const double timeFontSize = 14.0;
   static const double dayFontSize = 16.0;
 
   @override

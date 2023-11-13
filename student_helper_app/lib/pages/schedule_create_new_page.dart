@@ -33,6 +33,8 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
     // of Colors of equal length
     List<Color> colors = [Colors.redAccent, Colors.blue, Colors.green, Colors.yellow, Colors.purpleAccent, Colors.orange, Colors.cyan];
 
+    bool courseInfoFilled = true;
+
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -41,14 +43,30 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
           actions: [
             IconButton(
               onPressed: () {
+                courseInfoFilled = true;
                 for (int i = 0; i < courseWidgets.length; i++) {
-                  courses.add(courseWidgets[i].getCourse(colors[i]));
+                  //todo: implement better error checking/handling
+                  // if (courseWidgets[i].endHour.value < courseWidgets[i].startHour.value
+                  //     ||
+                  //     courseWidgets[i].endHour.value == courseWidgets[i].startHour.value && courseWidgets[i].endMinute.value < courseWidgets[i].startMinute.value) {
+                  //   courseInfoFilled = false;
+                  //   break;
+                  // } else if (courseWidgets[i].courseNameController.text.isEmpty) {
+                  //   courseInfoFilled = false;
+                  //   break;
+                  // } else {
+                    courses.add(courseWidgets[i].getCourse(colors[i]));
+                  // }
                 }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DisplayGeneratedSchedulesPage(coursesFromInput: courses)),
-                );
+                if (courseInfoFilled) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DisplayGeneratedSchedulesPage(
+                                coursesFromInput: courses)),
+                  );
+                }
               },
               icon: Icon(Icons.navigate_next),
             )

@@ -2,9 +2,9 @@
 
 // main.dart
 
-
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
+//import 'package:student_helper_project/models/sas_model/Assessments.dart';
 
 
 
@@ -18,9 +18,11 @@ class UpcomingPage extends StatefulWidget {
 class UpcomingPageState extends State<UpcomingPage> {
   final List<Accommodation> amdtns = [
     //These are just here for now to prove that this works
-    //The plan is for the user to be able to tell what accommodations they'll have access to
-    Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz']),
-    Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe', assessments: ['Test', 'Quiz', 'Written Work']),
+    //The plan is for the user to be able to tell what accommodations they'll have acess to
+    Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz'],
+        eventDate: DateTime.utc(2023,11,29)),
+    Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe',
+        assessments: ['Test', 'Quiz', 'Written Work'], eventDate: DateTime.utc(2023, 4, 7)),
 
   ];
 
@@ -65,6 +67,8 @@ class UpcomingPageState extends State<UpcomingPage> {
     String eventName = '';
     String eventType = '';
     String? Acmdtn;
+    DateTime eventDate = DateTime.now(); // Set a default date
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -88,15 +92,31 @@ class UpcomingPageState extends State<UpcomingPage> {
                     setState(() {
                       eventType = value;
                       if (amdtns.any((e) => e.assessments.contains(value))) {
-                        var temp = (amdtns.where((e) => e.assessments.contains(value)));
+                        var temp = (amdtns.where((e) =>
+                            e.assessments.contains(value)));
                         Acmdtn = temp.first.desc;
-                        print (Acmdtn);
+                        print(Acmdtn);
                       }
                     });
-
-
-
                   },
+                ),
+                const SizedBox(height: 16),
+                // Add a date picker for event date
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null && pickedDate != eventDate) {
+                      setState(() {
+                        eventDate = pickedDate;
+                      });
+                    }
+                  },
+                  child: Text('Select Event Date'),
                 ),
               ],
             ),
@@ -110,13 +130,13 @@ class UpcomingPageState extends State<UpcomingPage> {
             ),
             TextButton(
               onPressed: () {
-
                 setState(() {
-                  print ("Add");
-                  amdtns.add(Accommodation(name: eventName, desc: Acmdtn ?? eventType, assessments: ['']));
-
+                  print("Add");
+                  amdtns.add(Accommodation(name: eventName,
+                      desc: Acmdtn ?? eventType,
+                      assessments: [''],
+                      eventDate: eventDate));
                 });
-
                 Navigator.of(context).pop();
               },
               child: Text('Add'),
@@ -125,12 +145,10 @@ class UpcomingPageState extends State<UpcomingPage> {
         );
       },
     );
-  }
-}
-
+  }}
 class EventList extends StatelessWidget {
   final List<Accommodation> accommodations;
-  //final List<Assessments> assessments;
+
   EventList({required this.accommodations});
 
   @override
@@ -138,17 +156,29 @@ class EventList extends StatelessWidget {
     return ListView.builder(
       itemCount: accommodations.length,
       itemBuilder: (context, index) {
+        bool withinTwoWeekNotice = accommodations[index].isWithinTwoWeekNotice();
+
         return ListTile(
           title: Text(accommodations[index].name as String),
-          subtitle: Text(accommodations[index].desc as String),
-          onTap: () {
-          },
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Description: ${accommodations[index].desc}'),
+              Text('Date: ${accommodations[index].eventDate.toLocal()}'),
+              Text(
+                'Within Two-Week Notice: ${withinTwoWeekNotice ? "Yes" : "No"}',
+                style: TextStyle(
+                  color: withinTwoWeekNotice ? Colors.red : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),),
+            ],
+          ),
+          onTap: () {},
         );
       },
     );
   }
 }
-
 
 class EventSearch extends SearchDelegate<String> {
   final List<Accommodation> accommodations;
@@ -194,5 +224,3 @@ class EventSearch extends SearchDelegate<String> {
     return EventList(accommodations: suggestionList);
   }
 }
-
-

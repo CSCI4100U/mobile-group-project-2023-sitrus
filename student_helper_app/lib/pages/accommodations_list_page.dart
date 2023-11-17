@@ -131,7 +131,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
                     desc: editedNotes,
                     name: editedName,
                     assessments: [''],
-                      eventDate: DateTime.now()
+                      //eventDate: DateTime.now()
                   );
                   Navigator.of(context).pop(updatedAcmdn);
                 }

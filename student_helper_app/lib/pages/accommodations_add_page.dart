@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 //import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
 import 'package:student_helper_project/models/sas_model/Sas_ModelSQLite.dart';
 import 'accommodations_list_page.dart';
@@ -63,7 +62,8 @@ class AddAccommodation_State extends State<AddAccommodation> {
           final newAcmdn = Accommodation(
             desc: n,
             name: g,
-            assessments: ['Test']
+            assessments: ['Test'],
+              eventDate: DateTime.now()
           );
 
           SASModel gradesModel=new SASModel();

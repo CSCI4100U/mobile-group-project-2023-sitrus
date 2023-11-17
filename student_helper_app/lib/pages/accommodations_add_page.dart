@@ -63,7 +63,7 @@ class AddAccommodation_State extends State<AddAccommodation> {
             desc: n,
             name: g,
             assessments: ['Test'],
-              eventDate: DateTime.now()
+              
           );
 
           SASModel gradesModel=new SASModel();

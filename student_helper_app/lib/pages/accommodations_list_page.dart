@@ -84,7 +84,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       // Handle the result, which contains the studentId and grade
       final studentId = result[0];
       final g = result[1];
-      sas_model.insertAcmdn(Accommodation(name: g, desc: studentId, assessments: ['']));
+      sas_model.insertAcmdn(Accommodation(name: g, desc: studentId, assessments: [''], eventDate: DateTime.now()));
       _refreshList();
       // Perform any additional logic, such as adding the new grade to the list or database
     }
@@ -127,10 +127,11 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
 
                 if (editedNotes.isNotEmpty && editedName.isNotEmpty) {
                   final updatedAcmdn = Accommodation(
-                    id: acmdn.id,
+                    //id: acmdn.id,
                     desc: editedNotes,
                     name: editedName,
-                    assessments: ['']
+                    assessments: [''],
+                      eventDate: DateTime.now()
                   );
                   Navigator.of(context).pop(updatedAcmdn);
                 }

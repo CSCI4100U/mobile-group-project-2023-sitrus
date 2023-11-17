@@ -2,15 +2,12 @@
 
 mobile devices student helper app project
 
-## Getting Started
+## Demo Notes
 
-This project is a starting point for a Flutter application.
+Please read the "schedule maker explanation.pdf" for a tutorial and other details on how the schedule maker feature works.
 
-A few resources to get you started if this is your first Flutter project:
+Other features are pretty self-explanatory so we did not include a help page for them. 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+There may be some errors that the group did not catch during testing; sorry and please report any errors. 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Many of the small functions of a big feature mentioned in the proposal have not been implemented; these will be done for the final. This was a demo, so the group prioritized that the major features have their main functionality.

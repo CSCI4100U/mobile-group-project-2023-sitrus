@@ -9,13 +9,13 @@ class Accommodation{
   String? desc;
   //'assessments' details what assessments get affected by this accommodation
   List<String> assessments = [''];
-  DateTime eventDate=DateTime.now();
+  DateTime? eventDate=DateTime.now();
 
-  Accommodation({required this.name, required this.desc, required this.assessments, required this.eventDate});
+  Accommodation({required this.name, required this.desc, required this.assessments, eventDate});
 
-  bool isWithinTwoWeekNotice() {
+  bool? isWithinTwoWeekNotice() {
     DateTime twoWeekNotice = DateTime.now().add(Duration(days: 14));
-    return eventDate.isBefore(twoWeekNotice);
+    return eventDate?.isBefore(twoWeekNotice);
   }
   Map<String, Object?> toMap() {
     return {

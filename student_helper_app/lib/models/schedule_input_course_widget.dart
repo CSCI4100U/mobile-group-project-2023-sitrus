@@ -60,11 +60,15 @@ class InputCourseWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Class Meeting Time"),
+                      Row(children: [
+                        Text("Class Meeting Time"),
+                      ]),
                       ValueListenableBuilder<String>(
                         valueListenable: selectedDay,
                         builder: (context, value, child) {
                           return DropdownButton<String>(
+                            style:
+                                TextStyle(fontSize: 32.0, color: Colors.black),
                             value: value,
                             items: daysOfWeek.map((day) {
                               return DropdownMenuItem<String>(
@@ -79,53 +83,62 @@ class InputCourseWidget {
                         },
                       ),
                       Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Start ", style: TextStyle(fontSize: 32.0)),
+                            ValueListenableBuilder<int>(
+                              valueListenable: startHour,
+                              builder: (context, value, child) {
+                                return DropdownButton<int>(
+                                  style: TextStyle(
+                                      fontSize: 32.0, color: Colors.black),
+                                  value: value,
+                                  items: hours.map((hour) {
+                                    return DropdownMenuItem<int>(
+                                      value: hour,
+                                      child: Text('$hour'.padLeft(2, '0')),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? value) {
+                                    startHour.value = value!;
+                                  },
+                                );
+                              },
+                            ),
+                            Text(
+                              ':',
+                              style: TextStyle(fontSize: 32.0),
+                            ),
+                            ValueListenableBuilder<int>(
+                              valueListenable: startMinute,
+                              builder: (context, value, child) {
+                                return DropdownButton<int>(
+                                  style: TextStyle(
+                                      fontSize: 32.0, color: Colors.black),
+                                  value: value,
+                                  items: minutes.map((minute) {
+                                    return DropdownMenuItem<int>(
+                                      value: minute,
+                                      child: Text('$minute'.padLeft(2, '0')),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int? value) {
+                                    startMinute.value = value!;
+                                  },
+                                );
+                              },
+                            ),
+                          ]),
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Start",
-                              style: TextStyle(fontSize: 18.0)),
-                          ValueListenableBuilder<int>(
-                            valueListenable: startHour,
-                            builder: (context, value, child) {
-                              return DropdownButton<int>(
-                                value: value,
-                                items: hours.map((hour) {
-                                  return DropdownMenuItem<int>(
-                                    value: hour,
-                                    child: Text('$hour'.padLeft(2, '0')),
-                                  );
-                                }).toList(),
-                                onChanged: (int? value) {
-                                  startHour.value = value!;
-                                },
-                              );
-                            },
-                          ),
-                          Text(
-                            ':',
-                            style: TextStyle(fontSize: 18.0),
-                          ),
-                          ValueListenableBuilder<int>(
-                            valueListenable: startMinute,
-                            builder: (context, value, child) {
-                              return DropdownButton<int>(
-                                value: value,
-                                items: minutes.map((minute) {
-                                  return DropdownMenuItem<int>(
-                                    value: minute,
-                                    child: Text('$minute'.padLeft(2, '0')),
-                                  );
-                                }).toList(),
-                                onChanged: (int? value) {
-                                  startMinute.value = value!;
-                                },
-                              );
-                            },
-                          ),
-                          Text("End", style: TextStyle(fontSize: 18.0)),
+                          Text("End ", style: TextStyle(fontSize: 32.0)),
                           ValueListenableBuilder<int>(
                             valueListenable: endHour,
                             builder: (context, value, child) {
                               return DropdownButton<int>(
+                                style: TextStyle(
+                                    fontSize: 32.0, color: Colors.black),
                                 value: value,
                                 items: hours.map((hour) {
                                   return DropdownMenuItem<int>(
@@ -139,10 +152,16 @@ class InputCourseWidget {
                               );
                             },
                           ),
+                          Text(
+                            ':',
+                            style: TextStyle(fontSize: 32.0),
+                          ),
                           ValueListenableBuilder<int>(
                             valueListenable: endMinute,
                             builder: (context, value, child) {
                               return DropdownButton<int>(
+                                style: TextStyle(
+                                    fontSize: 32.0, color: Colors.black),
                                 value: value,
                                 items: minutes.map((minute) {
                                   return DropdownMenuItem<int>(
@@ -186,14 +205,12 @@ class InputCourseWidget {
                                     });
                               },
                             );
-                          }
-                      ),
-                    ]
-                ),
+                          }),
+                    ]),
               ),
-              SizedBox(height: 10.0,),
-            ]
-        )
-    );
+              SizedBox(
+                height: 10.0,
+              ),
+            ]));
   }
 }

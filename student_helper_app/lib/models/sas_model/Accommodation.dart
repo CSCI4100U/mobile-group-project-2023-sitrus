@@ -1,6 +1,7 @@
 class Accommodation{
+
   //basic layout of what information there would be per accommodation
-  Accommodation({this.id, this.name, this.desc, required this.assessments});
+  //Accommodation({this.id, this.name, this.desc, required this.assessments});
   int? id;
   //Below, we have 'name' for 'what is this accommodation called
   String? name;
@@ -8,12 +9,21 @@ class Accommodation{
   String? desc;
   //'assessments' details what assessments get affected by this accommodation
   List<String> assessments = [''];
+  DateTime eventDate=DateTime.now();
+
+  Accommodation({required this.name, required this.desc, required this.assessments, required this.eventDate});
+
+  bool isWithinTwoWeekNotice() {
+    DateTime twoWeekNotice = DateTime.now().add(Duration(days: 14));
+    return eventDate.isBefore(twoWeekNotice);
+  }
   Map<String, Object?> toMap() {
     return {
       'id': id,
       'name': name,
       'notes': desc,
-      'assements': assessments,
+      'assessments': assessments,
+      'eventdate' : eventDate,
     };
   }
 
@@ -23,6 +33,7 @@ class Accommodation{
     this.name=map['name'];
     this.desc=map['notes'];
     this.assessments=map['assessments'];
+    this.eventDate=map['eventDate'];
   }
 
 }

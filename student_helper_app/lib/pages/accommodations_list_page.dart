@@ -14,6 +14,9 @@ enum SortOrder { byName, byDate }
 
 SortOrder _currentSortOrder = SortOrder.byName;
 
+TextEditingController _searchController = TextEditingController();
+
+
 class ViewAccommodations extends StatefulWidget {
   @override
   ViewAccommodationsState createState() => ViewAccommodationsState();
@@ -64,26 +67,50 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
               _showExplanationPopup(context);
             },
           ),
+
         ],
       ),
-      body: ListView.builder(
-        itemCount: _accommodations.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_accommodations[index].name ?? "NA"),
-            subtitle: Text(_accommodations[index].desc ?? "NA"),
-            onTap: () {
-              _editAcmdn(context, _accommodations[index]);
-            },
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _deleteAcmdn(_accommodations[index].id);
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _refreshList(); // Reset the list when clearing the search
+                  },
+                ),
+              ),
+              onChanged: (value) {
+                _filterAccommodations(value);
               },
             ),
-          );
-        },
-      ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _accommodations.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_accommodations[index].name ?? "NA"),
+                  subtitle: Text(_accommodations[index].desc ?? "NA"),
+                  onTap: () {
+                    _editAcmdn(context, _accommodations[index]);
+                  },
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      _deleteAcmdn(_accommodations[index].id);
+                    },
+                  ),
+                );
+              },),),],),
+
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print ("Add button printed");
@@ -229,7 +256,21 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       },
     );
   }
+  //---------------------------------------------------------------------------
+  void _filterAccommodations(String query) {
+    List<Accommodation> filteredList = _accommodations
+        .where((accommodation) =>
+    accommodation.name!.toLowerCase().contains(query.toLowerCase()) ||
+        accommodation.desc!.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    setState(() {
+      _accommodations = filteredList;
+    });
+  }
+
 
 }
+
 
 

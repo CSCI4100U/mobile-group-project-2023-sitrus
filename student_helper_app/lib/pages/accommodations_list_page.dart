@@ -9,6 +9,11 @@ import 'package:path/path.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
 import 'package:student_helper_project/models/sas_model/Sas_ModelSQLite.dart';
 import 'accommodations_add_page.dart';
+
+enum SortOrder { byName, byDate }
+
+SortOrder _currentSortOrder = SortOrder.byName;
+
 class ViewAccommodations extends StatefulWidget {
   @override
   ViewAccommodationsState createState() => ViewAccommodationsState();
@@ -18,7 +23,9 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
 
   SASModel sas_model = SASModel();
 
-  List<Accommodation> _accommodations = [];
+  List<Accommodation> _accommodations = [
+
+  ];
 
   @override
   void initState() {
@@ -30,8 +37,10 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
     final List<Accommodation> accommodations = await sas_model.getAll();
     setState(() {
       _accommodations = accommodations;
+      _sortAccommodations(); // Call the sorting method
     });
   }
+
 
 
   String selectedGrade = "NA";
@@ -42,6 +51,14 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       appBar: AppBar(
         title: Text('Your Accommodations'),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.sort),
+            onPressed: () {
+              _toggleSortOrder();
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: _accommodations.length,
@@ -130,8 +147,8 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
                     //id: acmdn.id,
                     desc: editedNotes,
                     name: editedName,
-                    assessments: [''],
-                      //eventDate: DateTime.now()
+                    assessments: ['Test'],
+                    //eventDate: DateTime.now(),
                   );
                   Navigator.of(context).pop(updatedAcmdn);
                 }
@@ -158,5 +175,28 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       // The deletion was successful, update the list of grades
       _refreshList();
     }
+  }void _toggleSortOrder() {
+    setState(() {
+      _currentSortOrder = (_currentSortOrder == SortOrder.byName)
+          ? SortOrder.byDate
+          : SortOrder.byName;
+
+      _sortAccommodations();
+    });
   }
+  void _sortAccommodations() {
+    setState(() {
+      switch (_currentSortOrder) {
+        case SortOrder.byName:
+          _accommodations.sort((a, b) => a.name?.compareTo(b.name as String) as int);
+          break;
+        case SortOrder.byDate:
+          _accommodations.sort((a, b) => a.eventDate?.compareTo(b.eventDate as DateTime) as int);
+          break;
+      }
+    });
+  }
+
 }
+
+

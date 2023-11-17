@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
-//import 'package:student_helper_project/models/sas_model/Assessments.dart';
 
 
 
@@ -20,7 +19,7 @@ class UpcomingPageState extends State<UpcomingPage> {
     //These are just here for now to prove that this works
     //The plan is for the user to be able to tell what accommodations they'll have acess to
     Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz'],
-        eventDate: DateTime.utc(2023,11,29)),
+    eventDate: DateTime.utc(2023,11,29)),
     Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe',
         assessments: ['Test', 'Quiz', 'Written Work'], eventDate: DateTime.utc(2023, 4, 7)),
 
@@ -156,21 +155,21 @@ class EventList extends StatelessWidget {
     return ListView.builder(
       itemCount: accommodations.length,
       itemBuilder: (context, index) {
-        bool withinTwoWeekNotice = accommodations[index].isWithinTwoWeekNotice();
+        bool? withinTwoWeekNotice = accommodations[index].isWithinTwoWeekNotice();
 
         return ListTile(
           title: Text(accommodations[index].name as String),
           subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Description: ${accommodations[index].desc}'),
-              Text('Date: ${accommodations[index].eventDate.toLocal()}'),
-              Text(
-                'Within Two-Week Notice: ${withinTwoWeekNotice ? "Yes" : "No"}',
-                style: TextStyle(
-                  color: withinTwoWeekNotice ? Colors.red : Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+          Text('Description: ${accommodations[index].desc}'),
+          Text('Date: ${accommodations[index].eventDate?.toLocal()}'),
+          Text(
+            'Within Two-Week Notice: ${withinTwoWeekNotice as bool ? "Yes" : "No"}',
+            style: TextStyle(
+              color: withinTwoWeekNotice ? Colors.red : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),),
             ],
           ),
           onTap: () {},
@@ -218,7 +217,7 @@ class EventSearch extends SearchDelegate<String> {
         ? accommodations
         : accommodations
         .where((event) =>
-        (event.name as String).toLowerCase().startsWith(query.toLowerCase()))
+    (event.name as String).toLowerCase().startsWith(query.toLowerCase()))
         .toList();
 
     return EventList(accommodations: suggestionList);

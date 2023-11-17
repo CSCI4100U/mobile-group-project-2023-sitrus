@@ -10,8 +10,15 @@ class SASModel{
     final db = await DBUtils.init();
     final List<Map<String, dynamic>> sasMaps = await db.query('accessibility');
 
-    List<Accommodation> accommodations = [];
+     List<Accommodation> accommodations = [
+      //These are just here for now to prove that this works
 
+      Accommodation(name: 'Extra Time', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz'],
+      ),
+      Accommodation(name: 'Assisted Writing', desc: 'Student is entitled to the use of a scribe',
+          assessments: ['Test', 'Quiz', 'Written Work']),
+
+    ];
     for (var map in sasMaps) {
 
       accommodations.add(Accommodation.fromMap(map));

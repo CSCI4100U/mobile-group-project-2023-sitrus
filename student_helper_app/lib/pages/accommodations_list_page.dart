@@ -58,6 +58,12 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
               _toggleSortOrder();
             },
           ),
+          IconButton(
+            icon: Icon(Icons.info),
+            onPressed: () {
+              _showExplanationPopup(context);
+            },
+          ),
         ],
       ),
       body: ListView.builder(
@@ -175,7 +181,9 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       // The deletion was successful, update the list of grades
       _refreshList();
     }
-  }void _toggleSortOrder() {
+  }
+  //---------------------------------------------------------------------------------------------
+  void _toggleSortOrder() {
     setState(() {
       _currentSortOrder = (_currentSortOrder == SortOrder.byName)
           ? SortOrder.byDate
@@ -195,6 +203,31 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
           break;
       }
     });
+  }
+//------------------------------------------------------------------------------------
+
+  void _showExplanationPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Page Explanation'),
+          content: Text(
+            'This page allows you to view and manage accommodations. '
+                'Tap on an item to edit it, press the delete button to remove it, '
+                'and use the add button to create a new accommodation.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 }

@@ -22,8 +22,6 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
       InputCourseWidget(),
       InputCourseWidget(),
       InputCourseWidget(),
-      InputCourseWidget(),
-      InputCourseWidget(),
     ];
 
     List<Course> courses = [];
@@ -78,13 +76,36 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
             )
           ],
         ),
-        body: ListView.separated(
-            padding: EdgeInsets.all(10.0),
-            itemCount: courseWidgets.length, // temp
-            separatorBuilder: (context, index) => Divider(height: 2),
-            itemBuilder: (context, index) {
-              return courseWidgets[index].build(context);
-            })
+        body: Column(
+          children: [
+            Expanded(
+              child:
+                ListView.separated(
+                    padding: EdgeInsets.all(10.0),
+                    itemCount: courseWidgets.length, // temp
+                    separatorBuilder: (context, index) => Divider(height: 2),
+                    itemBuilder: (context, index) {
+                      return courseWidgets[index].build(context);
+                    }),
+            ),
+            OutlinedButton.icon(
+                icon: Icon(
+                  Icons.add,
+                  size: 30,
+                ),
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.blue[400],
+                    minimumSize: Size(400, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0)),
+                    textStyle: TextStyle(
+                      fontSize: 30,
+                    )),
+                onPressed: () {},
+                label: Text("Add Course")),
+          ],
+        )
     );
   }
 }

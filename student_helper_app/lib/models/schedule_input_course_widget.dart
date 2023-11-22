@@ -18,6 +18,13 @@ class InputCourseWidget {
   final ValueNotifier<String> selectedDay = ValueNotifier<String>('Monday');
   final TextEditingController courseNameController = TextEditingController();
 
+  //temp
+  final ValueNotifier<int> startHour2 = ValueNotifier<int>(8);
+  final ValueNotifier<int> startMinute2 = ValueNotifier<int>(0);
+  final ValueNotifier<int> endHour2 = ValueNotifier<int>(8);
+  final ValueNotifier<int> endMinute2 = ValueNotifier<int>(0);
+  final ValueNotifier<String> selectedDay2 = ValueNotifier<String>('Monday');
+
   List<int> hours = List.generate(14,
       (index) => index + 8); //list from [8, 9, ..., 21] -> 8am, 9am,..., 9pm
   List<int> minutes = List.generate(60, (index) => index);
@@ -52,7 +59,8 @@ class InputCourseWidget {
               TextField(
                 controller: courseNameController,
                 decoration: InputDecoration(
-                  labelText: 'Enter course name',
+                    labelText: 'Enter course name',
+                    labelStyle: TextStyle(fontSize: 24.0)
                 ),
               ),
               Container(
@@ -61,7 +69,7 @@ class InputCourseWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Row(children: [
-                        Text("Class Meeting Time"),
+                        Text("Class Meeting Time 1", style: TextStyle(fontSize: 24.0)),
                       ]),
                       ValueListenableBuilder<String>(
                         valueListenable: selectedDay,
@@ -208,6 +216,178 @@ class InputCourseWidget {
                           }),
                     ]),
               ),
+              // //temp
+              // Container(
+              //   color: Colors.blue[400],
+              //   child: Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Row(children: [
+              //           Text("Class Meeting Time 2", style: TextStyle(fontSize: 24.0)),
+              //         ]),
+              //         ValueListenableBuilder<String>(
+              //           valueListenable: selectedDay2,
+              //           builder: (context, value, child) {
+              //             return DropdownButton<String>(
+              //               style:
+              //               TextStyle(fontSize: 32.0, color: Colors.black),
+              //               value: value,
+              //               items: daysOfWeek.map((day) {
+              //                 return DropdownMenuItem<String>(
+              //                   value: day,
+              //                   child: Text(day),
+              //                 );
+              //               }).toList(),
+              //               onChanged: (String? value) {
+              //                 selectedDay2.value = value!;
+              //               },
+              //             );
+              //           },
+              //         ),
+              //         Row(
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             children: [
+              //               Text("Start ", style: TextStyle(fontSize: 32.0)),
+              //               ValueListenableBuilder<int>(
+              //                 valueListenable: startHour2,
+              //                 builder: (context, value, child) {
+              //                   return DropdownButton<int>(
+              //                     style: TextStyle(
+              //                         fontSize: 32.0, color: Colors.black),
+              //                     value: value,
+              //                     items: hours.map((hour) {
+              //                       return DropdownMenuItem<int>(
+              //                         value: hour,
+              //                         child: Text('$hour'.padLeft(2, '0')),
+              //                       );
+              //                     }).toList(),
+              //                     onChanged: (int? value) {
+              //                       startHour2.value = value!;
+              //                     },
+              //                   );
+              //                 },
+              //               ),
+              //               Text(
+              //                 ':',
+              //                 style: TextStyle(fontSize: 32.0),
+              //               ),
+              //               ValueListenableBuilder<int>(
+              //                 valueListenable: startMinute2,
+              //                 builder: (context, value, child) {
+              //                   return DropdownButton<int>(
+              //                     style: TextStyle(
+              //                         fontSize: 32.0, color: Colors.black),
+              //                     value: value,
+              //                     items: minutes.map((minute) {
+              //                       return DropdownMenuItem<int>(
+              //                         value: minute,
+              //                         child: Text('$minute'.padLeft(2, '0')),
+              //                       );
+              //                     }).toList(),
+              //                     onChanged: (int? value) {
+              //                       startMinute2.value = value!;
+              //                     },
+              //                   );
+              //                 },
+              //               ),
+              //             ]),
+              //         Row(
+              //           mainAxisAlignment: MainAxisAlignment.center,
+              //           children: [
+              //             Text("End ", style: TextStyle(fontSize: 32.0)),
+              //             ValueListenableBuilder<int>(
+              //               valueListenable: endHour2,
+              //               builder: (context, value, child) {
+              //                 return DropdownButton<int>(
+              //                   style: TextStyle(
+              //                       fontSize: 32.0, color: Colors.black),
+              //                   value: value,
+              //                   items: hours.map((hour) {
+              //                     return DropdownMenuItem<int>(
+              //                       value: hour,
+              //                       child: Text('$hour'.padLeft(2, '0')),
+              //                     );
+              //                   }).toList(),
+              //                   onChanged: (int? value) {
+              //                     endHour2.value = value!;
+              //                   },
+              //                 );
+              //               },
+              //             ),
+              //             Text(
+              //               ':',
+              //               style: TextStyle(fontSize: 32.0),
+              //             ),
+              //             ValueListenableBuilder<int>(
+              //               valueListenable: endMinute2,
+              //               builder: (context, value, child) {
+              //                 return DropdownButton<int>(
+              //                   // focusColor: Colors.indigo,
+              //                   style: TextStyle(
+              //                       fontSize: 32.0, color: Colors.black),
+              //                   value: value,
+              //                   items: minutes.map((minute) {
+              //                     return DropdownMenuItem<int>(
+              //                       value: minute,
+              //                       child: Text('$minute'.padLeft(2, '0')),
+              //                     );
+              //                   }).toList(),
+              //                   onChanged: (int? value) {
+              //                     endMinute2.value = value!;
+              //                   },
+              //                 );
+              //               },
+              //             ),
+              //           ],
+              //         ),
+              //         ValueListenableBuilder<int>(
+              //             valueListenable: startHour2,
+              //             builder: (context, startHourValue, child) {
+              //               return ValueListenableBuilder<int>(
+              //                 valueListenable: startMinute2,
+              //                 builder: (context, startMinuteValue, child) {
+              //                   return ValueListenableBuilder<int>(
+              //                       valueListenable: endHour2,
+              //                       builder: (context, endHourValue, child) {
+              //                         return ValueListenableBuilder<int>(
+              //                           valueListenable: endMinute2,
+              //                           builder:
+              //                               (context, endMinuteValue, child) {
+              //                             return ValueListenableBuilder<String>(
+              //                               valueListenable: selectedDay2,
+              //                               builder: (context, selectedDayValue,
+              //                                   child) {
+              //                                 return Text(
+              //                                   '${startHourValue.toString().padLeft(2, '0')}:${startMinuteValue.toString().padLeft(2, '0')} to ${endHourValue.toString().padLeft(2, '0')}:${endMinuteValue.toString().padLeft(2, '0')} on $selectedDayValue',
+              //                                   style: TextStyle(fontSize: 18),
+              //                                 );
+              //                               },
+              //                             );
+              //                           },
+              //                         );
+              //                       });
+              //                 },
+              //               );
+              //             }),
+              //       ]),
+              // ),
+              // OutlinedButton.icon(
+              //     icon: Icon(
+              //       Icons.add,
+              //       size: 30,
+              //     ),
+              //     style: OutlinedButton.styleFrom(
+              //         foregroundColor: Colors.black,
+              //         backgroundColor: Colors.blue[400],
+              //         minimumSize: Size(300, 30),
+              //         shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(0.0)),
+              //         textStyle: TextStyle(
+              //           fontSize: 24,
+              //         )),
+              //     onPressed: () {},
+              //     label: Text("Add Class")),
+              // //
               SizedBox(
                 height: 10.0,
               ),

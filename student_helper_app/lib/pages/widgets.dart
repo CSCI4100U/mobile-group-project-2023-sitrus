@@ -65,3 +65,4 @@ class StyledButton extends StatelessWidget {
     child: child,
   );
 }
+

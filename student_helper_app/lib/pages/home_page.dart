@@ -87,8 +87,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("Sitrus Student Aid"),
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
+          title: const Text(
+              "Sitrus Student Aid",
+              style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold
+              )
+          ),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.settings),
@@ -105,6 +112,7 @@ class HomePage extends StatelessWidget {
         padding: EdgeInsets.all(10),
         children: <Widget>[
           OutlinedButton.icon(
+              autofocus: true,
               icon: Icon(
                 Icons.calendar_month,
                 size: 60,
@@ -114,7 +122,7 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.indigo,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
                     fontSize: 36,
                   )),
@@ -122,11 +130,11 @@ class HomePage extends StatelessWidget {
                 _goto_schedule_home_page(context);
               },
               label: Text("Schedule Maker")),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           OutlinedButton.icon(
-              icon: Icon(
+              icon: const Icon(
                 Icons.accessibility_new,
                 size: 60,
               ),
@@ -135,19 +143,19 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.deepOrange,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
-                  textStyle: TextStyle(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  textStyle: const TextStyle(
                     fontSize: 36,
                   )),
               onPressed: () {
                 _goto_SAS_home_page(context);
               },
-              label: Text("SAS Help")),
-          SizedBox(
+              label: const Text("SAS Help")),
+          const SizedBox(
             height: 10,
           ),
           OutlinedButton.icon(
-              icon: Icon(
+              icon: const Icon(
                 Icons.map,
                 size: 60,
               ),
@@ -156,19 +164,20 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.indigo,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
-                  textStyle: TextStyle(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  textStyle: const TextStyle(
                     fontSize: 36,
                   )),
               onPressed: () {
                 _goto_map_page(context);
               },
-              label: Text("Campus Map")),
-          SizedBox(
+              label: const Text("Campus Map")),
+
+          const SizedBox(
             height: 10,
           ),
           OutlinedButton.icon(
-              icon: Icon(
+              icon: const Icon(
                 Icons.person,
                 size: 60,
               ),
@@ -177,15 +186,15 @@ class HomePage extends StatelessWidget {
                   backgroundColor: Colors.deepOrange,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
-                  textStyle: TextStyle(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  textStyle: const TextStyle(
                     fontSize: 36,
                   )),
               onPressed: () {
                 _goto_friends_list_page(context);
               },
-              label: Text("Friends List")),
-          SizedBox(height: 10,),
+              label: const Text("Friends List")),
+          const SizedBox(height: 10,),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -193,10 +202,10 @@ class HomePage extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.indigo,
-                      minimumSize: Size(100, 150),
-                      maximumSize: Size(180, 150),
+                      minimumSize: const Size(100, 150),
+                      maximumSize: const Size(180, 150),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0.0)),
+                          borderRadius: BorderRadius.circular(10.0)),
                       textStyle: TextStyle(
                         fontSize: 24,
                       )),
@@ -212,7 +221,7 @@ class HomePage extends StatelessWidget {
                       minimumSize: Size(100, 150),
                       maximumSize: Size(180, 150),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0.0)),
+                          borderRadius: BorderRadius.circular(10.0)),
                       textStyle: TextStyle(
                         fontSize: 24,
                       )),

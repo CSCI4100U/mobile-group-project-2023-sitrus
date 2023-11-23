@@ -5,6 +5,7 @@
 //or maybe only have list tiles because we don't have that many options for the home page
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'schedule_home_page.dart';
 import 'accommodations_home_page.dart';
 import '../models/friend_list/friends_list_home_page.dart';
@@ -69,6 +70,18 @@ void _goto_profile_page(context) {
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
+
+
+  Future<void> _launchURL(String url) async {
+
+    final Uri uri = Uri(scheme: "https", host: url);
+    if(!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw "Can not launch url";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +200,9 @@ class HomePage extends StatelessWidget {
                       textStyle: TextStyle(
                         fontSize: 24,
                       )),
-                  onPressed: () {},
+                  onPressed: () {
+                    _launchURL("my.ontariotechu.ca");
+                  },
                   child: Text("OntarioTechMobile App")),
               SizedBox(width: 10,),
               OutlinedButton(
@@ -201,7 +216,9 @@ class HomePage extends StatelessWidget {
                       textStyle: TextStyle(
                         fontSize: 24,
                       )),
-                  onPressed: () {},
+                  onPressed: () {
+                    _launchURL("learn.ontariotechu.ca");
+                  },
                   child: Text("Canvas Student App")),
             ],
           )

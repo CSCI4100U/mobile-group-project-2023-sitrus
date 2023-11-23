@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Sitrus Student Aid',
-      theme: ThemeData(
+      theme: ThemeData.dark(
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark(),

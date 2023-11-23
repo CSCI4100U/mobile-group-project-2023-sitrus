@@ -35,7 +35,7 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Colors.indigo,
           title: const Text("Make New Schedules"),
           //todo (for final): add a better button? for when the user finishes inputting course info
           actions: [

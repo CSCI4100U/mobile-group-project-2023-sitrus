@@ -55,7 +55,7 @@ class DisplayGeneratedSchedulesPage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Colors.indigo,
           title: const Text("Schedules"),
         ),
         //builds a listview of a visual display of the schedules

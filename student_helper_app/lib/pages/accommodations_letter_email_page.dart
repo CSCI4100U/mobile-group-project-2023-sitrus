@@ -34,6 +34,7 @@ class Renewal_LettersState extends State<Renewal_Letters>{
     return Scaffold(
       appBar: AppBar(
         title: Text("Renew Accommodations"),
+        backgroundColor: Colors.indigo
       ),
       body: Column(
 

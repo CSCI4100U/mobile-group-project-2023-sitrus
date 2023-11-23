@@ -92,7 +92,7 @@ class HomePage extends StatelessWidget {
           title: const Text(
               "Sitrus Student Aid",
               style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold
               )
           ),

@@ -1,45 +1,33 @@
 import 'package:flutter/material.dart';
 import 'class_info_widget.dart';
 
-//section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
+//basically the same as lab (which is like a section)
+//lab = [(name, time), (name, time), +button] = (classinfo, classinfo, +button) i.e. contains info for all tut sections, each tut is essentially just 1 class
 //can also be thought of as a widget holding class info containers and a button to add more class containers to the listview
-class SectionInfoContainer extends StatefulWidget {
+class TutsInfoContainer extends StatefulWidget {
   final String name;
-  SectionInfoContainer({required this.name});
+  TutsInfoContainer({required this.name});
 
   @override
-  _SectionInfoContainerState createState() => _SectionInfoContainerState();
+  _TutsInfoContainerState createState() => _TutsInfoContainerState();
 }
 
-class _SectionInfoContainerState extends State<SectionInfoContainer> {
-  List<ClassInfoContainer> classInfoContainerList = [];
+class _TutsInfoContainerState extends State<TutsInfoContainer> {
+  // List<ClassInfoContainer> classInfoContainerList = [ClassInfoContainer(name: 'Tutorial 1')];
+  List<ClassInfoContainer> tutsInfoContainer = [];
 
   void addClassContainer() {
-    classInfoContainerList.add(ClassInfoContainer(
-        name: 'Lecture ${classInfoContainerList.length + 1}',
+    tutsInfoContainer.add(ClassInfoContainer(
+        name: 'Tutorial ${tutsInfoContainer.length + 1}',
         onDelete: () {
           setState(() {
-            classInfoContainerList.removeAt(0);
+            tutsInfoContainer.removeAt(tutsInfoContainer.length - 1);
           });
         }));
   }
 
-  void deleteClassContainer() {
-    classInfoContainerList.removeLast();
-  }
-
   @override
   Widget build(BuildContext context) {
-
-    // classInfoContainerList.add(ClassInfoContainer(
-    //   name: 'Lecture 1',
-    //   onDelete: () {
-    //     setState(() {
-    //       classInfoContainerList.removeAt(classInfoContainerList.length);
-    //     });
-    //   },
-    // ));
-
     return Container(
       padding: EdgeInsets.all(5.0),
       margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
@@ -56,19 +44,21 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
                 padding: EdgeInsets.only(left: 10.0),
                 child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
-              IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
-                onPressed: () {
-
-                },
+              IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Color(0xFFe47c43),
+                ),
+                onPressed: () {},
               ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: classInfoContainerList.length,
+            itemCount: tutsInfoContainer.length,
             itemBuilder: (context, index) {
-              return classInfoContainerList[index];
+              return tutsInfoContainer[index];
             },
           ),
           Container(
@@ -94,20 +84,21 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
                 });
               },
               label: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(right: 40.0, top: 20.0, bottom: 20.0),
-                    child: Text(
-                      "Add Lecture",
-                      style: TextStyle(
-                        fontSize: 30.0,
-                      ),
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding:
+                  EdgeInsets.only(right: 40.0, top: 20.0, bottom: 20.0),
+                  child: Text(
+                    "Add Tutorial",
+                    style: TextStyle(
+                      fontSize: 30.0,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
             ),
           ),
         ],

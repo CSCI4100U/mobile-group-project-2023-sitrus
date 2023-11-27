@@ -1,45 +1,33 @@
 import 'package:flutter/material.dart';
 import 'class_info_widget.dart';
 
-//section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
+//basically the same as tutorial (which is like a section)
+//lab = [(name, time), (name, time), +button] = (classinfo, classinfo, +button) i.e. contains info for all lab sections, each lab is essentially just 1 class
 //can also be thought of as a widget holding class info containers and a button to add more class containers to the listview
-class SectionInfoContainer extends StatefulWidget {
+class LabsInfoContainer extends StatefulWidget {
   final String name;
-  SectionInfoContainer({required this.name});
+  LabsInfoContainer({required this.name});
 
   @override
-  _SectionInfoContainerState createState() => _SectionInfoContainerState();
+  _LabsInfoContainerState createState() => _LabsInfoContainerState();
 }
 
-class _SectionInfoContainerState extends State<SectionInfoContainer> {
-  List<ClassInfoContainer> classInfoContainerList = [];
+class _LabsInfoContainerState extends State<LabsInfoContainer> {
+  // List<ClassInfoContainer> classInfoContainerList = [ClassInfoContainer(name: 'Laboratory 1')];
+  List<ClassInfoContainer> labsInfoContainer = [];
 
   void addClassContainer() {
-    classInfoContainerList.add(ClassInfoContainer(
-        name: 'Lecture ${classInfoContainerList.length + 1}',
+    labsInfoContainer.add(ClassInfoContainer(
+        name: 'Laboratory ${labsInfoContainer.length + 1}',
         onDelete: () {
           setState(() {
-            classInfoContainerList.removeAt(0);
+            labsInfoContainer.removeAt(labsInfoContainer.length - 1);
           });
         }));
   }
 
-  void deleteClassContainer() {
-    classInfoContainerList.removeLast();
-  }
-
   @override
   Widget build(BuildContext context) {
-
-    // classInfoContainerList.add(ClassInfoContainer(
-    //   name: 'Lecture 1',
-    //   onDelete: () {
-    //     setState(() {
-    //       classInfoContainerList.removeAt(classInfoContainerList.length);
-    //     });
-    //   },
-    // ));
-
     return Container(
       padding: EdgeInsets.all(5.0),
       margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
@@ -57,18 +45,16 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
                 child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
               IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
-                onPressed: () {
-
-                },
+                onPressed: () {},
               ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: classInfoContainerList.length,
+            itemCount: labsInfoContainer.length,
             itemBuilder: (context, index) {
-              return classInfoContainerList[index];
+              return labsInfoContainer[index];
             },
           ),
           Container(
@@ -98,9 +84,10 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(right: 40.0, top: 20.0, bottom: 20.0),
+                    padding:
+                    EdgeInsets.only(right: 32.0, top: 20.0, bottom: 20.0),
                     child: Text(
-                      "Add Lecture",
+                      "Add Laboratory",
                       style: TextStyle(
                         fontSize: 30.0,
                       ),

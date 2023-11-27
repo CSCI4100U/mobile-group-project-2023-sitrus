@@ -29,7 +29,7 @@ class _ScheduleSavedListPageState extends State<ScheduleSavedListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Colors.indigo,
           title: const Text("Save Schedules"),
         ),
         body: ListView.separated(

@@ -29,7 +29,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          backgroundColor: Colors.indigo,
           title: const Text("Schedule Maker"),
 
       ),
@@ -77,7 +77,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {},
-              label: Text("Search Courses by Term")),
+              label: const Text("Search Courses by Term")),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
               icon: Icon(
@@ -95,7 +95,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {},
-              label: Text("Program Map")),
+              label: const Text("Program Map")),
           SizedBox(height: buttonSpacing),
           
           OutlinedButton.icon(
@@ -116,7 +116,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {_goto_createNewSchedule_page(context);},
-              label: Text("Make New Schedules")),
+              label: const Text("Make New Schedules")),
         ],
       ),
     );

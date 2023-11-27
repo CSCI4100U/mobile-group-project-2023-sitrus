@@ -1,5 +1,4 @@
-//display campus map with features like seeing current location, friends location, clicking buildings for info
-//this should probably be a lower priority feature
+
 
 import 'package:flutter/material.dart';
 
@@ -15,8 +14,8 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text("Campus Map"),
+          backgroundColor: Colors.indigo,
+          title: const Text("Campus Map", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
         ),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -25,8 +24,10 @@ class _MapPageState extends State<MapPage> {
               Container(
                 width: 380,
                 height: 600,
-                color: Colors.red,
+                color: Colors.red[400],
               ),
-            ]));
+            ]
+        )
+    );
   }
 }

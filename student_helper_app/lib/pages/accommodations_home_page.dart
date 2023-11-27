@@ -19,7 +19,7 @@ class SASHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.indigo,
         title: const Text("SAS Home"),
       ),
       body: ListView(
@@ -36,7 +36,7 @@ class SASHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
@@ -59,7 +59,7 @@ class SASHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
@@ -77,7 +77,7 @@ class SASHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
@@ -101,7 +101,7 @@ class SASHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),

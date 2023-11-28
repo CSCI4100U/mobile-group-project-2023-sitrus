@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'accommodations_list_page.dart';
 import 'accommodations_letter_email_page.dart';
 
+
 class SASHomePage extends StatelessWidget {
   SASHomePage({super.key});
 
@@ -19,7 +20,7 @@ class SASHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text("SAS Home"),
       ),
       body: ListView(
@@ -31,14 +32,15 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
                   textStyle: TextStyle(
-                    fontSize: buttonFontSize,
+                    fontSize: buttonFontSize
+
                   )),
               onPressed: () {
                 Navigator.push(
@@ -46,7 +48,7 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  ViewAccommodations()),
                 );
               },
-              label: Text("View Accommodations")),
+              label: const Text("View Accommodations")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
               icon: Icon(
@@ -54,8 +56,8 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -64,7 +66,7 @@ class SASHomePage extends StatelessWidget {
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {},
-              label: Text("View Upcoming Assessments")),
+              label: const Text("View Upcoming Assessments")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
               icon: Icon(
@@ -72,8 +74,8 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -88,7 +90,7 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
                 );
               },
-              label: Text("Send Accommodation Letters")),
+              label: const Text("Send Accommodation Letters")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
               icon: Icon(
@@ -96,8 +98,8 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -111,7 +113,7 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
                 );
               },
-              label: Text("Renew Accommodations")),
+              label: const Text("Renew Accommodations")),
         ],
       ),
     );

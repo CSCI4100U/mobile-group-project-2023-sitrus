@@ -77,18 +77,28 @@ class HomePage extends StatelessWidget {
     final Uri uri = Uri(scheme: "https", host: url);
     if(!await launchUrl(
       uri,
-      mode: LaunchMode.externalApplication,
+      mode: LaunchMode.inAppWebView,
     )) {
       throw "Can not launch url";
     }
   }
 
+  int selectedIndex = 0;
+
+  List<NavPage> pages = [
+    NavPage(name: "Add to Cart", icon: Icons.add_shopping_cart),
+    NavPage(name: "Be Sad", icon: Icons.javascript),
+    NavPage(name: "Join the Navy", icon: Icons.radar),
+  ];
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.indigo,
-          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.background,
           title: const Text(
               "Sitrus Student Aid",
               style: TextStyle(
@@ -118,8 +128,8 @@ class HomePage extends StatelessWidget {
                 size: 60,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
@@ -133,14 +143,15 @@ class HomePage extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
+
           OutlinedButton.icon(
               icon: const Icon(
                 Icons.accessibility_new,
                 size: 60,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
@@ -160,8 +171,8 @@ class HomePage extends StatelessWidget {
                 size: 60,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
@@ -182,8 +193,8 @@ class HomePage extends StatelessWidget {
                 size: 60,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(200, 150),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
@@ -200,8 +211,8 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.indigo,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       minimumSize: const Size(100, 150),
                       maximumSize: const Size(180, 150),
                       shape: RoundedRectangleBorder(
@@ -216,8 +227,8 @@ class HomePage extends StatelessWidget {
               SizedBox(width: 10,),
               OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.indigo,
+                      foregroundColor: Theme.of(context).colorScheme.background,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       minimumSize: Size(100, 150),
                       maximumSize: Size(180, 150),
                       shape: RoundedRectangleBorder(
@@ -233,6 +244,16 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
+
     );
   }
+
+
+}
+
+class NavPage{
+  String? name;
+  IconData? icon;
+
+  NavPage({this.name, this.icon});
 }

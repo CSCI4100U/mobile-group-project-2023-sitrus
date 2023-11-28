@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'schedule_saved_list_page.dart';
 import 'schedule_create_new_page.dart';
 
@@ -25,22 +26,33 @@ class ScheduleMakerHomePage extends StatelessWidget {
   final iconSize = 60.0;
   final buttonSpacing = 10.0;
 
+  Future<void> _launchURL(String url) async {
+
+    final Uri uri = Uri(scheme: "https", host: url);
+    if(!await launchUrl(
+      uri,
+      mode: LaunchMode.inAppBrowserView,
+    )) {
+      throw "Can not launch url";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           title: const Text("Schedule Maker"),
 
       ),
       body: ListView(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         children: <Widget>[
           Container(
-            color: Colors.red,
+            color: Theme.of(context).colorScheme.primary,
             width: 200,
             height: 300,
-            child: Text("primary schedule, empty if not set"),
+            child: const Text("primary schedule, empty if not set"),
           ),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
@@ -49,8 +61,8 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -59,7 +71,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {_goto_scheduleSavedList_page(context);},
-              label: Text("View Saved Courses")),
+              label: const Text("View Saved Courses")),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
               icon: Icon(
@@ -67,8 +79,8 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -76,7 +88,11 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
+              onPressed: () {
+                final Uri _url = Uri.parse('https://registrar.ontariotechu.ca/registration/scheduling/available-courses.php');
+                launchUrl(_url);
+
+              },
               label: const Text("Search Courses by Term")),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
@@ -85,8 +101,8 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
@@ -94,7 +110,10 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
+              onPressed: () {
+                final Uri _url = Uri.parse('https://calendar.ontariotechu.ca/content.php?catoid=62&navoid=2811');
+                launchUrl(_url);
+              },
               label: const Text("Program Map")),
           SizedBox(height: buttonSpacing),
           
@@ -106,8 +125,8 @@ class ScheduleMakerHomePage extends StatelessWidget {
 
 
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.indigo,
+                  foregroundColor: Theme.of(context).colorScheme.background,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(

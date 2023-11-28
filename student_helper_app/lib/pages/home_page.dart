@@ -77,7 +77,7 @@ class HomePage extends StatelessWidget {
     final Uri uri = Uri(scheme: "https", host: url);
     if(!await launchUrl(
       uri,
-      mode: LaunchMode.externalApplication,
+      mode: LaunchMode.inAppWebView,
     )) {
       throw "Can not launch url";
     }
@@ -90,6 +90,8 @@ class HomePage extends StatelessWidget {
     NavPage(name: "Be Sad", icon: Icons.javascript),
     NavPage(name: "Join the Navy", icon: Icons.radar),
   ];
+
+
 
   @override
   Widget build(BuildContext context) {

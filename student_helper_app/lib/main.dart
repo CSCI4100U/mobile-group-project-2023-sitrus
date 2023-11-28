@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:student_helper_project/pages/app_state.dart';
-import 'package:student_helper_project/pages/home_page.dart';
+import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/theme.dart';
 
 void main() {
@@ -20,7 +20,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) =>  HomePage(),
+      builder: (context, state) =>  OnboardingScreen(),
       routes: [
         GoRoute(
           path: 'sign-in',

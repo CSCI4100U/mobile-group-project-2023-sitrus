@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'schedule_display_generated_page.dart';
 import '../models/schedule_course_model.dart';
 import '../models/schedule_input_course_widget.dart';
@@ -26,6 +27,8 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
 
     List<Course> courses = [];
 
+
+
     //todo (for final): change Colors list so that it's based on the number of courses entered
     // loop through courseWidgets.length and generate a random (no overlap) list
     // of Colors of equal length
@@ -35,7 +38,7 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
 
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           title: const Text("Make New Schedules"),
           //todo (for final): add a better button? for when the user finishes inputting course info
           actions: [
@@ -94,8 +97,8 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
                   size: 30,
                 ),
                 style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.blue[400],
+                    foregroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     minimumSize: Size(400, 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0.0)),

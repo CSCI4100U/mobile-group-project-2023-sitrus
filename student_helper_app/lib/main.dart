@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:student_helper_project/pages/app_state.dart';
 import 'package:student_helper_project/pages/home_page.dart';
+import 'package:student_helper_project/theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,12 +97,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+
       title: 'Sitrus Student Aid',
-      theme: ThemeData.dark(
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
+      theme: lightMode,
+      darkTheme: darkMode,
       routerConfig: _router,
     );
   }

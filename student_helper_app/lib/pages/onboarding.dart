@@ -45,7 +45,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onTap: (){
                       _controller.jumpToPage(2);
                     },
-                    child: Text("skip"),
+                    child: Text("skip",
+                        style: TextStyle(fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
                   ),
                   SmoothPageIndicator(controller: _controller, count: 3),
 
@@ -59,14 +62,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             return HomePage();
                           }));
                     },
-                    child: Text("done"),
+                    child: Text(
+                      "done",
+                      style: TextStyle(fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   ) : GestureDetector(
                     onTap: (){
                       _controller.nextPage(
                           duration: Duration(milliseconds: 500),
                           curve: Curves.linear);
                     },
-                    child: Text("next"),
+                    child: Text("next",
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                    ),
                   )
                 ],
               )

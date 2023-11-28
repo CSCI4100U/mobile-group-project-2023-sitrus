@@ -37,7 +37,8 @@ class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Time Picker App'),
+        title: Text('Schedule Maker (testing)'),
+        backgroundColor: Colors.blue,
       ),
       body: ListView(
         padding: EdgeInsets.all(10.0),

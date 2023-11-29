@@ -20,7 +20,7 @@ class FAQPageState extends State<FAQPage> {
     ),
     FAQItem(
       question: 'Do I have accommodations?',
-      answer: 'If you are registered with your universitys student accessibility services'
+      answer: 'If you are registered with your universitys student accessibility services '
           'it is very likely that you have accommodations.',
     ),
     FAQItem(
@@ -33,10 +33,17 @@ class FAQPageState extends State<FAQPage> {
     ),
     FAQItem(
       question: 'How can I register for Student Accessibility?',
-      answer: '',
+      answer: 'This is a process that requires a few steps, and is encouraged to be done as soon as possible.\n\nStep 1: You need to have recent documentation from a certified health care practitioner in the field to which the disability applies, '
+          '\tand these must include the functional or cognitive limitations and impact on the student’s academic performance.\nYou may need'
+          'to arrange an appointment to be reassessed to have more recent documentation.\n\n Step 2: Complete an intake form. This can be difficult to locate on UOITs student portal.'
+          '\tFor this reason, the intake form has been included in Renew Accommodations.\n\n Step 3:'
+          'You will need to complete a disability documentation form. This has been provided in Renew Accommodations.\n\nStep 4:'
+          'Submit the intake and disability documents by emailing studentaccessibility@ontariotechu.ca. \n\nStep 5:'
+          'Wait for an email response from  studentaccessibility@ontariotechu.ca.\n They will help you arrange'
+          'an appointment with an accessibility advisor.'
+      ,
     )
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +58,10 @@ class FAQPageState extends State<FAQPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(faqList[index].answer),
+                child: Text(
+                  faqList[index].answer,
+                  softWrap: true,
+                ),
               ),
             ],
           );

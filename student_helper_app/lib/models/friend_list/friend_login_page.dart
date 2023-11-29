@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/pages/home_page.dart';
+import '../../pages/new_home_page.dart';
 import 'friend_registration_page.dart';
 import 'friends_list_home_page.dart';
 
@@ -154,6 +155,7 @@ class _LoginPageState extends State<LoginPage> {
     // Scaffold provides the structure for the login form.
     // The form includes fields for email and password, a "Remember Me" checkbox, and buttons to login or register.
     return Scaffold(
+      backgroundColor: Colors.indigo[100],
       // Other UI components such as AppBar, TextFormField, and ElevatedButton are used to create the form and handle user input.
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -164,23 +166,38 @@ class _LoginPageState extends State<LoginPage> {
             // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => NewHomePage()),
             );
           },
         ),
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
-      body: SingleChildScrollView(
-        child: Form(
+      body: ListView(
+
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 40, bottom: 30),
+            child: Icon(
+                Icons.backpack,
+                size: 90,),
+          ),
+          Container(
+              alignment: Alignment.center,
+              child: const Text("S I T R U S",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),)),
+
+          Form(
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.person),
                     labelText: 'Email',
                     border: OutlineInputBorder(),
                   ),
@@ -191,13 +208,14 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(),
                   ),
                   obscureText: true,
                   validator: (value) => value!.isEmpty ? 'Enter your password' : null,
                 ),
                 SizedBox(height: 20),
-                CheckboxListTile(
+                /*CheckboxListTile(
                   value: _rememberMe,
                   onChanged: (bool? value) {
                     setState(() {
@@ -206,31 +224,63 @@ class _LoginPageState extends State<LoginPage> {
                   },
                   title: Text('Remember me'),
                   controlAffinity: ListTileControlAffinity.leading,
-                ),
+                ),*/
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+
+
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Navigate to the RegistrationPage
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistrationPage()));
-                        },
-                        child: Text('Register'),
-                      ),
+                      child:
+                        ElevatedButton(
+                          //icon: Icon(Icons.arrow_forward_ios),
+
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo[400],
+                            foregroundColor: Colors.white,
+                            elevation: 14,
+                            minimumSize: Size(30, 40)
+                          ),
+                          onPressed: _login,
+                          //label: const
+                          child: Text('Login',
+                          style: TextStyle(fontSize: 30),),
+                        ),
+
                     ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        child: Text('Login'),
-                      ),
-                    ),
+
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(28.0),
+                  child: Text("Don't Have An Account?"),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.indigo[400],
+                                  foregroundColor: Colors.white,
+                                  elevation: 14,
+                                  minimumSize: Size(30, 40)
+                              ),
+                              onPressed: () {
+                                // Navigate to the RegistrationPage
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistrationPage()));
+                              },
+                              child: Text('Register Here',
+                                      style: TextStyle(fontSize: 30),)),
+
+                          ),
+                            ]
+                        ),
+                //SizedBox(width: 20),
               ],
             ),
           ),
-        ),
+        ),]
       ),
     );
   }

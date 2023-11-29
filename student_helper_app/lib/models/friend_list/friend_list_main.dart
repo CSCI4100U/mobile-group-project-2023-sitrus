@@ -39,6 +39,7 @@ class FriendList extends StatelessWidget {
   Widget build(BuildContext context) {
     // Define the MaterialApp with a title and theme
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Friend List',
       theme: ThemeData(
         primarySwatch: Colors.blue,

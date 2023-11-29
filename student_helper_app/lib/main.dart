@@ -9,6 +9,7 @@ import 'package:student_helper_project/pages/new_home_page.dart';
 import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 import 'package:student_helper_project/theme.dart';
+import 'models/ThemeProvider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -99,13 +100,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
+    return FutureBuilder<bool?>(
+      future: ThemeProvider.loadThemeFromPreferences(),
+      builder: (context, snapshot) {
+        ThemeData initialTheme =
+        snapshot.data ?? false ? darkMode : lightMode;
 
-      title: 'Sitrus Student Aid',
-      theme: lightMode,
-      darkTheme: darkMode,
-      routerConfig: _router,
+        return MaterialApp.router(
+          title: 'Sitrus Student Aid',
+          theme: initialTheme,
+          darkTheme: darkMode,
+          themeMode: ThemeMode.system, // Set your default theme mode here
+          routerConfig: _router,
+        );
+      },
     );
   }
 }

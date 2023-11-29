@@ -4,6 +4,7 @@
 //also buttons leading to external site (university website) for renewing accommodations and potential other things
 
 import 'package:flutter/material.dart';
+import 'package:student_helper_project/pages/accommodations_upcoming_assessments_page.dart';
 import 'accommodations_list_page.dart';
 import 'accommodations_letter_email_page.dart';
 
@@ -65,7 +66,12 @@ class SASHomePage extends StatelessWidget {
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  UpcomingPage()),
+                );
+              },
               label: const Text("View Upcoming Assessments")),
           SizedBox(height: 10,),
           OutlinedButton.icon(

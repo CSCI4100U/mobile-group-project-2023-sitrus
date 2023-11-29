@@ -7,7 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:student_helper_project/pages/accommodations_upcoming_assessments_page.dart';
 import 'accommodations_list_page.dart';
 import 'accommodations_letter_email_page.dart';
-
+import 'accommodations_faq_page.dart';
+//import 'package:student_helper_project/models/notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class SASHomePage extends StatelessWidget {
   SASHomePage({super.key});
@@ -16,6 +19,8 @@ class SASHomePage extends StatelessWidget {
   final buttonWidth = 200.0;
   final buttonFontSize = 30.0;
   final iconSize = 60.0;
+  TextEditingController Notification_title = TextEditingController();
+  TextEditingController Notification_descrp = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +101,7 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
                 );
               },
-              label: const Text("Send Accommodation Letters")),
+              label: const Text("Renew Accommodations")),
           SizedBox(height: 10,),
           OutlinedButton.icon(
               icon: Icon(
@@ -116,12 +121,13 @@ class SASHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  Renewal_Letters()),
+                  MaterialPageRoute(builder: (context) =>  FAQPage()),
                 );
               },
-              label: const Text("Renew Accommodations")),
+              label: const Text("FAQ")),
         ],
       ),
+
     );
   }
 }

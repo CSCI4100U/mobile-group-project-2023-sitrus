@@ -40,11 +40,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: const Text("Schedule Maker"),
 
-      ),
       body: ListView(
         padding: const EdgeInsets.all(10),
         children: <Widget>[

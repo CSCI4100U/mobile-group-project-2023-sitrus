@@ -7,6 +7,7 @@ import 'package:student_helper_project/pages/app_state.dart';
 import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
 import 'package:student_helper_project/pages/onboarding.dart';
+import 'package:student_helper_project/pages/settings_page.dart';
 import 'package:student_helper_project/theme.dart';
 
 void main() {
@@ -22,7 +23,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) =>  HomePage(),
+      builder: (context, state) =>  NewHomePage(),
       routes: [
         GoRoute(
           path: 'sign-in',

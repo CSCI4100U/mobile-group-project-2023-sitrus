@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
 import 'package:student_helper_project/pages/home_page.dart';
+import 'package:student_helper_project/pages/schedule_home_page.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 
 import '../models/friend_list/friends_chat_page.dart';
 import '../models/friend_list/friends_list_home_page.dart';
+import 'info.dart';
 
 class NewHomePage extends StatefulWidget {
   NewHomePage({super.key});
@@ -27,7 +29,7 @@ class _NewHomePageState extends State<NewHomePage> {
   }
 
   final List _pages = [
-    SettingsPage(),
+    ScheduleMakerHomePage(),
     HomePage(),
     SASHomePage()
   ];
@@ -57,7 +59,7 @@ class _NewHomePageState extends State<NewHomePage> {
                   size: 60
               ),
               ),
-            const ListTile(
+            ListTile(
               leading: Icon(
                   Icons.person,
                   size: 40,
@@ -78,6 +80,38 @@ class _NewHomePageState extends State<NewHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading:  Icon(
+                Icons.info,
+                size: 40,
+              ),
+              title:  Text("I N F O",
+                  style: TextStyle(
+                      fontSize: 20)
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading:  Icon(
+                Icons.question_mark,
+                size: 40,
+              ),
+              title:  Text("H E L P",
+                  style: TextStyle(
+                      fontSize: 20)
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoPage()),
                 );
               },
             )

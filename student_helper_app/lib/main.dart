@@ -98,13 +98,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
+    return FutureBuilder<bool?>(
+      future: ThemeProvider.loadThemeFromPreferences(),
+      builder: (context, snapshot) {
+        ThemeData initialTheme =
+        snapshot.data ?? false ? darkMode : lightMode;
 
-      title: 'Sitrus Student Aid',
-      theme: lightMode,
-      darkTheme: darkMode,
-      routerConfig: _router,
+        return MaterialApp.router(
+          title: 'Sitrus Student Aid',
+          theme: initialTheme,
+          darkTheme: darkMode,
+          themeMode: ThemeMode.system, // Set your default theme mode here
+          routerConfig: _router,
+        );
+      },
     );
   }
 }

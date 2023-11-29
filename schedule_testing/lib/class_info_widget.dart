@@ -18,18 +18,28 @@ class ClassInfoContainer extends StatefulWidget {
 }
 
 class _ClassInfoContainerState extends State<ClassInfoContainer> {
+  String selectedDay = 'Monday';
+
+  List<String> daysOfWeek = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+  ];
+
   double _lowerValue = 0.0;
   double _upperValue = 1.0;
 
   final List<String> leftValues = [
-    '8:10 am', '9:40 am', '11:10 am', '12:40 pm', '2:10 pm', '3:40 pm', '5:10 pm', '6:40 pm', '8:10 pm',
-    '9:30 pm' //buffer for the end, since the start and end share the same values. i.e. they both end
+    '8:10am', '9:40am', '11:10am', '12:40pm', '2:10pm', '3:40pm', '5:10pm', '6:40pm', '8:10pm',
+    '9:30pm' //buffer for the end, since the start and end share the same values. i.e. they both end
     // at 8.0 but only the right side can be at that value; the left side maxes out at 7.0
   ];
 
   final List<String> rightValues = [
-    '8:10 am', //buffer for the start
-    '9:30 am', '11:00 am', '12:30 pm', '2:00 pm', '3:30 pm', '5:00 pm', '6:30 pm', '8:00 pm', '9:30 pm'
+    '8:10am', //buffer for the start
+    '9:30am', '11:00am', '12:30pm', '2:00pm', '3:30pm', '5:00pm', '6:30pm', '8:00pm', '9:30pm'
   ];
 
   final double unitDistance = 1.0;
@@ -67,7 +77,38 @@ class _ClassInfoContainerState extends State<ClassInfoContainer> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var day in daysOfWeek)
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedDay = day;
+                            });
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: selectedDay == day ? Color(0xFF243f6e) : Color(0xFFeae3d6),
+                              border: Border.all(color: Color(0xFFe47c43)),
+                            ),
+                            child: Text(
+                              day.substring(0, 1),
+                              style: TextStyle(fontSize: 20.0, color: selectedDay == day ? Color(0xFFeae3d6) : Color(0xFFe47c43)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
               RangeSlider(
+                activeColor: Color(0xFF243f6e),
                 values: RangeValues(_lowerValue, _upperValue),
                 onChanged: (RangeValues values) {
 
@@ -105,7 +146,7 @@ class _ClassInfoContainerState extends State<ClassInfoContainer> {
                   rightValues[_upperValue.round()],
                 ),
               ),
-              Text('${leftValues[_lowerValue.round()]} to ${rightValues[_upperValue.round()]}', style: TextStyle(fontSize: 24.0, color: Colors.white),),
+              Text('$selectedDay ${leftValues[_lowerValue.round()]} to ${rightValues[_upperValue.round()]}', style: TextStyle(fontSize: 24.0, color: Colors.white),),
             ],
           ),
         ],

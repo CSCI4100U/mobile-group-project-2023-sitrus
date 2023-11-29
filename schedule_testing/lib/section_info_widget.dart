@@ -72,42 +72,31 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
             },
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
-            child: OutlinedButton.icon(
-              icon: Icon(
-                Icons.add,
-                size: 36.0,
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Color(0xFFe47c43),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                textStyle: TextStyle(
-                  fontSize: 36.0,
-                ),
-              ),
-              onPressed: () {
-                setState(() {
-                  addClassContainer();
-                });
-              },
-              label: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(right: 40.0, top: 20.0, bottom: 20.0),
-                    child: Text(
-                      "Add Lecture",
-                      style: TextStyle(
-                        fontSize: 30.0,
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFe47c43),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
+                      padding: EdgeInsets.all(5.0),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        addClassContainer();
+                      });
+                    },
+                    child: const Icon(
+                      Icons.add,
+                      size: 60.0,
+                      color: Colors.white,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

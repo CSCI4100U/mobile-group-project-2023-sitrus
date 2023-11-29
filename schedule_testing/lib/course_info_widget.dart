@@ -22,7 +22,7 @@ class _CourseInfoContainerState extends State<CourseInfoContainer> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        // color: Color(0xFF243f6e),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Column(
@@ -33,15 +33,16 @@ class _CourseInfoContainerState extends State<CourseInfoContainer> {
             children: [
               Container(
                 color: Color(0xFF243f6e),
-                padding: EdgeInsets.all(5.0),
+                // padding: EdgeInsets.all(5.0),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          widget.name,
-                          style: const TextStyle(fontSize: 36.0, color: Colors.white),
+                        Padding(
+                          padding: EdgeInsets.only(left: 5.0),
+                          child: Text(widget.name, style: const TextStyle(fontSize: 36.0, color: Colors.white),
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.white,),
@@ -114,42 +115,31 @@ class _SectionListState extends State<SectionList> {
           },
         ),
         Container(
-          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
-          child: OutlinedButton.icon(
-            icon: Icon(
-              Icons.add,
-              size: 36.0,
-            ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Color(0xFFe47c43),
-              backgroundColor: Color(0xFFeae3d6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              textStyle: TextStyle(
-                fontSize: 36.0,
-              ),
-            ),
-            onPressed: () {
-              setState(() {
-                addSectionContainer();
-              });
-            },
-            label: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(right: 40.0, top: 20.0, bottom: 20.0),
-                  child: Text(
-                    "Add Section",
-                    style: TextStyle(
-                      fontSize: 30.0,
+          padding: EdgeInsets.only(top: 5.0, bottom: 15.0, right: 5.0, left: 5.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFeae3d6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
                     ),
+                    padding: EdgeInsets.all(5.0),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      addSectionContainer();
+                    });
+                  },
+                  child: const Icon(
+                    Icons.add,
+                    size: 60.0,
+                    color: Color(0xFFe47c43),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],

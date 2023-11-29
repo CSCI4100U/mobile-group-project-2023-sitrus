@@ -85,44 +85,16 @@ class HomePage extends StatelessWidget {
 
   int selectedIndex = 0;
 
-  List<NavPage> pages = [
-    NavPage(name: "Add to Cart", icon: Icons.add_shopping_cart),
-    NavPage(name: "Be Sad", icon: Icons.javascript),
-    NavPage(name: "Join the Navy", icon: Icons.radar),
-  ];
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.background,
-          title: const Text(
-              "Sitrus Student Aid",
-              style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold
-              )
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.settings),
-              tooltip: 'Settings',
-              onPressed: () {_goto_settings_page(context);},
-            ),
-            IconButton(
-              icon: const Icon(Icons.account_circle),
-              tooltip: 'Profile',
-              onPressed: () {_goto_profile_page(context);},
-            ),
-          ]),
+
       body: ListView(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(15),
         children: <Widget>[
           OutlinedButton.icon(
-              autofocus: true,
+              autofocus: false,
               icon: Icon(
                 Icons.calendar_month,
                 size: 60,

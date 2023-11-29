@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:student_helper_project/pages/app_state.dart';
+import 'package:student_helper_project/pages/home_page.dart';
+import 'package:student_helper_project/pages/new_home_page.dart';
 import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/theme.dart';
 
@@ -20,7 +22,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) =>  OnboardingScreen(),
+      builder: (context, state) =>  HomePage(),
       routes: [
         GoRoute(
           path: 'sign-in',
@@ -97,6 +99,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
 
       title: 'Sitrus Student Aid',
       theme: lightMode,

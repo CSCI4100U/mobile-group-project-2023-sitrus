@@ -8,6 +8,7 @@ import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
 import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/theme.dart';
+import 'models/ThemeProvider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

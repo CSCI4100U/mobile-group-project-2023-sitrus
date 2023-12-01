@@ -253,8 +253,10 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await FirebaseFirestore.instance.collection('messages').add(newMessage.toMap());
       setState(() {
-        messages.insert(0, newMessage);
+        // Add new message to the end of the list
+        messages.add(newMessage);
         _messageController.clear();
+        // Scroll to the bottom of the list to show the new message
         _scrollToBottom();
       });
     } catch (e) {

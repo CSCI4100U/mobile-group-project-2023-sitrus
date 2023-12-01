@@ -2,6 +2,12 @@ import 'package:async/async.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as p;
+import 'package:permission_handler/permission_handler.dart';
+
 import 'local_storage.dart';
 import 'message.dart';
 
@@ -230,7 +236,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // Sends a new message to the Firestore collection.
-  void _sendMessage() async {
+  void _sendMessage({String? text, String? mediaUrl}) async {
     final String content = _messageController.text.trim();
     if (content.isEmpty) {
       return;
@@ -245,9 +251,10 @@ class _ChatPageState extends State<ChatPage> {
       senderUid: userUid,
       receiver: widget.friendName,
       receiverUid: friendUid,
-      content: content,
+      content: content ?? '' ,
       edited: false,
       deleted: false,
+      mediaUrl: mediaUrl,
     );
 
     try {
@@ -263,6 +270,45 @@ class _ChatPageState extends State<ChatPage> {
       // Error handling for message send failure
     }
   }
+
+  Future<void> _pickAndSendMedia() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // Check gallery permissions
+      var status = await Permission.photos.status;
+      if (status.isDenied) {
+        // Request permission
+        if (await Permission.photos.request().isGranted) {
+          // Permission granted
+          _uploadFile(File(pickedFile.path));
+        }
+      } else if (status.isGranted) {
+        // Permission is already granted
+        _uploadFile(File(pickedFile.path));
+      } else {
+        // Handle other statuses, such as permanently denied
+      }
+    }
+  }
+
+  Future<void> _uploadFile(File file) async {
+    String fileName = 'chat_media/${DateTime.now().millisecondsSinceEpoch}_${p.basename(file.path)}';
+    Reference storageReference = FirebaseStorage.instance.ref().child(fileName);
+
+    try {
+      // Upload file
+      await storageReference.putFile(file);
+      // Get file URL
+      String fileUrl = await storageReference.getDownloadURL();
+      // Send message with media URL
+      _sendMessage(mediaUrl: fileUrl);
+    } catch (e) {
+      // Handle upload errors
+    }
+  }
+
 
   // Deletes a single message identified by its messageId.
   void _deleteMessage(String messageId) async {
@@ -508,6 +554,7 @@ class _ChatPageState extends State<ChatPage> {
                       icon: const Icon(Icons.photo),
                       onPressed: () {
                         // TODO:Implement sending image or video
+                        _pickAndSendMedia();
                       },
                     ),
                     Expanded(

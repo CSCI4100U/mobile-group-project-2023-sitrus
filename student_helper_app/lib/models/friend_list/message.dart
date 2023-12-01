@@ -20,6 +20,8 @@ class Message {
   final bool edited;
   // Flag to indicate if the message has been deleted.
   final bool deleted;
+  // URL of the image or video, nullable since not all messages will include media.
+  final String? mediaUrl;
 
   // Constructor for creating a new Message instance.
   Message({
@@ -32,6 +34,7 @@ class Message {
     required this.content,
     this.edited = false,
     this.deleted = false,
+    this.mediaUrl,
   });
 
   // Converts a Message instance to a map, useful for Firestore operations.
@@ -46,6 +49,7 @@ class Message {
       'content': content,
       'edited': edited,
       'deleted': deleted,
+      'mediaUrl': mediaUrl,
     };
   }
 
@@ -61,6 +65,7 @@ class Message {
       content: map['content'],
       edited: map['edited'] ?? false,
       deleted: map['deleted'] ?? false,
+      mediaUrl: map['mediaUrl'],
     );
   }
 
@@ -75,6 +80,7 @@ class Message {
     String? content,
     bool? edited,
     bool? deleted,
+    String? mediaUrl,
   }) {
     return Message(
       uid: uid ?? this.uid,
@@ -86,6 +92,7 @@ class Message {
       content: content ?? this.content,
       edited: edited ?? this.edited,
       deleted: deleted ?? this.deleted,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
     );
   }
 }

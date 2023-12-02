@@ -213,13 +213,13 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
                 title: ProfileTabs(title: "Student Number ", text: _user!.studentNumber, onPressed: () {  },),
 
                 onTap: () => _editField(
-                    'First Name', _user!.studentNumber, (newValue) => _saveProfile('firstName', newValue)),
+                    'First Name', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
               ),
               ListTile(
                 title: ProfileTabs(title: "First Name ", text: _user!.firstName, onPressed: () {  },),
 
                 onTap: () => _editField(
-                    'Student Number', _user!.firstName, (newValue) => _saveProfile('studentNumber', newValue)),
+                    'Student Number', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
               ),
               ListTile(
                 title: ProfileTabs(title: "Last Name", text: _user!.lastName, onPressed: () {  },),
@@ -231,7 +231,7 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
                 title: ProfileTabs(title: "Email ", text: _user!.email, onPressed: () {  },),
 
                 onTap: () => _editField(
-                    'Student Number', _user!.email, (newValue) => _saveProfile('studentNumber', newValue)),
+                    'Student Number', _user!.email, (newValue) => _saveProfile('email', newValue)),
               ),
               ListTile(
                 title: ProfileTabs(title: "Phone Number ", text: "phone number placeholder", onPressed: () {  },),

@@ -25,10 +25,7 @@ class SASHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text("SAS Home"),
-      ),
+
       body: ListView(
         padding: EdgeInsets.all(10.0),
         children: <Widget>[
@@ -124,7 +121,12 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  FAQPage()),
                 );
               },
-              label: const Text("FAQ")),
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("FAQ"),
+                ],
+              )),
         ],
       ),
 

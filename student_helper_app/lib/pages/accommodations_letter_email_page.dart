@@ -33,8 +33,8 @@ class Renewal_LettersState extends State<Renewal_Letters>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Renew Accommodations"),
-        backgroundColor: Colors.indigo
+        title: const Text("Renew Accommodations"),
+        backgroundColor: Theme.of(context).colorScheme.secondary
       ),
       body: Column(
 
@@ -48,7 +48,7 @@ class Renewal_LettersState extends State<Renewal_Letters>{
               onPressed: () {
                 _showAlertDialog(context);
               },
-              child: Text("Go to university site"),
+              child: const Text("Go to university site"),
             ),
 
 

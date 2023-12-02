@@ -107,8 +107,9 @@ class MyApp extends StatelessWidget {
         snapshot.data ?? false ? darkMode : lightMode;
 
         return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           title: 'Sitrus Student Aid',
-          theme: initialTheme,
+          theme: lightMode,
           darkTheme: darkMode,
           themeMode: ThemeMode.system, // Set your default theme mode here
           routerConfig: _router,

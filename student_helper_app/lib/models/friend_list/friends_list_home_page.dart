@@ -12,6 +12,8 @@ import 'friends_profile_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'new_profile_page.dart';
+
 class FriendListPage extends StatefulWidget {
   const FriendListPage({super.key});
 
@@ -671,7 +673,7 @@ class _FriendListPageState extends State<FriendListPage> {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => UserProfilePage(userId: FirebaseAuth.instance.currentUser!.uid),
+                builder: (context) => NewUserProfilePage(userId: FirebaseAuth.instance.currentUser!.uid),
               ),
             );
           },

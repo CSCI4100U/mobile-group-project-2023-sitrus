@@ -174,6 +174,11 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: ListView(
 
+        //CHANGES TO LOGIN PAGE: BY NIRUJAN
+        //ADDED ICON AT TOP OF PAGE, ADDED APP NAME, SPACED OUT LOGIN PAGE ELEMENTS
+        //COMMENTED OUT REMEMBER ME WIDGET, MOVED REGISTER BUTTON DOWN
+        // ADDED TEXT ASKING IF YOU DONT HAVE AN ACCOUNT, ADDED STYLING AND PADDING
+
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 40, bottom: 30),

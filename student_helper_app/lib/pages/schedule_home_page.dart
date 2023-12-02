@@ -62,12 +62,17 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(16.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {_goto_scheduleSavedList_page(context);},
-              label: const Text("View Saved Courses")),
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("View Saved Courses"),
+                ],
+              )),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
               icon: Icon(
@@ -80,7 +85,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(16.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
@@ -89,7 +94,12 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 launchUrl(_url);
 
               },
-              label: const Text("Search Courses by Term")),
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Search Courses"),
+                ],
+              )),
           SizedBox(height: buttonSpacing),
           OutlinedButton.icon(
               icon: Icon(
@@ -102,7 +112,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(16.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
@@ -110,7 +120,12 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 final Uri _url = Uri.parse('https://calendar.ontariotechu.ca/content.php?catoid=62&navoid=2811');
                 launchUrl(_url);
               },
-              label: const Text("Program Map")),
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Program Map"),
+                ],
+              )),
           SizedBox(height: buttonSpacing),
           
           OutlinedButton.icon(
@@ -126,12 +141,17 @@ class ScheduleMakerHomePage extends StatelessWidget {
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0.0)),
+                      borderRadius: BorderRadius.circular(16.0)),
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
                   )),
               onPressed: () {_goto_createNewSchedule_page(context);},
-              label: const Text("Make New Schedules")),
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Make New Schedules"),
+                ],
+              )),
         ],
       ),
     );

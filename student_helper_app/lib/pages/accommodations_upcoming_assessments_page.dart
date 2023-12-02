@@ -31,6 +31,7 @@ class UpcomingPageState extends State<UpcomingPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upcoming Assessments'),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         actions: [
           //add button
           IconButton(

@@ -28,7 +28,7 @@ class AddAccommodation_State extends State<AddAccommodation> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

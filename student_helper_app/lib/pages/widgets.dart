@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
@@ -64,5 +66,67 @@ class StyledButton extends StatelessWidget {
     onPressed: onPressed,
     child: child,
   );
+}
+
+class ProfileTabs extends StatelessWidget{
+
+  final String text;
+  final String title;
+  final Function()?onPressed;
+
+  const ProfileTabs({
+    super.key,
+    required this.title,
+    required this.text,
+    required this.onPressed
+
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration:
+        BoxDecoration(
+          color: Colors.blue[200],
+          borderRadius: BorderRadius.circular(10),
+        ),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("$title: ", style:
+                TextStyle(
+                  fontSize: 20,
+
+                ),),
+
+            IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.edit)
+            )
+            ],
+              
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 70),
+            child: Text(text,
+              style:
+              TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold
+              ),),
+          )
+        ],
+
+      ),
+
+
+
+    );
+  }
 }
 

@@ -53,7 +53,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Accommodations'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         actions: [
           IconButton(
             icon: Icon(Icons.sort),

@@ -39,7 +39,7 @@ class _NewHomePageState extends State<NewHomePage> {
     return Scaffold(
       appBar: AppBar(
 
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         foregroundColor: Theme.of(context).colorScheme.background,
         title: const Text(
             "Sitrus Student Aid",
@@ -51,7 +51,7 @@ class _NewHomePageState extends State<NewHomePage> {
       ),
       body: _pages[_selectedIndex],
       drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         child: Column(
           children: [
               const DrawerHeader(child: Icon(
@@ -123,7 +123,7 @@ class _NewHomePageState extends State<NewHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: _navigateBottomBar,
         currentIndex: _selectedIndex,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         selectedItemColor: Theme.of(context).colorScheme.background,
         items:  [
           BottomNavigationBarItem(

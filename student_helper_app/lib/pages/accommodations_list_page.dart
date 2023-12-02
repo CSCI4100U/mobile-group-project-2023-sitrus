@@ -33,7 +33,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
   @override
   void initState() {
     super.initState();
-    _refreshList(); // Initialize _grades inside initState
+    _refreshList();
   }
 
   void _refreshList() async {
@@ -46,8 +46,8 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
 
 
 
-  String selectedGrade = "NA";
-  List<String> gradeOptions = ["NA", "Example1", "Example2", "ASL", "Extra time", "Scribe"];
+  String selectedOption = "NA";
+  List<String> testOptions = ["NA", "Example1", "Example2", "ASL", "Extra time", "Scribe"];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

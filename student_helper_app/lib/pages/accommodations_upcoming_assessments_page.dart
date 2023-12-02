@@ -1,58 +1,188 @@
-
-
-// main.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+
 import 'package:student_helper_project/models/sas_model/Accommodation.dart';
+
+
+TextEditingController _searchController = TextEditingController();
 
 
 
 class UpcomingPage extends StatefulWidget {
-  const UpcomingPage({super.key});
+  const UpcomingPage({Key? key}) : super(key: key);
 
   @override
-  UpcomingPageState createState() => UpcomingPageState();
+  _UpcomingPageState createState() => _UpcomingPageState();
 }
 
-class UpcomingPageState extends State<UpcomingPage> {
-  final List<Accommodation> amdtns = [
-    //These are just here for now to prove that this works
-    //The plan is for the user to be able to tell what accommodations they'll have acess to
-    Accommodation(name: 'Test 1', desc: 'Student recieves double time on assessment', assessments: ['Test', 'Quiz'],
-    eventDate: DateTime.utc(2023,11,29)),
-    Accommodation(name: 'Quiz 2', desc: 'Student is entitled to the use of a scribe',
-        assessments: ['Test', 'Quiz', 'Written Work'], eventDate: DateTime.utc(2023, 4, 7)),
+class _UpcomingPageState extends State<UpcomingPage> {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
 
+  @override
+  void initState() {
+    super.initState();
+    initializeNotifications();
+  }
+
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('app icon');
+
+    final InitializationSettings initializationSettings =
+    InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+        //onSelectNotification: onSelectNotification);
+  }
+
+  Future<void> onSelectNotification(String? payload) async {
+    // Handle notification tap
+    print('Notification tapped!');
+  }
+
+  Future<void> showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'csci-4100u-final-pg-friendlist',
+      'Upcoming Assessments',
+      //'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
+  }
+
+  final List<Accommodation> amdtns = [
+    Accommodation(
+        name: 'Test 1',
+        desc: 'Student receives double time on assessment',
+        assessments: ['Test', 'Quiz'],
+        eventDate: DateTime.utc(2023, 11, 29)),
+    Accommodation(
+        name: 'Quiz 2',
+        desc: 'Student is entitled to the use of a scribe',
+        assessments: ['Test', 'Quiz', 'Written Work'],
+        eventDate: DateTime.utc(2023, 4, 7)),
   ];
 
   List<Accommodation> filteredAccommodations = [];
+  void _refreshList() {
+    setState(() {
+      filteredAccommodations = []; 
+    });
+  }
+  void _filterAccommodations(String query) {
+    List<Accommodation> filteredList = amdtns
+        .where((accommodation) =>
+    accommodation.name!.toLowerCase().contains(query.toLowerCase()) ||
+        accommodation.desc!.toLowerCase().contains(query.toLowerCase()))
+        .toList();
 
+    setState(() {
+      filteredAccommodations = filteredList;
+    });
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upcoming Assessments'),
+
         backgroundColor: Theme.of(context).colorScheme.secondary,
+
         actions: [
-          //add button
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.sort),
             onPressed: () {
-              _showAddEventDialog(context);
+              // Add your sorting logic here
             },
           ),
           IconButton(
-            //search button!
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.info),
             onPressed: () {
-              showSearch(
-                context: context,
-                delegate: EventSearch(amdtns),
-              );
+              _showExplanationPopup(context);
             },
           ),
         ],
       ),
-      body: EventList(accommodations: filteredAccommodations.isNotEmpty ? filteredAccommodations : amdtns),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _refreshList(); // Reset the list when clearing the search
+                  },
+                ),
+              ),
+              onChanged: (value) {
+                _filterAccommodations(value);
+              },
+              onEditingComplete: () {
+                _searchController.clear();
+                _refreshList(); // Reset the list when clearing the search
+              },
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredAccommodations.isNotEmpty
+                  ? filteredAccommodations.length
+                  : amdtns.length,
+              itemBuilder: (context, index) {
+                bool? withinTwoWeekNotice =
+                filteredAccommodations.isNotEmpty
+                    ? filteredAccommodations[index].isWithinTwoWeekNotice()
+                    : amdtns[index].isWithinTwoWeekNotice();
+
+                return ListTile(
+                  title: Text(
+                    filteredAccommodations.isNotEmpty
+                        ? filteredAccommodations[index].name as String
+                        : amdtns[index].name as String,
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Description: ${filteredAccommodations.isNotEmpty ? filteredAccommodations[index].desc : amdtns[index].desc}'),
+                      Text(
+                          'Date: ${filteredAccommodations.isNotEmpty ? filteredAccommodations[index].eventDate?.toLocal() : amdtns[index].eventDate?.toLocal()}'),
+                      Text(
+                        'Within Two-Week Notice: ${withinTwoWeekNotice as bool ? "Yes" : "No"}',
+                        style: TextStyle(
+                          color: withinTwoWeekNotice ? Colors.red : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    // Add your onTap logic here
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddEventDialog(context);
@@ -61,9 +191,13 @@ class UpcomingPageState extends State<UpcomingPage> {
         child: Icon(Icons.add),
       ),
     );
+
+
   }
 
-  void _showAddEventDialog(BuildContext context) {
+
+
+void _showAddEventDialog(BuildContext context) {
     String eventName = '';
     String eventType = '';
     String? Acmdtn;
@@ -128,24 +262,68 @@ class UpcomingPageState extends State<UpcomingPage> {
               },
               child: Text('Cancel'),
             ),
+
             TextButton(
               onPressed: () {
                 setState(() {
                   print("Add");
-                  amdtns.add(Accommodation(name: eventName,
-                      desc: Acmdtn ?? eventType,
-                      assessments: [''],
-                      eventDate: eventDate));
+                  Accommodation newAccommodation = Accommodation(
+                    name: eventName,
+                    desc: Acmdtn ?? eventType,
+                    assessments: [''],
+                    eventDate: eventDate,
+                  );
+                  amdtns.add(newAccommodation);
+
+                  // Schedule a notification for the event date
+                  scheduleNotification(newAccommodation);
+
+                  // Close the dialog
+                  Navigator.of(context).pop();
                 });
-                Navigator.of(context).pop();
               },
               child: Text('Add'),
             ),
+
           ],
         );
       },
+
     );
-  }}
+
+  }
+
+  void scheduleNotification(Accommodation accommodation) async {
+    tz.TZDateTime scheduledDate = tz.TZDateTime.from(
+      accommodation.eventDate!,
+      tz.local,
+    );
+
+    // Calculate the date for the two-week reminder
+    tz.TZDateTime twoWeeksBefore = scheduledDate.subtract(Duration(days: 14));
+
+    // Schedule a notification for the event date
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Upcoming Event',
+      'You have an upcoming event: ${accommodation.name}',
+      scheduledDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'csci-4100u-final-pg-friendlist',
+          'Upcoming Assessments',
+          //'Check if registered in SAS',
+          importance: Importance.max,
+          priority: Priority.high,
+        ),
+      ),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    );
+  }
+}
 class EventList extends StatelessWidget {
   final List<Accommodation> accommodations;
 
@@ -224,3 +402,28 @@ class EventSearch extends SearchDelegate<String> {
     return EventList(accommodations: suggestionList);
   }
 }
+//------------------------------------------------------------------------------------
+
+void _showExplanationPopup(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Page Explanation'),
+        content: Text(
+          'This page allows you to schedule upcoming assessments and see what you are entitled to. '
+              'Use the add button to create a new event.'
+              'You will get a two week notice before each event.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Close'),
+          ),
+        ],
+      );
+    },
+  );
+}//---------------------------------------------------------

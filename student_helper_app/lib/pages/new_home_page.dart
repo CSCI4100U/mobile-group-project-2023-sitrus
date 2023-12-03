@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/models/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
@@ -8,6 +9,7 @@ import 'package:student_helper_project/pages/settings_page.dart';
 import '../models/friend_list/friends_chat_page.dart';
 import '../models/friend_list/friends_list_home_page.dart';
 import 'info.dart';
+import '../models/friend_list/friends_profile_page.dart';
 
 class NewHomePage extends StatefulWidget {
   NewHomePage({super.key});
@@ -19,6 +21,9 @@ class NewHomePage extends StatefulWidget {
 }
 
 class _NewHomePageState extends State<NewHomePage> {
+  currentUserId() {
+    return FirebaseAuth.instance.currentUser!.uid;
+  }
 
   int _selectedIndex = 1;
 
@@ -66,6 +71,12 @@ class _NewHomePageState extends State<NewHomePage> {
                   ),
               title: Text("P R O F I L E",
               style: TextStyle(fontSize: 20),),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfilePage(userId: currentUserId(),)), // Integration Preparation
+                );
+              },
             ),
             ListTile(
               leading:  const Icon(

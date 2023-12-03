@@ -35,11 +35,13 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+
   // List to store and display messages.
   List<Message> messages = [];
 
   // Variables to customize chat background.
   Color _backgroundColor = Colors.white;
+  final ImagePicker _picker = ImagePicker();
   String? _backgroundImage;
 
   // Initialize state, set up scroll listener and load messages from the cloud.
@@ -229,10 +231,35 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // Handles the image upload process.
-  void _uploadImage() {
-    // TODO: Implement the logic for uploading an image
-    // For example, using image_picker package to pick an image
-    // and then setting _backgroundImage to the path of the selected image
+  void _uploadImage() async {
+    try {
+      // Pick an image
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+      // Check if an image is selected
+      if (image == null) return;
+
+      // Create a file from the picked image path
+      File file = File(image.path);
+
+      // Define the destination path in Firebase Storage
+      String filePath = 'chat_backgrounds/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+      Reference ref = FirebaseStorage.instance.ref().child(filePath);
+
+      // Upload the file
+      await ref.putFile(file);
+
+      // Get the download URL
+      String downloadUrl = await ref.getDownloadURL();
+
+      // Update the state to reflect the new background image
+      setState(() {
+        _backgroundImage = downloadUrl;
+      });
+    } catch (e) {
+      // Handle exceptions
+      print('Error occurred while picking or uploading image: $e');
+    }
   }
 
   // Sends a new message to the Firestore collection.
@@ -271,7 +298,19 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  // TODO: Still have to fix
   Future<void> _pickAndSendMedia() async {
+    var cameraStatus = await Permission.camera.status;
+    var storageStatus = await Permission.storage.status;
+
+    if (!cameraStatus.isGranted) {
+      await Permission.camera.request();
+    }
+
+    if (!storageStatus.isGranted) {
+      await Permission.storage.request();
+    }
+
     final picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -553,7 +592,7 @@ class _ChatPageState extends State<ChatPage> {
                     IconButton(
                       icon: const Icon(Icons.photo),
                       onPressed: () {
-                        // TODO:Implement sending image or video
+                        // sending image or video
                         _pickAndSendMedia();
                       },
                     ),

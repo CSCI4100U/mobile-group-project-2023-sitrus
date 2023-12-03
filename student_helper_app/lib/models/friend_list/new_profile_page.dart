@@ -8,7 +8,7 @@ import 'package:student_helper_project/pages/widgets.dart';
 // Import the 'AppUser' class from a separate file
 import 'friend_login_page.dart';
 import 'appuser.dart';
-import '../../pages/widgets.dart';
+// import '../../pages/widgets.dart';
 
 /// UserProfilePage allows viewing and editing the user profile.
 class NewUserProfilePage extends StatefulWidget {

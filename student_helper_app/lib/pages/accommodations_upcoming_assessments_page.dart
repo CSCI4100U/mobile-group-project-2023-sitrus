@@ -24,17 +24,17 @@ class _UpcomingPageState extends State<UpcomingPage> {
   @override
   void initState() {
     super.initState();
-    initializeNotifications();
+   // initializeNotifications();
   }
+/*
 
   void initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('app icon');
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
 
     final InitializationSettings initializationSettings =
     InitializationSettings(android: initializationSettingsAndroid);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-        //onSelectNotification: onSelectNotification);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
   }
 
   Future<void> onSelectNotification(String? payload) async {
@@ -47,7 +47,7 @@ class _UpcomingPageState extends State<UpcomingPage> {
     AndroidNotificationDetails(
       'csci-4100u-final-pg-friendlist',
       'Upcoming Assessments',
-      //'your_channel_description',
+      'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -62,6 +62,7 @@ class _UpcomingPageState extends State<UpcomingPage> {
       payload: 'Default_Sound',
     );
   }
+*/
 
   final List<Accommodation> amdtns = [
     Accommodation(
@@ -79,28 +80,28 @@ class _UpcomingPageState extends State<UpcomingPage> {
   List<Accommodation> filteredAccommodations = [];
   void _refreshList() {
     setState(() {
-      filteredAccommodations = []; 
+      filteredAccommodations = [];
     });
   }
   void _filterAccommodations(String query) {
     List<Accommodation> filteredList = amdtns
         .where((accommodation) =>
-    accommodation.name!.toLowerCase().contains(query.toLowerCase()) ||
-        accommodation.desc!.toLowerCase().contains(query.toLowerCase()))
+    (accommodation.name!.toLowerCase().contains(query.toLowerCase()) ||
+        accommodation.desc!.toLowerCase().contains(query.toLowerCase())) &&
+        !accommodation.isEventPast()) // Check if the event is not past
         .toList();
 
     setState(() {
       filteredAccommodations = filteredList;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upcoming Assessments'),
-
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-
+        backgroundColor: Colors.indigo,
         actions: [
           IconButton(
             icon: Icon(Icons.sort),
@@ -312,7 +313,7 @@ void _showAddEventDialog(BuildContext context) {
         android: AndroidNotificationDetails(
           'csci-4100u-final-pg-friendlist',
           'Upcoming Assessments',
-          //'Check if registered in SAS',
+          'Check if registered in SAS',
           importance: Importance.max,
           priority: Priority.high,
         ),

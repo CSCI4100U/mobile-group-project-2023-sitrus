@@ -8,7 +8,17 @@ class Renewal_Letters extends StatefulWidget {
 }
 
 class RenewalLettersState extends State<Renewal_Letters> {
-  List<Item> _data = generateItems();
+  late List<Item> _data;
+  late List<Item> _filteredData;
+
+  TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _data = generateItems();
+    _filteredData = List.from(_data);
+  }
 
   void _showAlertDialog(BuildContext context, Item item) {
     showDialog(
@@ -35,64 +45,70 @@ class RenewalLettersState extends State<Renewal_Letters> {
     );
   }
 
+  void _filterData(String query) {
+    setState(() {
+      _filteredData = _data
+          .where((item) =>
+      item.header.toLowerCase().contains(query.toLowerCase()) ||
+          item.description.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  // ... (previous code remains the same)
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // Fixed typo here: PopScope -> Scaffold
+    return Scaffold(
       appBar: AppBar(
-
-        title: const Text("Renew Accommodations"),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-
-
+        title: Text("Renew Accommodations"),
+        backgroundColor: Colors.indigo,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ExpansionPanelList(
-              elevation: 1,
-              expandedHeaderPadding: EdgeInsets.all(0),
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  _data[index].isExpanded = !_data[index].isExpanded;
-                });
-              },
-
-              //child: const Text("Go to university site"),
-
-              children: _data.map((Item item) {
-                return ExpansionPanel(
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return new Text(item.header);
-
-                  },
-                  /*body: ListTile(
-                    title: new Text(item.description),
-                    subtitle: Text(item.link),
-                    onTap: () {
-                      _showAlertDialog(context, item);
-                    },
-                  ),*/
-                  isExpanded: item.isExpanded,
-                  body:
-                      ListTile(
-                        title:
-                          Text(item.description),
-                      subtitle: Text(item.link),
-                        onTap: () {
-                          _showAlertDialog(context, item);
-                        },
-                      )
-
-
-                );
-              }).toList(),
-
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _filterData,
+              decoration: InputDecoration(
+                labelText: "Search",
+                hintText: "Search for items...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: ExpansionPanelList.radio(
+                elevation: 1,
+                expandedHeaderPadding: EdgeInsets.all(0),
+                children: _filteredData.map((Item item) {
+                  return ExpansionPanelRadio(
+                    value: item,
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return new Text(item.header);
+                    },
+                    body: ListTile(
+                      title: Text(item.description),
+                      subtitle: Text(item.link),
+                      onTap: () {
+                        _showAlertDialog(context, item);
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
 }
 
 class Item {
@@ -122,6 +138,12 @@ List<Item> generateItems() {
       header: 'Intake Form.',
       description: 'This contains a link to the intake form. Needed for registering with Accessibility services.',
       link: 'https://shared.ontariotechu.ca/shared/department/student-life/student-accessibility-services/documentation/new-sas-student-intake-package.pdf',
+    ),
+    Item(
+      isExpanded: false,
+      header: 'SAS Disability Form.',
+      description: 'This contains a link to the disability form. Needed for registering with Accessibility services.',
+      link: 'https://studentlife.ontariotechu.ca/current-students/accessibility/students/new-students/index.php#tab1-2',
     ),
   ];
 }

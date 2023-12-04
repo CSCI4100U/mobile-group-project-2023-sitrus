@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:student_helper_project/pages/app_state.dart';
 import 'package:student_helper_project/pages/home_page.dart';
@@ -15,14 +15,13 @@ import 'models/friend_list/friend_login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await initializeFirebase();
 
   runApp(ChangeNotifierProvider(
     create: (context) => ApplicationState(),
-    builder: (context, child) => MyApp(),
+    builder: ((context, child) => const MyApp()),
   ));
 }
-
 
 final _router = GoRouter(
   routes: [
@@ -131,7 +130,6 @@ final _router = GoRouter(
 //     );
 //   }
 // }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -171,6 +169,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

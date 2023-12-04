@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:student_helper_project/models/friend_list/friends_list_home_page.dart';
 
 import 'local_storage.dart';
 import 'message.dart';
@@ -231,6 +232,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   // Handles the image upload process.
+  // TODO: Still have to fix
   void _uploadImage() async {
     try {
       // Pick an image
@@ -264,8 +266,11 @@ class _ChatPageState extends State<ChatPage> {
 
   // Sends a new message to the Firestore collection.
   void _sendMessage({String? text, String? mediaUrl}) async {
-    final String content = _messageController.text.trim();
-    if (content.isEmpty) {
+    // Use provided 'text' or fallback to text from the controller
+    final String content = text ?? _messageController.text.trim();
+
+    // Check if both content and mediaUrl are empty, then return
+    if (content.isEmpty && mediaUrl == null) {
       return;
     }
 
@@ -278,7 +283,7 @@ class _ChatPageState extends State<ChatPage> {
       senderUid: userUid,
       receiver: widget.friendName,
       receiverUid: friendUid,
-      content: content ?? '' ,
+      content: content,
       edited: false,
       deleted: false,
       mediaUrl: mediaUrl,
@@ -287,10 +292,8 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await FirebaseFirestore.instance.collection('messages').add(newMessage.toMap());
       setState(() {
-        // Add new message to the end of the list
         messages.add(newMessage);
         _messageController.clear();
-        // Scroll to the bottom of the list to show the new message
         _scrollToBottom();
       });
     } catch (e) {
@@ -298,37 +301,54 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // TODO: Still have to fix
-  Future<void> _pickAndSendMedia() async {
+  Future<bool> requestPermissions() async {
+    print("Requesting camera and storage permissions");
+
     var cameraStatus = await Permission.camera.status;
-    var storageStatus = await Permission.storage.status;
+    var storageStatus = await Permission.photos.status;
+
+    print("Initial Camera Permission Status: ${cameraStatus.isGranted}");
+    print("Initial Storage Permission Status: ${storageStatus.isGranted}");
 
     if (!cameraStatus.isGranted) {
-      await Permission.camera.request();
+      print("Requesting camera permission");
+      cameraStatus = await Permission.camera.request();
+      print("Camera Permission Status After Request: ${cameraStatus.isGranted}");
     }
 
     if (!storageStatus.isGranted) {
-      await Permission.storage.request();
+      print("Requesting storage permission");
+      storageStatus = await Permission.photos.request();
+      print("Storage Permission Status After Request: ${storageStatus.isGranted}");
     }
+
+    if (!cameraStatus.isGranted || !storageStatus.isGranted) {
+      print("Not all permissions granted");
+      return false;
+    }
+
+    print("All required permissions granted");
+    return true;
+  }
+
+  // method to pick and send image/media
+  Future<void> _pickAndSendMedia() async {
+    print("Initiating media pick process");
+
+    bool permissionsGranted = await requestPermissions();
+
+    if (!permissionsGranted) {
+      print("Required permissions are not granted");
+      return;
+    }
+
+    print("Permissions granted, proceeding to pick media");
 
     final picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      // Check gallery permissions
-      var status = await Permission.photos.status;
-      if (status.isDenied) {
-        // Request permission
-        if (await Permission.photos.request().isGranted) {
-          // Permission granted
-          _uploadFile(File(pickedFile.path));
-        }
-      } else if (status.isGranted) {
-        // Permission is already granted
-        _uploadFile(File(pickedFile.path));
-      } else {
-        // Handle other statuses, such as permanently denied
-      }
+      _uploadFile(File(pickedFile.path));
     }
   }
 
@@ -347,7 +367,6 @@ class _ChatPageState extends State<ChatPage> {
       // Handle upload errors
     }
   }
-
 
   // Deletes a single message identified by its messageId.
   void _deleteMessage(String messageId) async {
@@ -546,7 +565,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FriendListPage()));
           },
         ),
         title: Text('${widget.friendName} - ${widget.friendStatus}'),

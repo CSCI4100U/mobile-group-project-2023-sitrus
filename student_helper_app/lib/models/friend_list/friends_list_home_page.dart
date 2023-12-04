@@ -348,40 +348,7 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
-  // Function to search for friends based on a query
-  // void _searchFriend(String searchQuery) async {
-  //   if (searchQuery.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Search query cannot be empty'),
-  //         duration: Duration(seconds: 3),
-  //         backgroundColor: Colors.red,
-  //       ),
-  //     );
-  //     return;
-  //   }
-  //
-  //   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-  //   final querySnapshot = await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(currentUserId)
-  //       .collection('friends')
-  //       .where('firstName', isEqualTo: searchQuery)
-  //       .get();
-  //
-  //   final List<AppUser> users = querySnapshot.docs
-  //       .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-  //       .where((user) => user.firstName.toLowerCase().contains(searchQuery.toLowerCase()))
-  //       .toList();
-  //
-  //   // setState(() {
-  //   //   searchResults = users;
-  //   // });
-  //   setState(() {
-  //     // Update searchResults with users if found, or an empty list if no users are found
-  //     searchResults = users.isNotEmpty ? users : [];
-  //   });
-  // }
+  // Function to search for friends by first name based on a query
   void _searchFriend(String searchQuery) async {
     print("Search query: $searchQuery"); // Debug: Print the search query
 
@@ -750,7 +717,7 @@ class _FriendListPageState extends State<FriendListPage> {
         ),
         title: const Text('Friend List'),
         actions: <Widget>[
-          Center(child: Text(_weatherDescription)),
+          // Center(child: Text(_weatherDescription)), // weather display
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {

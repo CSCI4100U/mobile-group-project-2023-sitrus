@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,21 +11,33 @@ import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 import 'package:student_helper_project/theme.dart';
 import 'models/ThemeProvider.dart';
+import 'models/friend_list/friend_login_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   runApp(ChangeNotifierProvider(
     create: (context) => ApplicationState(),
-    builder: ((context, child) => const MyApp()),
+    builder: (context, child) => MyApp(),
   ));
 }
+
 
 final _router = GoRouter(
   routes: [
     GoRoute(
+      // path: '/',
+      // builder: (context, state) =>  NewHomePage(),
       path: '/',
-      builder: (context, state) =>  NewHomePage(),
+      builder: (context, state) {
+        // Check if user is logged in and decide initial route
+        if (FirebaseAuth.instance.currentUser != null) {
+          return NewHomePage();
+        } else {
+          return LoginPage();
+        }
+      },
       routes: [
         GoRoute(
           path: 'sign-in',
@@ -94,6 +108,30 @@ final _router = GoRouter(
   ],
 );
 
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<bool?>(
+//       future: ThemeProvider.loadThemeFromPreferences(),
+//       builder: (context, snapshot) {
+//         ThemeData initialTheme =
+//         snapshot.data ?? false ? darkMode : lightMode;
+//
+//         return MaterialApp.router(
+//           debugShowCheckedModeBanner: false,
+//           title: 'Sitrus Student Aid',
+//           theme: lightMode,
+//           darkTheme: darkMode,
+//           themeMode: ThemeMode.system, // Set your default theme mode here
+//           routerConfig: _router,
+//         );
+//       },
+//     );
+//   }
+// }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -105,13 +143,29 @@ class MyApp extends StatelessWidget {
         ThemeData initialTheme =
         snapshot.data ?? false ? darkMode : lightMode;
 
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'Sitrus Student Aid',
-          theme: lightMode,
-          darkTheme: darkMode,
-          themeMode: ThemeMode.system, // Set your default theme mode here
-          routerConfig: _router,
+        return StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, authSnapshot) {
+            if (authSnapshot.connectionState == ConnectionState.active) {
+              User? user = authSnapshot.data;
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                title: 'Sitrus Student Aid',
+                theme: lightMode,
+                darkTheme: darkMode,
+                themeMode: ThemeMode.system,
+                routeInformationParser: _router.routeInformationParser,
+                routerDelegate: _router.routerDelegate,
+                routeInformationProvider: _router.routeInformationProvider,
+              );
+            }
+            // Show loading indicator while waiting for auth state
+            return MaterialApp(
+              home: Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          },
         );
       },
     );

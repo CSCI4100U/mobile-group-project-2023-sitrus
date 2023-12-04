@@ -35,7 +35,7 @@ class _NewHomePageState extends State<NewHomePage> {
 
   final List _pages = [
     ScheduleMakerHomePage(),
-    HomePage(),
+    const FriendListPage(),
     SASHomePage()
   ];
 
@@ -65,11 +65,11 @@ class _NewHomePageState extends State<NewHomePage> {
               ),
               ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                   Icons.person,
                   size: 40,
                   ),
-              title: Text("P R O F I L E",
+              title: const Text("P R O F I L E",
               style: TextStyle(fontSize: 20),),
               onTap: () {
                 Navigator.push(
@@ -90,39 +90,39 @@ class _NewHomePageState extends State<NewHomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
             ),
             ListTile(
-              leading:  Icon(
+              leading:  const Icon(
                 Icons.info,
                 size: 40,
               ),
-              title:  Text("I N F O",
+              title:  const Text("I N F O",
                   style: TextStyle(
                       fontSize: 20)
               ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => InfoPage()),
+                  MaterialPageRoute(builder: (context) => const InfoPage()),
                 );
               },
             ),
             ListTile(
-              leading:  Icon(
+              leading:  const Icon(
                 Icons.question_mark,
                 size: 40,
               ),
-              title:  Text("H E L P",
+              title:  const Text("H E L P",
                   style: TextStyle(
                       fontSize: 20)
               ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => InfoPage()),
+                  MaterialPageRoute(builder: (context) => const InfoPage()),
                 );
               },
             )
@@ -137,13 +137,13 @@ class _NewHomePageState extends State<NewHomePage> {
         backgroundColor: Theme.of(context).colorScheme.secondary,
         selectedItemColor: Theme.of(context).colorScheme.background,
         items:  [
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.table_chart, size: 40),
               label: "Schedule",),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble, size: 40),
               label: "Chat"),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 40),
               label: "Accommodations"),
 

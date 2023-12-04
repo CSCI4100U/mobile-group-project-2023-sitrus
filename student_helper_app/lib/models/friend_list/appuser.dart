@@ -87,4 +87,10 @@ class AppUser {
   String getFullName() {
     return [firstName, if (middleName?.isNotEmpty ?? false) middleName, lastName].join(" ").trim();
   }
+
+  // Override the toString method to provide a better representation of the object
+  @override
+  String toString() {
+    return 'AppUser(uid: $uid, studentNumber: $studentNumber, firstName: $firstName, middleName: $middleName, lastName: $lastName, email: $email, phoneNumber: $phoneNumber, birthday: $birthday, grade: $grade, status: $status, major: $major, description: $description, icon: $icon, friendList: $friendList, isFriend: $isFriend, isRequested: $isRequested)';
+  }
 }

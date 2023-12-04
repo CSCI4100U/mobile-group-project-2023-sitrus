@@ -348,9 +348,43 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
-
   // Function to search for friends based on a query
+  // void _searchFriend(String searchQuery) async {
+  //   if (searchQuery.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Search query cannot be empty'),
+  //         duration: Duration(seconds: 3),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //     return;
+  //   }
+  //
+  //   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  //   final querySnapshot = await FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(currentUserId)
+  //       .collection('friends')
+  //       .where('firstName', isEqualTo: searchQuery)
+  //       .get();
+  //
+  //   final List<AppUser> users = querySnapshot.docs
+  //       .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+  //       .where((user) => user.firstName.toLowerCase().contains(searchQuery.toLowerCase()))
+  //       .toList();
+  //
+  //   // setState(() {
+  //   //   searchResults = users;
+  //   // });
+  //   setState(() {
+  //     // Update searchResults with users if found, or an empty list if no users are found
+  //     searchResults = users.isNotEmpty ? users : [];
+  //   });
+  // }
   void _searchFriend(String searchQuery) async {
+    print("Search query: $searchQuery"); // Debug: Print the search query
+
     if (searchQuery.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -359,25 +393,49 @@ class _FriendListPageState extends State<FriendListPage> {
           backgroundColor: Colors.red,
         ),
       );
+      print("Search query is empty"); // Debug: Print when search query is empty
       return;
     }
 
     final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-    final querySnapshot = await FirebaseFirestore.instance
+    print("Current user ID: $currentUserId"); // Debug: Print the current user ID
+
+    // Step 1: Retrieve friend UIDs
+    final friendUidsSnapshot = await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUserId)
         .collection('friends')
-        .where('firstName', isEqualTo: searchQuery)
         .get();
 
-    final List<AppUser> users = querySnapshot.docs
-        .map((doc) => AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-        .where((user) => user.firstName.toLowerCase().contains(searchQuery.toLowerCase()))
+    List<String> friendUids = friendUidsSnapshot.docs
+        .map((doc) => doc.id) // Assuming the friend UID is the document ID
         .toList();
 
-    setState(() {
-      searchResults = users;
-    });
+    print("Friend UIDs: $friendUids"); // Debug: Print the list of friend UIDs
+
+    // Step 2: Retrieve user details and filter
+    List<AppUser> users = [];
+    for (String uid in friendUids) {
+      var userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (userDoc.exists) {
+        AppUser user = AppUser.fromMap(userDoc.data() as Map<String, dynamic>, userDoc.id);
+        print("User details: ${user.toString()}"); // Enhance this line to print more details
+        if (user.firstName.toLowerCase().contains(searchQuery.toLowerCase())) {
+          users.add(user);
+        }
+      }
+    }
+
+    print("Filtered users: $users"); // Debug: Print the list of filtered users
+
+    if (mounted) {
+      setState(() {
+        searchResults = users;
+        isSearching = true;
+      });
+    }
+
+    print("Search results updated"); // Debug: Print when search results are updated
   }
 
   // Dialog to allow searching for friends
@@ -390,7 +448,7 @@ class _FriendListPageState extends State<FriendListPage> {
           content: TextField(
             controller: searchController,
             decoration: const InputDecoration(
-              hintText: "Enter a friend's name",
+              hintText: "Enter a friend's firstname",
             ),
             onSubmitted: (value) {
               // Implement the search functionality
@@ -401,6 +459,18 @@ class _FriendListPageState extends State<FriendListPage> {
             TextButton(
               child: const Text('Cancel'),
               onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Reset'),
+              onPressed: () {
+                // Reset the search field
+                searchController.clear();
+                // Reset the search results
+                setState(() {
+                  searchResults = allFriends;
+                  isSearching = false;
+                });
+              },
             ),
             TextButton(
               child: const Text('Search'),

@@ -136,7 +136,10 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('remember_me', _rememberMe);
     }
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+    // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => NewHomePage()),
+    );
   }
 
   // Checks if "Remember Me" was selected in a previous session.
@@ -145,7 +148,9 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool rememberMe = prefs.getBool('remember_me') ?? false;
     if (rememberMe) {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => NewHomePage()),
+      );
     }
   }
 
@@ -159,17 +164,17 @@ class _LoginPageState extends State<LoginPage> {
       // Other UI components such as AppBar, TextFormField, and ElevatedButton are used to create the form and handle user input.
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Navigate to the HomePage for now
-            // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NewHomePage()),
-            );
-          },
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back),
+        //   onPressed: () {
+        //     // Navigate to the HomePage for now
+        //     // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => NewHomePage()),
+        //     );
+        //   },
+        // ),
         title: const Text('Login'),
       ),
       body: ListView(

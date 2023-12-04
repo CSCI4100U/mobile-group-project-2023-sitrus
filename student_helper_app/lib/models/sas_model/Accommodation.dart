@@ -17,6 +17,10 @@ class Accommodation{
     DateTime twoWeekNotice = DateTime.now().add(Duration(days: 14));
     return eventDate?.isBefore(twoWeekNotice);
   }
+  bool isEventPast() {
+    // Compare the event date with the current date
+    return DateTime.now().isAfter(eventDate!);
+  }
   Map<String, Object?> toMap() {
     return {
       'id': id,

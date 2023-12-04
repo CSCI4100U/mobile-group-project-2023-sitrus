@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:student_helper_project/models/friend_list/friends_list_home_page.dart';
+import 'package:student_helper_project/pages/new_home_page.dart';
 
 import 'local_storage.dart';
 import 'message.dart';
@@ -565,7 +566,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FriendListPage()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NewHomePage()));
           },
         ),
         title: Text('${widget.friendName} - ${widget.friendStatus}'),

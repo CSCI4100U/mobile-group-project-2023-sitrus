@@ -1,15 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:student_helper_project/models/friend_list/friend_login_page.dart';
+import 'package:student_helper_project/pages/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
 import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/schedule_home_page.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 
-import '../models/friend_list/friends_chat_page.dart';
-import '../models/friend_list/friends_list_home_page.dart';
+import 'friend_list/friends_chat_page.dart';
+import 'friend_list/friends_list_home_page.dart';
 import 'info.dart';
-import '../models/friend_list/friends_profile_page.dart';
+import 'friend_list/friends_profile_page.dart';
 
 class NewHomePage extends StatefulWidget {
   NewHomePage({super.key});

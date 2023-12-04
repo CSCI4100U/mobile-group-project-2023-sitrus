@@ -3,34 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:student_helper_project/pages/widgets.dart';
 
 // Import the 'AppUser' class from a separate file
 import 'friend_login_page.dart';
-import 'appuser.dart';
-// import '../../pages/widgets.dart';
+import '../../models/friend_list/appuser.dart';
 
 /// UserProfilePage allows viewing and editing the user profile.
-class NewUserProfilePage extends StatefulWidget {
+class UserProfilePage extends StatefulWidget {
   final String userId;
 
-  const NewUserProfilePage({super.key, required this.userId});
+  const UserProfilePage({super.key, required this.userId});
 
   @override
-  _NewUserProfilePageState createState() => _NewUserProfilePageState();
+  _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _NewUserProfilePageState extends State<NewUserProfilePage> {
+class _UserProfilePageState extends State<UserProfilePage> {
   AppUser? _user; // User data object
   bool _isLoading = true; // Loading state indicator
   TextEditingController? _controller; // Controller for text fields in edit dialogs
-  currentUserId() {
-    return FirebaseAuth.instance.currentUser!.uid;
-  }
-
-  currentUser() {
-    return FirebaseAuth.instance.currentUser!;
-  }
+  currentUserId() {return FirebaseAuth.instance.currentUser!.uid;}
+  currentUser() {return FirebaseAuth.instance.currentUser!;}
 
   @override
   void initState() {
@@ -44,7 +37,7 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
     // Fetch a document from Firestore based on the 'userId'
     DocumentSnapshot userData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(widget.userId) // Use widget.userId
+        .doc(widget.userId)  // Use widget.userId
         .get();
     if (userData.exists && userData.data() != null) {
       // If the document exists and contains data, update the UI
@@ -114,14 +107,12 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
         });
         // Optionally, show a snackbar to confirm the update
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$field updated successfully.'),
-              backgroundColor: Colors.green),
+          SnackBar(content: Text('$field updated successfully.'), backgroundColor: Colors.green),
         );
       }).catchError((error) {
         // Handle errors, possibly show a snackbar with the error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update $field.'),
-              backgroundColor: Colors.red),
+          SnackBar(content: Text('Failed to update $field.'), backgroundColor: Colors.red),
         );
       });
     }
@@ -135,9 +126,7 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
 
     // Update the user's status to 'Offline' in Firestore
     final String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
-    await FirebaseFirestore.instance.collection('users')
-        .doc(currentUserUid)
-        .update({
+    await FirebaseFirestore.instance.collection('users').doc(currentUserUid).update({
       'status': 'Offline',
     });
 
@@ -183,78 +172,95 @@ class _NewUserProfilePageState extends State<NewUserProfilePage> {
     // Display user profile information and provide options for editing
     return Scaffold(
       appBar: AppBar(
-        title: Text("P R O F I L E"),
+        leading: const BackButton(),
+        title: Text("${_user!.firstName}'s Profile"),
+        bottom: PreferredSize(
+          child: Container(
+            color: Colors.blue,
 
+        ),
+          preferredSize: Size.fromHeight(30),
+        ),
       ),
-      body:
-
-          ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey.shade200,
-                  backgroundImage: _user!.icon != null
-                      ? NetworkImage(_user!.icon!)
-                      : null,
-                  child: _user!.icon == null
-                      ? Text(
-                    _user!.getInitials(),
-                    style: const TextStyle(fontSize: 40),
-                  )
-                      : null,
-                ),
-
-              ),
-              Center(child: Text("${_user!.firstName}'s Profile", style:
-                TextStyle(fontSize: 30),)),
-              ListTile(
-                title: ProfileTabs(title: "Student Number ", text: _user!.studentNumber, onPressed: () {  },),
-
-                onTap: () => _editField(
-                    'First Name', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
-              ),
-              ListTile(
-                title: ProfileTabs(title: "First Name ", text: _user!.firstName, onPressed: () {  },),
-
-                onTap: () => _editField(
-                    'Student Number', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
-              ),
-              ListTile(
-                title: ProfileTabs(title: "Last Name", text: _user!.lastName, onPressed: () {  },),
-
-                onTap: () => _editField(
-                    'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
-              ),
-              ListTile(
-                title: ProfileTabs(title: "Email ", text: _user!.email, onPressed: () {  },),
-
-                onTap: () => _editField(
-                    'Student Number', _user!.email, (newValue) => _saveProfile('email', newValue)),
-              ),
-              ListTile(
-                title: ProfileTabs(title: "Phone Number ", text: "phone number placeholder", onPressed: () {  },),
-
-                onTap: () => _editField(
-                  'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
-              ),
-              ListTile(
-                title: ProfileTabs(title: "Birthday ", text: "birthday placeholder", onPressed: () {  },),
-
-                onTap: () => _editField(
-                    'Birthday', _user!.birthday != null
-                    ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
-                    : '', (newValue) => _saveProfile('birthday', newValue)),
-              ),
-
-
-
-            ],
-          )
-
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey.shade200,
+            backgroundImage: _user!.icon != null
+                ? NetworkImage(_user!.icon!)
+                : null,
+            child: _user!.icon == null
+                ? Text(
+              _user!.getInitials(),
+              style: const TextStyle(fontSize: 40),
+            )
+                : null,
+          ),
+          ListTile(
+            title: Text(_user!.studentNumber),
+            subtitle: const Text('Student Number'),
+            onTap: () => _editField(
+                'Student Number', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
+          ),
+          // Include ListTiles for other fields similar to the one above
+          ListTile(
+            title: Text(_user!.firstName),
+            subtitle: const Text('First Name'),
+            onTap: () => _editField(
+                'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.lastName),
+            subtitle: const Text('Last Name'),
+            onTap: () => _editField(
+                'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.email),
+            subtitle: const Text('Email'),
+          ),
+          ListTile(
+            title: Text(_user!.phoneNumber ?? 'Not provided'),
+            subtitle: const Text('Phone Number'),
+            onTap: () => _editField(
+                'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.birthday != null
+                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                : 'Not provided'),
+            subtitle: const Text('Birthday'),
+            onTap: () => _editField(
+                'Birthday', _user!.birthday != null
+                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                : '', (newValue) => _saveProfile('birthday', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.grade ?? 'Not provided'),
+            subtitle: const Text('Grade'),
+            onTap: () => _editField(
+                'Grade', _user!.grade ?? '', (newValue) => _saveProfile('grade', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.major ?? 'Not provided'),
+            subtitle: const Text('Major'),
+            onTap: () => _editField(
+                'Major', _user!.major ?? '', (newValue) => _saveProfile('major', newValue)),
+          ),
+          ListTile(
+            title: Text(_user!.description ?? 'Not provided'),
+            subtitle: const Text('Description'),
+            onTap: () => _editField(
+                'Description', _user!.description ?? '', (newValue) => _saveProfile('description', newValue)),
+          ),
+          ListTile(
+            title: const Text('Logout', style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
+            onTap: _logout,
+          ),
+        ],
+      ),
     );
   }
 }
-
-

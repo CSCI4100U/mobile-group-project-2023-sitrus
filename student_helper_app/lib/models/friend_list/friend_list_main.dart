@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../firebase_options.dart';
-import 'friend_login_page.dart';
-import 'friends_list_home_page.dart';
+import '../../pages/friend_list/friend_login_page.dart';
+import '../../pages/friend_list/friends_list_home_page.dart';
 
 Future<void> main() async {
   // Ensure that Firebase is initialized before the app starts

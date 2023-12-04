@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'appuser.dart';
+import '../../models/friend_list/appuser.dart';
 
 // This page allows users to search for other users by their student number and manage friend requests.
 class AddFriendPage extends StatefulWidget {

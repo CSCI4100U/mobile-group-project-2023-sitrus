@@ -7,11 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:student_helper_project/models/friend_list/friends_list_home_page.dart';
+import 'package:student_helper_project/pages/friend_list/friends_list_home_page.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
 
-import 'local_storage.dart';
-import 'message.dart';
+import '../../models/friend_list/local_storage.dart';
+import '../../models/friend_list/message.dart';
 
 // ChatPage widget allows users to chat with a specific friend.
 class ChatPage extends StatefulWidget {

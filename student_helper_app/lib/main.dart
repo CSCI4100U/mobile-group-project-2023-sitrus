@@ -11,7 +11,7 @@ import 'package:student_helper_project/pages/onboarding.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 import 'package:student_helper_project/theme.dart';
 import 'models/ThemeProvider.dart';
-import 'models/friend_list/friend_login_page.dart';
+import 'pages/friend_list/friend_login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

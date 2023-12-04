@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'schedule_home_page.dart';
 import 'accommodations_home_page.dart';
-import '../models/friend_list/friends_list_home_page.dart';
+import 'friend_list/friends_list_home_page.dart';
 import 'settings_page.dart';
 import 'map_page.dart';
 import 'profile_page.dart';

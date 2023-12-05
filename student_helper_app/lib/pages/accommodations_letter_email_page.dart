@@ -62,7 +62,7 @@ class RenewalLettersState extends State<Renewal_Letters> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Renew Accommodations"),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
       body: Column(
         children: [
@@ -71,7 +71,7 @@ class RenewalLettersState extends State<Renewal_Letters> {
             child: TextField(
               controller: _searchController,
               onChanged: _filterData,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Search",
                 hintText: "Search for items...",
                 prefixIcon: Icon(Icons.search),

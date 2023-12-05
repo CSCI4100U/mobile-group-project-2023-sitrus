@@ -101,7 +101,7 @@ class _UpcomingPageState extends State<UpcomingPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Upcoming Assessments'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         actions: [
           IconButton(
             icon: Icon(Icons.sort),
@@ -313,7 +313,7 @@ void _showAddEventDialog(BuildContext context) {
         android: AndroidNotificationDetails(
           'csci-4100u-final-pg-friendlist',
           'Upcoming Assessments',
-          'Check if registered in SAS',
+          //'Check if registered in SAS',
           importance: Importance.max,
           priority: Priority.high,
         ),

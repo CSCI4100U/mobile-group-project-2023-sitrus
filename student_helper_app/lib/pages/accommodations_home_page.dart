@@ -25,7 +25,10 @@ class SASHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text("SAS Home"),
+      ),
       body: ListView(
         padding: EdgeInsets.all(10.0),
         children: <Widget>[
@@ -108,12 +111,17 @@ class SASHomePage extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.background,
                   backgroundColor: Theme.of(context).colorScheme.primary,
+
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
+
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0)),
+
                   textStyle: TextStyle(
                     fontSize: buttonFontSize,
+                    //textAlign: TextAlign.right,
+
                   )),
               onPressed: () {
                 Navigator.push(
@@ -121,14 +129,22 @@ class SASHomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) =>  FAQPage()),
                 );
               },
-              label: const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("FAQ"),
-                ],
-              )),
+    label: const Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+            Padding(
+            padding:
+            EdgeInsets.only(top: 20.0, bottom: 20.0),
+            child: Text(
+            "FAQ",
+            style: TextStyle(
+            fontSize: 30.0,
+            ),
+        ),
+        ),
         ],
-      ),
+      ))]),
 
     );
   }

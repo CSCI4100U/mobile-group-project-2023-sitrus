@@ -173,16 +173,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text("${_user!.firstName}'s Profile"),
-        bottom: PreferredSize(
-          child: Container(
-            color: Colors.blue,
+        title: Text("${_user!.firstName}'s Profile")
+
 
         ),
-          preferredSize: Size.fromHeight(30),
-        ),
-      ),
+
       body: ListView(
+
         padding: const EdgeInsets.all(16.0),
         children: [
           CircleAvatar(
@@ -198,67 +195,163 @@ class _UserProfilePageState extends State<UserProfilePage> {
             )
                 : null,
           ),
-          ListTile(
-            title: Text(_user!.studentNumber),
-            subtitle: const Text('Student Number'),
-            onTap: () => _editField(
-                'Student Number', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.studentNumber),
+              subtitle: const Text('Student Number'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Student Number', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
+            ),
           ),
           // Include ListTiles for other fields similar to the one above
-          ListTile(
-            title: Text(_user!.firstName),
-            subtitle: const Text('First Name'),
-            onTap: () => _editField(
-                'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.firstName),
+              subtitle: const Text('First Name'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.lastName),
-            subtitle: const Text('Last Name'),
-            onTap: () => _editField(
-                'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.lastName),
+              subtitle: const Text('Last Name'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.email),
-            subtitle: const Text('Email'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.email),
+              subtitle: const Text('Email'),
+              trailing: Icon(Icons.edit),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.phoneNumber ?? 'Not provided'),
-            subtitle: const Text('Phone Number'),
-            onTap: () => _editField(
-                'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.phoneNumber ?? 'Not provided'),
+              subtitle: const Text('Phone Number'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.birthday != null
-                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
-                : 'Not provided'),
-            subtitle: const Text('Birthday'),
-            onTap: () => _editField(
-                'Birthday', _user!.birthday != null
-                ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
-                : '', (newValue) => _saveProfile('birthday', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.birthday != null
+                  ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                  : 'Not provided'),
+              subtitle: const Text('Birthday'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Birthday', _user!.birthday != null
+                  ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
+                  : '', (newValue) => _saveProfile('birthday', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.grade ?? 'Not provided'),
-            subtitle: const Text('Grade'),
-            onTap: () => _editField(
-                'Grade', _user!.grade ?? '', (newValue) => _saveProfile('grade', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.grade ?? 'Not provided'),
+              subtitle: const Text('Grade'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Grade', _user!.grade ?? '', (newValue) => _saveProfile('grade', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.major ?? 'Not provided'),
-            subtitle: const Text('Major'),
-            onTap: () => _editField(
-                'Major', _user!.major ?? '', (newValue) => _saveProfile('major', newValue)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                //side: BorderSide(color: Colors.white, width: 2)
+              ),
+              tileColor: Theme.of(context).colorScheme.secondary,
+              title: Text(_user!.major ?? 'Not provided'),
+              subtitle: const Text('Major'),
+              trailing: Icon(Icons.edit),
+              onTap: () => _editField(
+                  'Major', _user!.major ?? '', (newValue) => _saveProfile('major', newValue)),
+            ),
           ),
-          ListTile(
-            title: Text(_user!.description ?? 'Not provided'),
-            subtitle: const Text('Description'),
-            onTap: () => _editField(
-                'Description', _user!.description ?? '', (newValue) => _saveProfile('description', newValue)),
-          ),
-          ListTile(
-            title: const Text('Logout', style: TextStyle(color: Colors.red), textAlign: TextAlign.center),
-            onTap: _logout,
-          ),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  //side: BorderSide(color: Colors.white, width: 2)
+                ),
+                tileColor: Theme.of(context).colorScheme.secondary,
+
+                title: Text(_user!.description ?? 'Not provided'),
+                subtitle: const Text('Description'),
+                trailing: Icon(Icons.edit),
+                onTap: () => _editField(
+                    'Description', _user!.description ?? '', (newValue) => _saveProfile('description', newValue)),
+              ),
+            ),
+
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                tileColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  //side: BorderSide(color: Colors.white, width: 2)
+                ),
+                title: const Text('Logout', style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
+
+                onTap: _logout,
+              ),
+            ),
+
         ],
       ),
     );

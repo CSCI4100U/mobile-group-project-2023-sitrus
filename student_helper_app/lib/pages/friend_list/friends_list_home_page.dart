@@ -198,11 +198,12 @@ class _FriendListPageState extends State<FriendListPage> {
               leading: const Icon(Icons.arrow_back),
               title: const Text('Back to Home Page'),
               onTap: () {
+                Navigator.pop(context);
                 // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
-                Navigator.push(
+                /*Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => NewHomePage()), // Go to the home page
-                );
+                )*/;
               },
             ),
           ],
@@ -666,13 +667,15 @@ class _FriendListPageState extends State<FriendListPage> {
         FloatingActionButton(
           onPressed: _showSearchDialog,
           mini: true,
-          child: const Icon(Icons.search),
+          child: Icon(Icons.search,
+            color: Theme.of(context).colorScheme.background),
         ),
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
           onPressed: _showFilterDialog,
           mini: true,
-          child: const Icon(Icons.filter_list),
+          child: Icon(Icons.filter_list,
+              color: Theme.of(context).colorScheme.background),
         ),
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
@@ -680,7 +683,8 @@ class _FriendListPageState extends State<FriendListPage> {
             _showSettings();
           },
           mini: true,
-          child: const Icon(Icons.settings),
+          child:  Icon(Icons.settings,
+              color: Theme.of(context).colorScheme.background),
         ),
       ],
     );
@@ -704,8 +708,9 @@ class _FriendListPageState extends State<FriendListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
+      /*appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        *//*leading: IconButton(
           icon: const Icon(Icons.account_circle, size: 45),
           onPressed: () {
             Navigator.of(context).push(
@@ -714,8 +719,8 @@ class _FriendListPageState extends State<FriendListPage> {
               ),
             );
           },
-        ),
-        title: const Text('Friend List'),
+        ),*//*
+        //title: const Text('Friend List'),
         actions: <Widget>[
           // Center(child: Text(_weatherDescription)), // weather display
           IconButton(
@@ -732,7 +737,7 @@ class _FriendListPageState extends State<FriendListPage> {
             onPressed: _showStatusChangeDialog,
           ),
         ],
-      ),
+      ),*/
       body:
       _buildFriendListWithLastMessage(),
       floatingActionButton: _buildFloatingActionButtons(),

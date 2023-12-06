@@ -166,10 +166,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Theme.of(context).colorScheme.tertiary,
       // Other UI components such as AppBar, TextFormField, and ElevatedButton are used to create the form and handle user input.
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        leading: null,
-        title: const Text('Login'),
-      ),
+
       body: ListView(
 
         children: [

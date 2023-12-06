@@ -6,8 +6,10 @@ class InfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      appBar: AppBar(
+        title: const Text("H E L P"),
+      ),
+
     );
   }
 }

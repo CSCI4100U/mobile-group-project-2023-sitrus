@@ -6,6 +6,7 @@ import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/schedule_home_page.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
 
+import 'friend_list/friends_add_friend_page.dart';
 import 'friend_list/friends_chat_page.dart';
 import 'friend_list/friends_list_home_page.dart';
 import 'info.dart';
@@ -39,25 +40,50 @@ class _NewHomePageState extends State<NewHomePage> {
     SASHomePage()
   ];
 
+  final List _pageNames = [
+    "Schedule",
+    "Chat",
+    "Accommodations"
+  ];
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
+        elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.secondary,
-        foregroundColor: Theme.of(context).colorScheme.background,
-        title: const Text(
+        foregroundColor: Colors.white,
+        title: Text(_pageNames[_selectedIndex])
+
+
+          /*Text(
             "Sitrus Student Aid",
             style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold
             )
+        )*/,
+
+        actions: _selectedIndex == 1 ? [IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddFriendPage()),
+            );
+          },
         ),
+
+          ] : []
       ),
       body: _pages[_selectedIndex],
       drawer: Drawer(
         backgroundColor: Theme.of(context).colorScheme.secondary,
+
         child: Column(
+
           children: [
               const DrawerHeader(child: Icon(
                   Icons.backpack,
@@ -128,7 +154,8 @@ class _NewHomePageState extends State<NewHomePage> {
             )
 
           ],
-        )
+        ),
+
       ),
 
       bottomNavigationBar: BottomNavigationBar(

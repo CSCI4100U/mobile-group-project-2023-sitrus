@@ -53,7 +53,7 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Accommodations'),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Colors.indigo,
         actions: [
           IconButton(
             icon: Icon(Icons.sort),
@@ -196,16 +196,15 @@ class ViewAccommodationsState extends State<ViewAccommodations> {
       final rowsUpdated = await sas_model.updateAcmdn(editedAcmdn);
 
       if (rowsUpdated > 0) {
-        // The update was successful, update the list of grades
         _refreshList();
       }
     }}
   Future<void> _deleteAcmdn(int? id) async {
-    // Delete the grade from the database and get the number of rows deleted
+
     final rowsDeleted = await sas_model.deleteAcmdnById(id);
 
     if (rowsDeleted > 0) {
-      // The deletion was successful, update the list of grades
+
       _refreshList();
     }
   }

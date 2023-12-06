@@ -55,14 +55,13 @@ class RenewalLettersState extends State<Renewal_Letters> {
     });
   }
 
-  // ... (previous code remains the same)
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Renew Accommodations"),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Colors.indigo,
       ),
       body: Column(
         children: [
@@ -71,16 +70,22 @@ class RenewalLettersState extends State<Renewal_Letters> {
             child: TextField(
               controller: _searchController,
               onChanged: _filterData,
-              decoration: const InputDecoration(
-                labelText: "Search",
-                hintText: "Search for items...",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              decoration: InputDecoration(
+                labelText: 'Search for items...',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _filteredData = List.from(_data);
+                  },
                 ),
+                //border: OutlineInputBorder(
+                 // borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                //),
               ),
             ),
           ),
+
           Expanded(
             child: SingleChildScrollView(
               child: ExpansionPanelList.radio(
@@ -144,6 +149,12 @@ List<Item> generateItems() {
       header: 'SAS Disability Form.',
       description: 'This contains a link to the disability form. Needed for registering with Accessibility services.',
       link: 'https://studentlife.ontariotechu.ca/current-students/accessibility/students/new-students/index.php#tab1-2',
+    ),
+    Item(
+      isExpanded: false,
+      header: 'Uoit SAS Resources Page.',
+      description: 'This contains a link to the SAS resource page on the UOIT studentlife website.',
+      link: 'https://studentlife.ontariotechu.ca/current-students/accessibility/students/resources/index.php',
     ),
   ];
 }

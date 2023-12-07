@@ -282,7 +282,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               tileColor: Theme.of(context).colorScheme.secondary,
               title: Text(_user!.email),
               subtitle: const Text('Email'),
-              trailing: Icon(Icons.edit),
+              // trailing: Icon(Icons.edit),
             ),
           ),
           Padding(

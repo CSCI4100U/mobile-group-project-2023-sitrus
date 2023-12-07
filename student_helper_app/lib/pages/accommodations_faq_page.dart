@@ -48,16 +48,16 @@ class FAQPageState extends State<FAQPage> {
     FAQItem(
       question: 'Do my accommodations matter?',
       answerSections: [
-        'Yes, they are.\nYour university has an obligation to ensure that your needs are met.',
-        ' Otherwise, this could result in potential legal trouble. Your university also legally cannot deny ',
+        'Yes, they are.\nYour university has an obligation to ensure that your needs are met.'
+        ' Otherwise, this could result in potential legal trouble. Your university also legally cannot deny '
         'a student their required services, or discriminate against them for having a disabilty.'
       ],
     ),
     FAQItem(
       question: 'Why is there a two week warning in Upcoming Assessments?',
       answerSections: [
-        'That is because you have a limited time window to book an upcoming test or quiz with the Test Center, should you ',
-        'need it. If you wish to book an assessment with the test center, you must do so A MINIMUM of ',
+        'That is because you have a limited time window to book an upcoming test or quiz with the Test Center, should you '
+        'need it. If you wish to book an assessment with the test center, you must do so A MINIMUM of '
         'seven days before the assessment takes place.',
       ],
     ),
@@ -65,15 +65,14 @@ class FAQPageState extends State<FAQPage> {
       question: 'Do I need to renew my accommodations regularly?',
       answerSections: [
         'You should renew your accommodations before the start of every semester.',
-        'To do this, a short cut has been provided in this app.\nSimply go back from ',
+        'To do this, a short cut has been provided in this app.\nSimply go back from '
         'this page and select Renew Accommodations. The first link will take you to where you need to go.'
       ],
     ),
     FAQItem(
       question: 'Should my professors be aware that I have accommodations?',
       answerSections: [
-        'Yes.\nIn order to provide you with what you require, your professors must ',
-        'be aware of your accommodations.\nYou do not have to tell them yourself, ',
+        'Yes.\nIn order to provide you with what you require, your professors must be aware of your accommodations.\nYou do not have to tell them yourself, '
         'as when you renew your accommodations, it automatically sends your professors a letter ',
         'detailing what you need.',
       ],

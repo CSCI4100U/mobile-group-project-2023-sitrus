@@ -38,7 +38,7 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.background,
+                  foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
@@ -62,7 +62,7 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.background,
+                  foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
@@ -85,7 +85,7 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.background,
+                  foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   minimumSize: Size(buttonWidth, buttonHeight),
                   maximumSize: Size(buttonWidth, buttonHeight),
@@ -109,7 +109,7 @@ class SASHomePage extends StatelessWidget {
                 size: iconSize,
               ),
               style: OutlinedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.background,
+                  foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.primary,
 
                   minimumSize: Size(buttonWidth, buttonHeight),

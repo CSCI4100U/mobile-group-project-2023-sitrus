@@ -43,6 +43,7 @@ class _ChatPageState extends State<ChatPage> {
 
   // Variables to customize chat background.
   Color _backgroundColor = Colors.white;
+  bool _darkmode = false;
   final ImagePicker _picker = ImagePicker();
   String? _backgroundImage;
 
@@ -203,6 +204,7 @@ class _ChatPageState extends State<ChatPage> {
                 Navigator.pop(context);
                 setState(() {
                   _backgroundColor = Colors.white;
+                  _darkmode = false;
                   _backgroundImage = null;
                 });
               },
@@ -213,7 +215,8 @@ class _ChatPageState extends State<ChatPage> {
               onTap: () {
                 Navigator.pop(context);
                 setState(() {
-                  _backgroundColor = Colors.blueGrey;
+                  _backgroundColor = Colors.black;
+                  _darkmode = true;
                   _backgroundImage = null;
                 });
               },
@@ -422,7 +425,7 @@ class _ChatPageState extends State<ChatPage> {
       mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         if (!isUserMessage) ...[
-          const Icon(Icons.account_circle), // Friend's icon
+          Icon(Icons.account_circle, color: _darkmode ? Colors.white : Colors.black), // Friend's icon
         ],
         GestureDetector(
           onLongPress: () => _showMessageOptions(context, message),
@@ -440,7 +443,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
         if (isUserMessage) ...[
-          const Icon(Icons.account_circle), // User's icon
+          Icon(Icons.account_circle, color: _darkmode ? Colors.white : Colors.black), // User's icon
         ],
       ],
     );
@@ -583,6 +586,7 @@ class _ChatPageState extends State<ChatPage> {
             icon: const Icon(Icons.settings),
             onPressed: _showSettings,
           ),
+
         ],
       ),
       body: Container(
@@ -618,7 +622,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.photo),
+                      icon: Icon(Icons.photo, color: _darkmode ? Colors.white : Colors.black,),
                       onPressed: () {
                         // sending image or video
                         _pickAndSendMedia();
@@ -628,6 +632,9 @@ class _ChatPageState extends State<ChatPage> {
                       child: TextField(
                         controller: _messageController,
                         decoration: InputDecoration(
+                          hintStyle: TextStyle(
+                              color: _darkmode ? Colors.black : Colors.black
+                          ),
                           hintText: 'Type a message',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -639,7 +646,8 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.send),
+                      icon: Icon(Icons.send,
+                          color: _darkmode ? Colors.white : Colors.black),
                       onPressed: _sendMessage,
                     ),
                   ],

@@ -51,7 +51,7 @@ class _NewHomePageState extends State<NewHomePage> {
     "Accommodations"
   ];
 
-  String _apiKey = '30c17ef9cc1cd4397ee2239f09434073'; // Replace with your actual API key from OpenWeatherMap
+  String _apiKey = '984d27836b39334bf123679ca9d4d96c'; // Replace with your actual API key from OpenWeatherMap
   String location = 'Oshawa'; // Example location
 
   String _weatherDescription = 'Loading weather...';

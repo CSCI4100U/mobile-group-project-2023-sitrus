@@ -65,8 +65,8 @@ class _UpcomingPageState extends State<UpcomingPage> {
 */
 
   final List<Accommodation> amdtns = [
-    Accommodation(
-        name: 'Test 1',
+    /* Accommodation(
+       name: 'Test 1',
         desc: 'Student receives double time on assessment',
         assessments: ['Test', 'Quiz'],
         eventDate: DateTime.utc(2023, 11, 29)),
@@ -74,7 +74,7 @@ class _UpcomingPageState extends State<UpcomingPage> {
         name: 'Quiz 2',
         desc: 'Student is entitled to the use of a scribe',
         assessments: ['Test', 'Quiz', 'Written Work'],
-        eventDate: DateTime.utc(2023, 4, 7)),
+        eventDate: DateTime.utc(2023, 4, 7)),*/
   ];
 
   List<Accommodation> filteredAccommodations = [];

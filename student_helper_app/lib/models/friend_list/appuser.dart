@@ -7,17 +7,17 @@ class AppUser {
   // late final String firstName;
   String studentNumber;
   String firstName;
-  final String? middleName;
-  final String lastName;
-  final String email;
-  final String? phoneNumber;
-  final DateTime? birthday;
-  final String? grade;
-  final String status;
-  final String? major;
-  final String? description;
-  final String? icon;
-  final List<String>? friendList;
+  String? middleName;
+  String lastName;
+  String email;
+  String? phoneNumber;
+  DateTime? birthday;
+  String? grade;
+  String status;
+  String? major;
+  String? description;
+  String? icon;
+  List<String>? friendList;
   bool isFriend; // Indicates if the user is a friend
   bool isRequested; // Indicates if a friend request has been sent
 

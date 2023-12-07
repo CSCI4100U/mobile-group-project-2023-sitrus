@@ -657,15 +657,40 @@ class _FriendListPageState extends State<FriendListPage> {
       print('Debug: Sender messages count: ${querySnapshotSender.docs.length}');
       print('Debug: Receiver messages count: ${querySnapshotReceiver.docs.length}');
 
-      // Determine which message is the latest
+      // // Determine which message is the latest
+      // DocumentSnapshot? latestMessageSnapshot;
+      // if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
+      //   final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
+      //   final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
+      //   latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
+      // } else if (querySnapshotSender.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotSender.docs.first;
+      // } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotReceiver.docs.first;
+      // }
+      // Check if there are messages and parse timestamps safely
+      Timestamp? senderTimestamp;
+      Timestamp? receiverTimestamp;
+
+      if (querySnapshotSender.docs.isNotEmpty) {
+        var senderTimestampData = querySnapshotSender.docs.first.get('timestamp');
+        senderTimestamp = _parseTimestamp(senderTimestampData);
+      }
+
+      if (querySnapshotReceiver.docs.isNotEmpty) {
+        var receiverTimestampData = querySnapshotReceiver.docs.first.get('timestamp');
+        receiverTimestamp = _parseTimestamp(receiverTimestampData);
+      }
+
+      // Determine the latest message
       DocumentSnapshot? latestMessageSnapshot;
-      if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
-        final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
-        final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
-        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
-      } else if (querySnapshotSender.docs.isNotEmpty) {
+      if (senderTimestamp != null && receiverTimestamp != null) {
+        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0
+            ? querySnapshotSender.docs.first
+            : querySnapshotReceiver.docs.first;
+      } else if (senderTimestamp != null) {
         latestMessageSnapshot = querySnapshotSender.docs.first;
-      } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      } else if (receiverTimestamp != null) {
         latestMessageSnapshot = querySnapshotReceiver.docs.first;
       }
 
@@ -686,6 +711,16 @@ class _FriendListPageState extends State<FriendListPage> {
       print('An error occurred while fetching the last message: $e');
       return 'Error fetching messages';
     }
+  }
+
+  // Helper method to parse Timestamp safely
+  Timestamp? _parseTimestamp(dynamic data) {
+    if (data is Timestamp) {
+      return data;
+    } else if (data is int) {
+      return Timestamp.fromMillisecondsSinceEpoch(data);
+    }
+    return null;
   }
 
   // Builds the floating action buttons for search and settings

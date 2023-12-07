@@ -82,8 +82,8 @@ flutter:
 
 
   assets:
-    - assets/chat.jpg
-    - assets/accomodations.jpg
+    - assets/
+
 
 
   # To add assets to your application, add an assets section, like this:

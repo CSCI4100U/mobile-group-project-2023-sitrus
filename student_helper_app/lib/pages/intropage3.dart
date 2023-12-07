@@ -23,7 +23,7 @@ class IntroPage3  extends StatelessWidget {
               style: TextStyle(fontSize: 30, color: Colors.white)),
               //image
               Image(image: AssetImage('assets/accomodations.jpg'),
-              height: 500,)
+              height: 550,)
           ],
         )
     );

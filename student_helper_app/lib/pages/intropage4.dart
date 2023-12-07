@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class IntroPage1 extends StatelessWidget {
-  const IntroPage1({super.key});
+class IntroPage4 extends StatelessWidget {
+  const IntroPage4({super.key});
 
 
   @override
@@ -18,19 +18,13 @@ class IntroPage1 extends StatelessWidget {
               ],
             )
         ),
-        child: const Column(
+        child:  Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
-              child: Text("Welcome To Sitrus,",
-                style: TextStyle(fontSize: 35, color: Colors.white),
-              textAlign: TextAlign.center,),
-            ),
-            Center(
-              child: Text("Your Student Aid App!",
-                style: TextStyle(fontSize: 35, color: Colors.white),
-                textAlign: TextAlign.center,),
-            )
+            Text("Chat with Friends!", style: TextStyle(fontSize: 30, color: Colors.white)),
+            //Image
+            Image(image: AssetImage('assets/chat.jpg'),
+              height: 500,)
           ],
         )
 

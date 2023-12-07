@@ -93,7 +93,9 @@ class FAQPageState extends State<FAQPage> {
             title: Text(faqList[index].question),
             children: [
               Container(
-                // Set a specific height or use constraints based on your design
+                
+                 // Set a specific height or use constraints based on your design
+
                 child: ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),

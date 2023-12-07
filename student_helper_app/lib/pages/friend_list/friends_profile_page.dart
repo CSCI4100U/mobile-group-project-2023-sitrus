@@ -188,8 +188,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     if (_isLoading) {
       // Display a loading indicator while user data is being fetched
       return Scaffold(
-        appBar: AppBar(title: const Text('Loading profile...')),
+        appBar: AppBar(title: const Text('Loading profile...'),
+            backgroundColor: Theme.of(context).colorScheme.secondary),
         body: const Center(child: CircularProgressIndicator()),
+
       );
     }
 
@@ -197,6 +199,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       // Display an error message if user data couldn't be loaded
       return Scaffold(
         appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
           leading: const BackButton(),
           title: const Text('Profile not found'),
         ),
@@ -208,7 +211,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: Text("${_user!.firstName}'s Profile")
+        title: Text("${_user!.firstName}'s Profile"),
+          backgroundColor: Theme.of(context).colorScheme.secondary
         ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -226,6 +230,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             )
                 : null,
           ),
+          Center(child: Text(_user!.email, style: TextStyle(fontSize: 20),)),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
@@ -234,8 +239,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.studentNumber),
-              subtitle: const Text('Student Number'),
+              title: Text(_user!.studentNumber, style: TextStyle(fontSize: 18),),
+              subtitle: const Text('Student Number', style: TextStyle(fontSize: 16),),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Student Number', _user!.studentNumber, (newValue) => _saveProfile('studentNumber', newValue)),
@@ -250,8 +255,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.firstName),
-              subtitle: const Text('First Name'),
+              title: Text(_user!.firstName, style: TextStyle(fontSize: 18)),
+              subtitle: const Text('First Name', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'First Name', _user!.firstName, (newValue) => _saveProfile('firstName', newValue)),
@@ -265,14 +270,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.lastName),
-              subtitle: const Text('Last Name'),
+              title: Text(_user!.lastName, style: TextStyle(fontSize: 18)),
+              subtitle: const Text('Last Name', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Last Name', _user!.lastName, (newValue) => _saveProfile('lastName', newValue)),
             ),
           ),
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
               shape: RoundedRectangleBorder(
@@ -282,9 +287,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
               tileColor: Theme.of(context).colorScheme.secondary,
               title: Text(_user!.email),
               subtitle: const Text('Email'),
-              // trailing: Icon(Icons.edit),
+
             ),
-          ),
+          ),*/
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
@@ -293,8 +298,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.phoneNumber ?? 'Not provided'),
-              subtitle: const Text('Phone Number'),
+              title: Text(_user!.phoneNumber ?? 'Not provided', style: TextStyle(fontSize: 18)),
+              subtitle: const Text('Phone Number', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Phone Number', _user!.phoneNumber ?? '', (newValue) => _saveProfile('phoneNumber', newValue)),
@@ -311,8 +316,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               tileColor: Theme.of(context).colorScheme.secondary,
               title: Text(_user!.birthday != null
                   ? '${_user!.birthday!.month}/${_user!.birthday!.day}/${_user!.birthday!.year}'
-                  : 'Not provided'),
-              subtitle: const Text('Birthday'),
+                  : 'Not provided', style: TextStyle(fontSize: 18)),
+              subtitle: const Text('Birthday', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Birthday', _user!.birthday != null
@@ -328,8 +333,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.grade ?? 'Not provided'),
-              subtitle: const Text('Grade'),
+              title: Text(_user!.grade ?? 'Not provided', style: TextStyle(fontSize: 18)),
+              subtitle: const Text('Grade', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Grade', _user!.grade ?? '', (newValue) => _saveProfile('grade', newValue)),
@@ -343,8 +348,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 //side: BorderSide(color: Colors.white, width: 2)
               ),
               tileColor: Theme.of(context).colorScheme.secondary,
-              title: Text(_user!.major ?? 'Not provided'),
-              subtitle: const Text('Major'),
+              title: Text(_user!.major ?? 'Not provided', style: TextStyle(fontSize: 18)),
+              subtitle: const Text('Major', style: TextStyle(fontSize: 16)),
               trailing: Icon(Icons.edit),
               onTap: () => _editField(
                   'Major', _user!.major ?? '', (newValue) => _saveProfile('major', newValue)),
@@ -360,8 +365,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
                 tileColor: Theme.of(context).colorScheme.secondary,
 
-                title: Text(_user!.description ?? 'Not provided'),
-                subtitle: const Text('Description'),
+                title: Text(_user!.description ?? 'Not provided', style: TextStyle(fontSize: 18)),
+                subtitle: const Text('Description', style: TextStyle(fontSize: 16)),
                 trailing: Icon(Icons.edit),
                 onTap: () => _editField(
                     'Description', _user!.description ?? '', (newValue) => _saveProfile('description', newValue)),

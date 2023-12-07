@@ -130,14 +130,14 @@ class _ChatPageState extends State<ChatPage> {
                 await _deleteChatHistory();
               },
             ),
-            ListTile(
+            /*ListTile(
               leading: const Icon(Icons.format_paint),
               title: const Text('Change Background'),
               onTap: () {
                 Navigator.pop(context); // Dismiss the bottom sheet
                 _showBackgroundOptions();
               },
-            ),
+            ),*/
             ListTile(
               leading: const Icon(Icons.download),
               title: const Text('Back up Chat History from Cloud'),
@@ -432,7 +432,10 @@ class _ChatPageState extends State<ChatPage> {
       mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         if (!isUserMessage) ...[
-          Icon(Icons.account_circle, color: _darkmode ? Colors.white : Colors.black), // Friend's icon
+          Icon(
+              Icons.account_circle,
+              color: Theme.of(context).colorScheme.background,
+              size: 30,), // Friend's icon
         ],
         GestureDetector(
           onLongPress: () => _showMessageOptions(context, message),
@@ -440,17 +443,22 @@ class _ChatPageState extends State<ChatPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isUserMessage ? Colors.blue : Colors.white,
+              color: isUserMessage ? Theme.of(context).colorScheme.primary : Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
               message.content,
-              style: TextStyle(color: isUserMessage ? Colors.white : Colors.black),
+              style: TextStyle(
+                  color: isUserMessage ? Colors.white : Colors.black,
+                  fontSize: 20),
             ),
           ),
         ),
         if (isUserMessage) ...[
-          Icon(Icons.account_circle, color: _darkmode ? Colors.white : Colors.black), // User's icon
+          Icon(
+              Icons.account_circle,
+              color: Theme.of(context).colorScheme.background,
+              size: 30,), // User's icon
         ],
       ],
     );

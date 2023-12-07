@@ -95,11 +95,15 @@ class RenewalLettersState extends State<Renewal_Letters> {
                   return ExpansionPanelRadio(
                     value: item,
                     headerBuilder: (BuildContext context, bool isExpanded) {
-                      return new Text(item.header);
+                      return new Text(item.header, style: TextStyle(fontSize: 20),);
                     },
                     body: ListTile(
-                      title: Text(item.description),
-                      subtitle: Text(item.link),
+                      title: Text(item.description,style: TextStyle(fontSize: 20)),
+                      subtitle: Text(
+                        item.link,
+                          style: TextStyle(fontSize: 20, color: Colors.blue),
+
+                      ),
                       onTap: () {
                         _showAlertDialog(context, item);
                       },

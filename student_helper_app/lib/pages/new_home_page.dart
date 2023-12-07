@@ -102,16 +102,7 @@ class _NewHomePageState extends State<NewHomePage> {
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         foregroundColor: Colors.white,
-        title: Text(_pageNames[_selectedIndex])
-
-
-          /*Text(
-            "Sitrus Student Aid",
-            style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold
-            )
-        )*/,
+        title: Text(_pageNames[_selectedIndex]),
 
         actions: _selectedIndex == 1 ? [IconButton(
           icon: const Icon(Icons.add),

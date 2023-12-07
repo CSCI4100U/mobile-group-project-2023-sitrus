@@ -90,10 +90,14 @@ class FAQPageState extends State<FAQPage> {
         itemCount: faqList.length,
         itemBuilder: (context, index) {
           return ExpansionTile(
-            title: Text(faqList[index].question),
+            title: Text(faqList[index].question,
+            style: TextStyle(
+              fontSize: 20
+            ),),
             children: [
               Container(
-                height: 200, // Set a specific height or use constraints based on your design
+                height: 350,
+                 // Set a specific height or use constraints based on your design
                 child: ListView.builder(
                   itemCount: faqList[index].answerSections.length,
                   itemBuilder: (context, sectionIndex) {
@@ -102,6 +106,9 @@ class FAQPageState extends State<FAQPage> {
                       child: Text(
                         faqList[index].answerSections[sectionIndex],
                         softWrap: true,
+                        style: TextStyle(
+                          fontSize: 18
+                        ),
                       ),
                     );
                   },

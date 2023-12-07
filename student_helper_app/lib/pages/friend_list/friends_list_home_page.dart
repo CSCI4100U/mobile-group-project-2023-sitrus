@@ -2,13 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../new_home_page.dart';
 import '../../models/friend_list/appuser.dart';
 import '../../models/friend_list/message.dart';
 import '../../models/friend_list/local_storage.dart';
-import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
-import 'friends_profile_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

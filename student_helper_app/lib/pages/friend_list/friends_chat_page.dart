@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:student_helper_project/pages/friend_list/friends_list_home_page.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
 
 import '../../models/friend_list/local_storage.dart';
@@ -42,9 +41,9 @@ class _ChatPageState extends State<ChatPage> {
   List<Message> messages = [];
 
   // Variables to customize chat background.
-  Color _backgroundColor = Colors.white;
-  bool _darkmode = false;
-  final ImagePicker _picker = ImagePicker();
+  // Color _backgroundColor = Colors.white;
+  // bool _darkmode = false;
+  // final ImagePicker _picker = ImagePicker();
   String? _backgroundImage;
 
   // Initialize state, set up scroll listener and load messages from the cloud.
@@ -198,82 +197,82 @@ class _ChatPageState extends State<ChatPage> {
 
 
   // Shows a modal bottom sheet to allow the user to change the chat background.
-  void _showBackgroundOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Wrap(
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.brightness_1),
-              title: const Text('Light'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _backgroundColor = Colors.white;
-                  _darkmode = false;
-                  _backgroundImage = null;
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.brightness_3),
-              title: const Text('Dark'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _backgroundColor = Colors.black;
-                  _darkmode = true;
-                  _backgroundImage = null;
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.image),
-              title: const Text('Upload Image'),
-              onTap: () {
-                Navigator.pop(context);
-                _uploadImage();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showBackgroundOptions() {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Wrap(
+  //         children: <Widget>[
+  //           ListTile(
+  //             leading: const Icon(Icons.brightness_1),
+  //             title: const Text('Light'),
+  //             onTap: () {
+  //               Navigator.pop(context);
+  //               setState(() {
+  //                 _backgroundColor = Colors.white;
+  //                 _darkmode = false;
+  //                 _backgroundImage = null;
+  //               });
+  //             },
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.brightness_3),
+  //             title: const Text('Dark'),
+  //             onTap: () {
+  //               Navigator.pop(context);
+  //               setState(() {
+  //                 _backgroundColor = Colors.black;
+  //                 _darkmode = true;
+  //                 _backgroundImage = null;
+  //               });
+  //             },
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.image),
+  //             title: const Text('Upload Image'),
+  //             onTap: () {
+  //               Navigator.pop(context);
+  //               _uploadImage();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   // Handles the image upload process.
-  // TODO: Still have to fix
-  void _uploadImage() async {
-    try {
-      // Pick an image
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-      // Check if an image is selected
-      if (image == null) return;
-
-      // Create a file from the picked image path
-      File file = File(image.path);
-
-      // Define the destination path in Firebase Storage
-      String filePath = 'chat_backgrounds/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
-      Reference ref = FirebaseStorage.instance.ref().child(filePath);
-
-      // Upload the file
-      await ref.putFile(file);
-
-      // Get the download URL
-      String downloadUrl = await ref.getDownloadURL();
-
-      // Update the state to reflect the new background image
-      setState(() {
-        _backgroundImage = downloadUrl;
-      });
-    } catch (e) {
-      // Handle exceptions
-      print('Error occurred while picking or uploading image: $e');
-    }
-  }
+  // // Wait for Fix
+  // void _uploadImage() async {
+  //   try {
+  //     // Pick an image
+  //     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  //
+  //     // Check if an image is selected
+  //     if (image == null) return;
+  //
+  //     // Create a file from the picked image path
+  //     File file = File(image.path);
+  //
+  //     // Define the destination path in Firebase Storage
+  //     String filePath = 'chat_backgrounds/${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+  //     Reference ref = FirebaseStorage.instance.ref().child(filePath);
+  //
+  //     // Upload the file
+  //     await ref.putFile(file);
+  //
+  //     // Get the download URL
+  //     String downloadUrl = await ref.getDownloadURL();
+  //
+  //     // Update the state to reflect the new background image
+  //     setState(() {
+  //       _backgroundImage = downloadUrl;
+  //     });
+  //   } catch (e) {
+  //     // Handle exceptions
+  //     print('Error occurred while picking or uploading image: $e');
+  //   }
+  // }
 
   // Sends a new message to the Firestore collection.
   void _sendMessage({String? text, String? mediaUrl}) async {

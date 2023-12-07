@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:student_helper_project/pages/accommodations_letter_email_page.dart';
 import 'package:student_helper_project/pages/app_state.dart';
+import 'package:student_helper_project/pages/help.dart';
 import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
 import 'package:student_helper_project/pages/onboarding.dart';
@@ -32,9 +34,9 @@ final _router = GoRouter(
       builder: (context, state) {
         // Check if user is logged in and decide initial route
         if (FirebaseAuth.instance.currentUser != null) {
-          return OnboardingScreen();
+          return HelpPage();
         } else {
-          return OnboardingScreen();
+          return HelpPage();
         }
       },
       routes: [

@@ -66,14 +66,15 @@ class RenewalLettersState extends State<Renewal_Letters> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(20),
             child: TextField(
               controller: _searchController,
               onChanged: _filterData,
               decoration: InputDecoration(
+
                 labelText: 'Search for items...',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
                     _filteredData = List.from(_data);
@@ -90,14 +91,18 @@ class RenewalLettersState extends State<Renewal_Letters> {
             child: SingleChildScrollView(
               child: ExpansionPanelList.radio(
                 elevation: 1,
-                expandedHeaderPadding: EdgeInsets.all(0),
+                expandedHeaderPadding: EdgeInsets.all(5),
                 children: _filteredData.map((Item item) {
                   return ExpansionPanelRadio(
                     value: item,
                     headerBuilder: (BuildContext context, bool isExpanded) {
-                      return new Text(item.header, style: TextStyle(fontSize: 20),);
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(item.header, style: TextStyle(fontSize: 20 )),
+                      );
                     },
                     body: ListTile(
+
                       title: Text(item.description,style: TextStyle(fontSize: 20)),
                       subtitle: Text(
                         item.link,

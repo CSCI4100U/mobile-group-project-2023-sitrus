@@ -24,7 +24,7 @@ class IntroPage4 extends StatelessWidget {
             Text("Chat with Friends!", style: TextStyle(fontSize: 30, color: Colors.white)),
             //Image
             Image(image: AssetImage('assets/chat.jpg'),
-              height: 500,)
+              height: 550,)
           ],
         )
 

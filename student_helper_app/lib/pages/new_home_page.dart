@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'friend_list/friends_add_friend_page.dart';
 import 'friend_list/friends_chat_page.dart';
 import 'friend_list/friends_list_home_page.dart';
-import 'info.dart';
+import 'help.dart';
 import 'friend_list/friends_profile_page.dart';
 import 'fonts.dart' as font;
 
@@ -146,7 +146,7 @@ class _NewHomePageState extends State<NewHomePage> {
                 );
               },
             ),
-            ListTile(
+            /*ListTile(
               leading:  const Icon(
                 Icons.settings,
                 size: 40,
@@ -161,8 +161,8 @@ class _NewHomePageState extends State<NewHomePage> {
                   MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
-            ),
-            ListTile(
+            ),*/
+            /*ListTile(
               leading:  const Icon(
                 Icons.info,
                 size: 40,
@@ -177,7 +177,7 @@ class _NewHomePageState extends State<NewHomePage> {
                   MaterialPageRoute(builder: (context) => const InfoPage()),
                 );
               },
-            ),
+            ),*/
             ListTile(
               leading:  const Icon(
                 Icons.question_mark,
@@ -190,11 +190,11 @@ class _NewHomePageState extends State<NewHomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const InfoPage()),
+                  MaterialPageRoute(builder: (context) => const HelpPage()),
                 );
               },
             ),
-            Divider(height: 240,),
+            const Divider(height: 350,),
             Text(_weatherDescription, style: TextStyle(fontSize: 19),)
 
           ],

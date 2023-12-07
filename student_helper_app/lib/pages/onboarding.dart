@@ -41,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ],
         ),
           Container(
-            alignment: Alignment(0, 0.75),
+            alignment: Alignment(0, 0.92),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -49,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onTap: (){
                       _controller.jumpToPage(3);
                     },
-                    child: Text("skip",
+                    child: const Text("skip",
                         style: TextStyle(fontSize: 25,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
@@ -66,7 +66,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             return NewHomePage();
                           }));
                     },
-                    child: Text(
+                    child: const Text(
                       "done",
                       style: TextStyle(fontSize: 25,
                           fontWeight: FontWeight.bold,
@@ -77,7 +77,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           duration: Duration(milliseconds: 500),
                           curve: Curves.linear);
                     },
-                    child: Text("next",
+                    child: const Text("next",
                         style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,

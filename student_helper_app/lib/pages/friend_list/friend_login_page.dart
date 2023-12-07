@@ -4,10 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:student_helper_project/pages/home_page.dart';
 import '../new_home_page.dart';
 import 'friend_registration_page.dart';
-import 'friends_list_home_page.dart';
 
 // LoginPage allows users to sign in to the application.
 class LoginPage extends StatefulWidget {

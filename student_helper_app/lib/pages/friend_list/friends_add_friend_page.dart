@@ -28,9 +28,40 @@ class _AddFriendPageState extends State<AddFriendPage> {
   }
 
   // Searches for users based on the input student number.
+  // void _search() async {
+  //   final queryText = _searchController.text;
+  //   if (queryText.isNotEmpty) {
+  //     // Fetch users where the 'studentNumber' field matches the query text.
+  //     final querySnapshot = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .where('studentNumber', isEqualTo: queryText)
+  //         .get();
+  //
+  //     // Process each user document to determine friendship and request status.
+  //     List<AppUser> users = await Future.wait(querySnapshot.docs.map((doc) async {
+  //       var user = AppUser.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+  //       user.isFriend = await _isAlreadyFriend(user.uid);
+  //       user.isRequested = await _isAlreadyRequested(user.uid);
+  //       return user;
+  //     }).toList());
+  //
+  //     // Update the state to reflect the new search results.
+  //     setState(() {
+  //       searchResults = users;
+  //     });
+  //   }
+  // }
   void _search() async {
     final queryText = _searchController.text;
     if (queryText.isNotEmpty) {
+      // Prevent search for the current user's student number
+      if (queryText == FirebaseAuth.instance.currentUser?.displayName) { // Assuming the student number is stored in displayName
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('You cannot search for yourself.')),
+        );
+        return;
+      }
+
       // Fetch users where the 'studentNumber' field matches the query text.
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -45,12 +76,16 @@ class _AddFriendPageState extends State<AddFriendPage> {
         return user;
       }).toList());
 
+      // Filter out the current user from the search results
+      users.removeWhere((user) => user.uid == FirebaseAuth.instance.currentUser?.uid);
+
       // Update the state to reflect the new search results.
       setState(() {
         searchResults = users;
       });
     }
   }
+
 
   // Checks if a user is already a friend.
   Future<bool> _isAlreadyFriend(String friendUid) async {

@@ -2,13 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../new_home_page.dart';
 import '../../models/friend_list/appuser.dart';
 import '../../models/friend_list/message.dart';
 import '../../models/friend_list/local_storage.dart';
-import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
-import 'friends_profile_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -164,7 +161,7 @@ class _FriendListPageState extends State<FriendListPage> {
       SnackBar(
         content: Text('Chat history backed up: $messagesBackedUpCount messages'),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -197,7 +194,7 @@ class _FriendListPageState extends State<FriendListPage> {
       SnackBar(
         content: Text('Local backup uploaded to cloud: $messagesUploadedCount messages'),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -225,12 +222,25 @@ class _FriendListPageState extends State<FriendListPage> {
   }
 
   // Shows a bottom sheet with settings options
-  void _showSettings() {
+  void _showOptions() {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
+            ListTile(
+              leading: Container(
+                width: 25, // Adjust the width as needed to match the other icons
+                alignment: Alignment.center,
+                child: Icon(Icons.circle, size: 15, color: getStatusColor(userStatus)),
+              ),
+              title: const Text('Change your status'),
+              onTap: () async {
+                Navigator.pop(context); // Dismiss the bottom sheet
+                _showStatusChangeDialog();
+              },
+            ),
+
             ListTile(
               leading: const Icon(Icons.delete),
               title: const Text('Delete All Message You send on Cloud'),
@@ -280,14 +290,14 @@ class _FriendListPageState extends State<FriendListPage> {
       stream: _friendsStream(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           print('Error loading friends: ${snapshot.error}');
           return Center(child: Text('Error: ${snapshot.error.toString()}'));
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No friends yet'));
+          return const Center(child: Text('No friends yet'));
         }
 
         List<AppUser> friendsList = snapshot.data!;
@@ -297,15 +307,16 @@ class _FriendListPageState extends State<FriendListPage> {
           itemCount: friendsToDisplay.length,
           itemBuilder: (context, index) {
             AppUser friend = friendsList[index];
-            String friendFullName = "${friend.firstName} ${friend.middleName ?? ''} ${friend.lastName}".trim();
+            // String friendFullName = "${friend.firstName} ${friend.middleName ?? ''} ${friend.lastName}".trim();
+            String friendFullName = friend.getFullName();
             return FutureBuilder<String>(
               future: _getLastMessage(currentUserId, friend.uid, friendFullName),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40), // Wait for fix: Replace with friend's profile picture
+                    leading: const Icon(Icons.account_circle, size: 40), // Wait for modify: Replace with friend's profile picture
                     title: Text('$friendFullName - ${friend.status}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 19
                       ),),
                     subtitle: const Text('Loading...'),
@@ -320,11 +331,11 @@ class _FriendListPageState extends State<FriendListPage> {
                   );
                 }
                 String lastMessage = snapshot.data ?? 'No messages';
-                return ListTile(
+                Widget friendTile = ListTile(
                   leading: const Icon(Icons.account_circle, size: 40),
                   title: Text('$friendFullName - ${friend.status}'),
                   subtitle: Text(lastMessage,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 14
                       )),
                   trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
@@ -343,12 +354,74 @@ class _FriendListPageState extends State<FriendListPage> {
                     );
                   },
                 );
+                // Wrap the ListTile with GestureDetector for long press
+                return GestureDetector(
+                  onLongPress: () => _showDeleteConfirmationDialog(friend),
+                  child: friendTile,
+                );
               },
             );
           },
         );
       },
     );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(AppUser friend) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Friend'),
+          content: Text('Are you sure you want to delete ${friend.getFullName()} from your friend list?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog
+                await _deleteFriendAndUpdateStatus(friend);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteFriendAndUpdateStatus(AppUser friend) async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    String friendUid = friend.uid;
+
+    try {
+      // Delete friend from current user's friend list
+      await FirebaseFirestore.instance.collection('users')
+          .doc(currentUserUid)
+          .collection('friends')
+          .doc(friendUid)
+          .delete();
+
+      // Delete the current user from the friend's friend list
+      await FirebaseFirestore.instance.collection('users')
+          .doc(friendUid)
+          .collection('friends')
+          .doc(currentUserUid)
+          .delete();
+
+      // Provide feedback and refresh friend list
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${friend.getFullName()} has been deleted from your friend list')),
+      );
+      _refreshFriendsList();
+    } catch (e) {
+      print("Error deleting friend: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete friend')),
+      );
+    }
   }
 
   // Refreshes the friend list UI
@@ -781,10 +854,10 @@ class _FriendListPageState extends State<FriendListPage> {
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
           onPressed: () {
-            _showSettings();
+            _showOptions();
           },
           mini: true,
-          child:  Icon(Icons.settings,
+          child:  Icon(Icons.more_vert,
               color: Theme.of(context).colorScheme.background),
         ),
       ],

@@ -34,9 +34,9 @@ final _router = GoRouter(
       builder: (context, state) {
         // Check if user is logged in and decide initial route
         if (FirebaseAuth.instance.currentUser != null) {
-          return HelpPage();
+          return OnboardingScreen();
         } else {
-          return HelpPage();
+          return OnboardingScreen();
         }
       },
       routes: [

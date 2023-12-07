@@ -84,7 +84,7 @@ class FAQPageState extends State<FAQPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('FAQ Page'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
       body: ListView.builder(
         itemCount: faqList.length,

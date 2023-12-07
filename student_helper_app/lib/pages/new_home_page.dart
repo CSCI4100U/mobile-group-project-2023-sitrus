@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:student_helper_project/pages/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
 import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/schedule_home_page.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
-
+import 'package:http/http.dart' as http;
 import 'friend_list/friends_add_friend_page.dart';
 import 'friend_list/friends_chat_page.dart';
 import 'friend_list/friends_list_home_page.dart';
@@ -46,6 +49,50 @@ class _NewHomePageState extends State<NewHomePage> {
     "Accommodations"
   ];
 
+  String _apiKey = '30c17ef9cc1cd4397ee2239f09434073'; // Replace with your actual API key from OpenWeatherMap
+  String location = 'Oshawa'; // Example location
+
+  String _weatherDescription = 'Loading weather...';
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetches the current user and stores it in a Future for later use
+    _fetchWeather();
+  }
+  Future<Map<String, dynamic>> fetchWeather(String apiKey, String location) async {
+    String url = 'http://api.weatherstack.com/current?access_key=$apiKey&query=$location';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseJson = json.decode(response.body);
+      if (responseJson['error'] != null) {
+        throw Exception('Weather API error: ${responseJson['error']['info']}');
+      }
+      return responseJson;
+    } else {
+      throw Exception('Failed to load weather data with status code: ${response.statusCode}');
+    }
+  }
+
+  void _fetchWeather() async {
+    try {
+      // Make sure to use https if you're on a paid plan for Weatherstack
+      final weatherData = await fetchWeather(_apiKey, location);
+      setState(() {
+        _weatherDescription = '${weatherData['current']['temperature']}°C, ${weatherData['current']['weather_descriptions'][0]}';
+      });
+    } catch (e) {
+      setState(() {
+        _weatherDescription = 'Weather unavailable';
+      });
+      if (kDebugMode) {
+        print('Error fetching weather: $e');
+      }
+    }
+  }
+
 
 
   @override
@@ -76,7 +123,7 @@ class _NewHomePageState extends State<NewHomePage> {
           },
         ),
 
-          ] : []
+          ] : [Center(child: Text(_weatherDescription))]
       ),
       body: _pages[_selectedIndex],
       drawer: Drawer(
@@ -163,14 +210,14 @@ class _NewHomePageState extends State<NewHomePage> {
         currentIndex: _selectedIndex,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         selectedItemColor: Theme.of(context).colorScheme.background,
-        items:  [
-          const BottomNavigationBarItem(
+        items:  const [
+          BottomNavigationBarItem(
               icon: Icon(Icons.table_chart, size: 40),
               label: "Schedule",),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble, size: 40),
               label: "Chat"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 40),
               label: "Accommodations"),
 

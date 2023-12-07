@@ -567,6 +567,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         leading: BackButton(
           onPressed: () {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NewHomePage()));
@@ -582,7 +583,7 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
       body: Container(
-        color: _backgroundImage == null ? _backgroundColor : null,
+
         decoration: _backgroundImage != null
           ? BoxDecoration(
             image: DecorationImage(
@@ -614,7 +615,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.photo, color: _darkmode ? Colors.white : Colors.black,),
+                      icon: Icon(Icons.photo, color: Theme.of(context).colorScheme.background),
                       onPressed: () {
                         // sending image or video
                         _pickAndSendMedia();
@@ -622,10 +623,13 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     Expanded(
                       child: TextField(
+                        style: TextStyle(
+                          color: Colors.black
+                        ),
                         controller: _messageController,
                         decoration: InputDecoration(
                           hintStyle: TextStyle(
-                              color: _darkmode ? Colors.black : Colors.black
+                              color: Colors.black
                           ),
                           hintText: 'Type a message',
                           border: OutlineInputBorder(
@@ -639,7 +643,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     IconButton(
                       icon: Icon(Icons.send,
-                          color: _darkmode ? Colors.white : Colors.black),
+                          color: Theme.of(context).colorScheme.background),
                       onPressed: _sendMessage,
                     ),
                   ],

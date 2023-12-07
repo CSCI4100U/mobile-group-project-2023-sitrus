@@ -119,9 +119,6 @@ class DatabaseHelper {
       whereArgs: [userUid, friendUid, friendUid, userUid],
     );
 
-    // If your local database doesn't store the Firestore document ID,
-    // You might need to pass a placeholder or null for the document ID (uid)
-    // Update the fromMap method to accept a null uid if it's not being used
     return messageMaps.map((map) => Message.fromMap(map, null)).toList();
   }
 }

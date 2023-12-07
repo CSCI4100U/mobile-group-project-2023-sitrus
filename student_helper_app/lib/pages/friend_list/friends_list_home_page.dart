@@ -139,7 +139,7 @@ class _FriendListPageState extends State<FriendListPage> {
         .where('senderUid', isEqualTo: currentUserUid)
         .get();
     var receiverSnapshot = await FirebaseFirestore.instance.collection('messages')
-        .where('senderUid', isEqualTo: currentUserUid)
+        .where('receiverUid', isEqualTo: currentUserUid)
         .get();
     for (var doc in senderSnapshot.docs) {
       var message = Message.fromMap(doc.data(), null);
@@ -202,6 +202,28 @@ class _FriendListPageState extends State<FriendListPage> {
     );
   }
 
+  Future<void> _cleanAllLocalBackupMessages() async {
+    try {
+      await _databaseHelper.deleteAllMessages();
+      print("All backup messages have been deleted from local storage.");
+
+      // Optionally, update the state if your UI needs to reflect this change
+      setState(() {
+        // Update your state here if necessary
+      });
+
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All backup messages have been deleted')),
+      );
+    } catch (e) {
+      print("Error while deleting backup messages: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete backup messages')),
+      );
+    }
+  }
+
   // Shows a bottom sheet with settings options
   void _showSettings() {
     showModalBottomSheet(
@@ -211,7 +233,7 @@ class _FriendListPageState extends State<FriendListPage> {
           children: <Widget>[
             ListTile(
               leading: const Icon(Icons.delete),
-              title: const Text('Delete All Chat History on Cloud'),
+              title: const Text('Delete All Message You send on Cloud'),
               onTap: () async {
                 Navigator.pop(context); // Dismiss the bottom sheet
                 await _deleteAllChatHistory();
@@ -233,6 +255,15 @@ class _FriendListPageState extends State<FriendListPage> {
                 // load logic
                 Navigator.pop(context);
                 uploadLocalBackupToCloud();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever_outlined),
+              title: const Text('Clean All Local Backup Messages'),
+              onTap: () {
+                // load logic
+                Navigator.pop(context);
+                _cleanAllLocalBackupMessages();
               },
             ),
           ],
@@ -272,7 +303,7 @@ class _FriendListPageState extends State<FriendListPage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
+                    leading: const Icon(Icons.account_circle, size: 40), // Wait for fix: Replace with friend's profile picture
                     title: Text('$friendFullName - ${friend.status}'),
                     subtitle: const Text('Loading...'),
                     trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),

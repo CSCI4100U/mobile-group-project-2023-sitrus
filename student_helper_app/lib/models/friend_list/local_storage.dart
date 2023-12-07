@@ -121,4 +121,10 @@ class DatabaseHelper {
 
     return messageMaps.map((map) => Message.fromMap(map, null)).toList();
   }
+
+  // Method to delete all messages on local storage
+  Future<void> deleteAllMessages() async {
+    Database db = await instance.database;
+    await db.delete('messages'); // Replace 'messages' with your actual table name
+  }
 }

@@ -164,31 +164,38 @@ class _ChatPageState extends State<ChatPage> {
 
   // Deletes the chat history between the user and their friend from Firestore.
   Future<void> _deleteChatHistory() async {
-    // Delete chat history from Firestore
-    QuerySnapshot sentMessages = await FirebaseFirestore.instance
-        .collection('messages')
-        .where('senderUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .where('receiverUid', isEqualTo: widget.friendUid)
-        .get();
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    String friendUid = widget.friendUid;
 
-    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
-        .collection('messages')
-        .where('senderUid', isEqualTo: widget.friendUid)
-        .where('receiverUid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    try {
+      // Fetch all messages between the current user and the friend
+      QuerySnapshot chatHistory = await FirebaseFirestore.instance
+          .collection('messages')
+          .where('senderUid', isEqualTo: currentUserUid)
+          .where('receiverUid', isEqualTo: friendUid)
+          .get();
 
-    for (var doc in sentMessages.docs) {
-      await doc.reference.delete();
+      // Delete each message
+      for (var doc in chatHistory.docs) {
+        await doc.reference.delete();
+      }
+
+      // Update UI
+      setState(() {
+        messages.clear();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chat history deleted successfully')),
+      );
+    } catch (e) {
+      print("Error deleting chat history: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete chat history')),
+      );
     }
-
-    for (var doc in receivedMessages.docs) {
-      await doc.reference.delete();
-    }
-
-    setState(() {
-      messages.clear();
-    });
   }
+
 
   // Shows a modal bottom sheet to allow the user to change the chat background.
   void _showBackgroundOptions() {
@@ -519,43 +526,62 @@ class _ChatPageState extends State<ChatPage> {
 
   // Methods for backing up and uploading chat history related to a specific friend.
   Future<void> backupChatToLocalForSpecificFriend(String friendUid) async {
-    // Saves messages with the specific friend to local storage.
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    print("Debug: Backing up chat to local for friend UID: $friendUid");
 
-    for (var message in messages) {
-      // Check if the current user is involved in the message
-      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
-        if (message.senderUid == friendUid || message.receiverUid == friendUid) {
-          // Save the message to local storage
+    try {
+      int messageCount = 0;
+      for (var message in messages) {
+        if ((message.senderUid == currentUserUid || message.receiverUid == currentUserUid) &&
+            (message.senderUid == friendUid || message.receiverUid == friendUid)) {
           await _databaseHelper.insertMessage(message.toMap());
+          messageCount++;
         }
       }
+      print("Debug: Total messages backed up: $messageCount");
+    } catch (e) {
+      print("Error during local backup: $e");
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Chat history backed up to local database')),
+    );
   }
+
 
 
   // Method to upload local backup to the cloud, only for messages between the current user and the specified friend
   Future<void> uploadLocalBackupToCloudForSpecificFriend(String friendUid) async {
-    // Uploads messages with the specific friend to the cloud.
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    print("Debug: Uploading local backup to cloud for friend UID: $friendUid");
 
-    // Fetch messages from local storage
-    List<Message> localMessages = await _databaseHelper.queryMessagesBetween(currentUserUid, friendUid);
+    try {
+      List<Message> localMessages = await _databaseHelper.queryMessagesBetween(currentUserUid, friendUid);
+      print("Debug: Number of local messages found: ${localMessages.length}");
 
-    for (var localMessage in localMessages) {
-      // Check if the message already exists in the cloud
-      var existingDoc = await FirebaseFirestore.instance.collection('messages')
-          .doc(localMessage.uid)
-          .get();
-
-      // If the message doesn't exist in the cloud, upload it
-      if (!existingDoc.exists) {
-        await FirebaseFirestore.instance.collection('messages')
+      int uploadCount = 0;
+      for (var localMessage in localMessages) {
+        var existingDoc = await FirebaseFirestore.instance.collection('messages')
             .doc(localMessage.uid)
-            .set(localMessage.toMap());
+            .get();
+
+        if (!existingDoc.exists) {
+          await FirebaseFirestore.instance.collection('messages')
+              .doc(localMessage.uid)
+              .set(localMessage.toMap());
+          uploadCount++;
+        }
       }
+      print("Debug: Number of messages uploaded to cloud: $uploadCount");
+    } catch (e) {
+      print("Error during cloud upload: $e");
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Local backup uploaded to cloud')),
+    );
   }
+
 
   // Disposes controllers when the widget is disposed.
   @override

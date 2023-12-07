@@ -569,8 +569,10 @@ class _ChatPageState extends State<ChatPage> {
     try {
       int messageCount = 0;
       for (var message in messages) {
-        if ((message.senderUid == currentUserUid || message.receiverUid == currentUserUid) &&
-            (message.senderUid == friendUid || message.receiverUid == friendUid)) {
+        if ((message.senderUid == currentUserUid || message.receiverUid == currentUserUid)
+            //&&
+            //(message.senderUid == friendUid || message.receiverUid == friendUid)
+        ) {
           await _databaseHelper.insertMessage(message.toMap());
           messageCount++;
         }

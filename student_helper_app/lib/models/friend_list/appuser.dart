@@ -3,8 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // Defines a user model for an application with fields for user details.
 class AppUser {
   final String uid;
-  late final String studentNumber;
-  late final String firstName;
+  // late final String studentNumber;
+  // late final String firstName;
+  String studentNumber;
+  String firstName;
   final String? middleName;
   final String lastName;
   final String email;

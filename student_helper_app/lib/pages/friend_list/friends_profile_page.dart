@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Import the 'AppUser' class from a separate file
+// Import theser' class from a separate file
 import 'friend_login_page.dart';
 import '../../models/friend_list/appuser.dart';
 
@@ -87,36 +87,71 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   // Save updated profile data to Firestore
+  // void _saveProfile(String field, String newValue) {
+  //   if (_user != null) {
+  //     // Update Firestore document with new field value
+  //     // Show success or error message based on operation result
+  //     FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(_user!.uid) // Use _user!.id instead of currentUserId()
+  //         .update({field: newValue})
+  //         .then((_) {
+  //       setState(() {
+  //         // Update the local user object
+  //         if (field == 'firstName') {
+  //           _user!.firstName = newValue;
+  //         } else if (field == 'studentNumber') {
+  //           _user!.studentNumber = newValue;
+  //         }
+  //         // Add else if branches for other fields as necessary
+  //       });
+  //       // Optionally, show a snackbar to confirm the update
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('$field updated successfully.'), backgroundColor: Colors.green),
+  //       );
+  //     }).catchError((error) {
+  //       // Handle errors, possibly show a snackbar with the error
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to update $field.'), backgroundColor: Colors.red),
+  //       );
+  //     });
+  //   }
+  // }
   void _saveProfile(String field, String newValue) {
     if (_user != null) {
-      // Update Firestore document with new field value
-      // Show success or error message based on operation result
       FirebaseFirestore.instance
           .collection('users')
-          .doc(_user!.uid) // Use _user!.id instead of currentUserId()
+          .doc(_user!.uid) // Make sure _user!.uid is the correct document ID
           .update({field: newValue})
           .then((_) {
-        setState(() {
-          // Update the local user object
-          if (field == 'firstName') {
-            _user!.firstName = newValue;
-          } else if (field == 'studentNumber') {
-            _user!.studentNumber = newValue;
-          }
-          // Add else if branches for other fields as necessary
-        });
-        // Optionally, show a snackbar to confirm the update
+        // Update the local user object
+        if (field == 'firstName') {
+          _user!.firstName = newValue;
+        } else if (field == 'studentNumber') {
+          _user!.studentNumber = newValue;
+        }
+        // Add else if branches for other fields as necessary
+
+        // Update the UI
+        setState(() {});
+
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('$field updated successfully.'), backgroundColor: Colors.green),
         );
       }).catchError((error) {
-        // Handle errors, possibly show a snackbar with the error
+        print('Failed to update $field: $error'); // Detailed error log
+
+        // Show failure message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update $field.'), backgroundColor: Colors.red),
         );
       });
+    } else {
+      print('User object is null'); // Log if the user object is null
     }
   }
+
 
   // Handle user logout, clear SharedPreferences and navigate to login screen
   Future<void> _logout() async {
@@ -174,12 +209,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
       appBar: AppBar(
         leading: const BackButton(),
         title: Text("${_user!.firstName}'s Profile")
-
-
         ),
-
       body: ListView(
-
         padding: const EdgeInsets.all(16.0),
         children: [
           CircleAvatar(

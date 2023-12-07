@@ -96,7 +96,7 @@ class FAQPageState extends State<FAQPage> {
             ),),
             children: [
               Container(
-                height: 350,
+                height: 200,
                  // Set a specific height or use constraints based on your design
                 child: ListView.builder(
                   itemCount: faqList[index].answerSections.length,

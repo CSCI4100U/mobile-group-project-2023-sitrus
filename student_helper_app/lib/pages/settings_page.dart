@@ -36,19 +36,19 @@ class _SettingsPageState extends State<SettingsPage> {
 
   //is Dark mode determines if we're in light mode or dark mode
   @override
-  void initState() {
+  /*void initState() {
     super.initState();
     loadTheme();
-  }
+  }*/
 
-  Future<void> loadTheme() async {
+  /*Future<void> loadTheme() async {
     bool? loadedDarkMode = await ThemeProvider.loadThemeFromPreferences();
     if (loadedDarkMode != null) {
       setState(() {
         isDarkMode = loadedDarkMode;
       });
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +84,8 @@ class _SettingsPageState extends State<SettingsPage> {
               title: const Text('Enable Dark Mode (In progress)'),
               value: isDarkMode,
               onChanged: (value) {
-                ThemeProvider.saveThemeToPreferences(value);
-                setState(() {
-                  isDarkMode = value;
+                /*ThemeProvider.saveThemeToPreferences(value);*/
 
-                  print('Dark Mode Enabled: $isDarkMode');
-                });
               },
             ),
 

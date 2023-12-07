@@ -107,13 +107,13 @@ class _FriendListPageState extends State<FriendListPage> {
       await doc.reference.delete();
     }
     // Delete messages received by the current user
-    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
-        .collection('messages')
-        .where('receiverUid', isEqualTo: currentUserUid)
-        .get();
-    for (var doc in receivedMessages.docs) {
-      await doc.reference.delete();
-    }
+    // QuerySnapshot receivedMessages = await FirebaseFirestore.instance
+    //     .collection('messages')
+    //     .where('receiverUid', isEqualTo: currentUserUid)
+    //     .get();
+    // for (var doc in receivedMessages.docs) {
+    //   await doc.reference.delete();
+    // }
     // Provide feedback to the user
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -133,32 +133,85 @@ class _FriendListPageState extends State<FriendListPage> {
   // Backs up chat messages to local storage
   Future<void> backupChatToLocal() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    int messagesBackedUpCount = 0;  // To count how many messages are backed up
 
-    for (var message in messages) {
-      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+    // for (var message in messages) {
+    //   if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+    //     try {
+    //       await _databaseHelper.insertMessage(message.toMap());
+    //       messagesBackedUpCount++;
+    //     } catch (e) {
+    //       print('Error backing up message with UID ${message.uid}: $e');
+    //     }
+    //   }
+    // }
+    var senderSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .get();
+    var receiverSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .get();
+    for (var doc in senderSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
         await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
       }
     }
+    for (var doc in receiverSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
+        await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
+      }
+    }
+
+    print('Total messages backed up: $messagesBackedUpCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Chat history backed up: $messagesBackedUpCount messages'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
+
 
   // Uploads local backup of chat messages to the cloud
   Future<void> uploadLocalBackupToCloud() async {
-    // Fetch messages from local storage
-    List<Message> localMessages = (await _databaseHelper.queryAllMessages()).cast<Message>();
+    List<Map<String, dynamic>> queryRows = await _databaseHelper.queryAllMessages();
+    List<Message> localMessages = queryRows.map((row) => Message.fromMap(row, null)).toList();
+    int messagesUploadedCount = 0;  // To count how many messages are uploaded
 
     for (var localMessage in localMessages) {
-      // Check if the message already exists in the cloud
-      var existingDoc = await FirebaseFirestore.instance.collection('messages')
-          .doc(localMessage.uid)
-          .get();
-
-      // If the message doesn't exist in the cloud, upload it
-      if (!existingDoc.exists) {
-        await FirebaseFirestore.instance.collection('messages')
+      try {
+        var existingDoc = await FirebaseFirestore.instance.collection('messages')
             .doc(localMessage.uid)
-            .set(localMessage.toMap());
+            .get();
+
+        if (!existingDoc.exists) {
+          await FirebaseFirestore.instance.collection('messages')
+              .doc(localMessage.uid)
+              .set(localMessage.toMap());
+          messagesUploadedCount++;
+        }
+      } catch (e) {
+        print('Error uploading message with UID ${localMessage.uid}: $e');
       }
     }
+
+    print('Total messages uploaded to cloud: $messagesUploadedCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Local backup uploaded to cloud: $messagesUploadedCount messages'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   // Shows a bottom sheet with settings options
@@ -194,17 +247,17 @@ class _FriendListPageState extends State<FriendListPage> {
                 uploadLocalBackupToCloud();
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.arrow_back),
-              title: const Text('Back to Home Page'),
-              onTap: () {
-                // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NewHomePage()), // Go to the home page
-                );
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.arrow_back),
+            //   title: const Text('Back to Home Page'),
+            //   onTap: () {
+            //     // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => NewHomePage()), // Go to the home page
+            //     );
+            //   },
+            // ),
           ],
         );
       },

@@ -32,7 +32,8 @@ class DatabaseHelper {
             receiverUid TEXT NOT NULL,
             content TEXT NOT NULL,
             edited INTEGER NOT NULL,
-            deleted INTEGER NOT NULL DEFAULT 0
+            deleted INTEGER NOT NULL DEFAULT 0,
+            mediaUrl TEXT
           )
           ''');
 
@@ -118,6 +119,9 @@ class DatabaseHelper {
       whereArgs: [userUid, friendUid, friendUid, userUid],
     );
 
-    return messageMaps.map((map) => Message.fromMap(map)).toList();
+    // If your local database doesn't store the Firestore document ID,
+    // You might need to pass a placeholder or null for the document ID (uid)
+    // Update the fromMap method to accept a null uid if it's not being used
+    return messageMaps.map((map) => Message.fromMap(map, null)).toList();
   }
 }

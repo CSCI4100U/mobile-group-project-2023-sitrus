@@ -236,6 +236,11 @@ class _AddFriendPageState extends State<AddFriendPage> {
               onSubmitted: (value) => _search(),
             ),
             const SizedBox(height: 20),
+            Expanded(
+              flex: 1, // Adjust the flex factor to control how much space this part should take
+              child: _buildFriendRequests(), // This will display the friend requests
+            ),
+            const SizedBox(height: 20),
             // Results from search
             Expanded(
               flex: 2, // Adjust the flex factor to control how much space this part should take
@@ -262,11 +267,11 @@ class _AddFriendPageState extends State<AddFriendPage> {
               )
                   : const Center(child: Text('No results')),
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              flex: 1, // Adjust the flex factor to control how much space this part should take
-              child: _buildFriendRequests(), // This will display the friend requests
-            ),
+            // const SizedBox(height: 20),
+            // Expanded(
+            //   flex: 1, // Adjust the flex factor to control how much space this part should take
+            //   child: _buildFriendRequests(), // This will display the friend requests
+            // ),
           ],
         ),
       ),

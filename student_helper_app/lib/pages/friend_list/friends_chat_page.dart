@@ -105,7 +105,7 @@ class _ChatPageState extends State<ChatPage> {
       combined.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
 
       List<Message> newMessages = combined
-          .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
 
       setState(() {
@@ -371,19 +371,27 @@ class _ChatPageState extends State<ChatPage> {
 
   // Deletes a single message identified by its messageId.
   void _deleteMessage(String messageId) async {
-    // Directly delete the message from Firestore
-    await FirebaseFirestore.instance.collection('messages').doc(messageId).delete();
+    try {
+      // Directly delete the message from Firestore
+      await FirebaseFirestore.instance.collection('messages').doc(messageId).delete();
 
-    // Update UI
-    setState(() {
-      messages.removeWhere((message) => message.uid == messageId);
-    });
+      // Update UI
+      setState(() {
+        messages.removeWhere((message) => message.uid == messageId); // Ensure this uses the property that stores the document ID
+      });
 
-    // Show a snackbar message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Message deleted')),
-    );
+      // Show a snackbar message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Message deleted')),
+      );
+    } catch (e) {
+      print('Error deleting message: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete message')),
+      );
+    }
   }
+
 
   // Allows the user to edit a message.
   void _editMessage(String messageId, String newContent) async {
@@ -394,7 +402,7 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     // Update the local message list
-    int index = messages.indexWhere((message) => message.uid == messageId);
+    int index = messages.indexWhere((message) => message.uid == messageId); // Use a field that holds the document ID
     if (index != -1) {
       setState(() {
         messages[index] = messages[index].copyWith(content: newContent, edited: true);
@@ -458,9 +466,8 @@ class _ChatPageState extends State<ChatPage> {
               leading: const Icon(Icons.delete),
               title: const Text('Delete'),
               onTap: () {
-                // delete logic
-                Navigator.pop(context);
-                _deleteMessage(message.uid!); // Assuming id is not null here
+                Navigator.pop(context); // Close the modal bottom sheet
+                _deleteMessage(message.uid!); // Use the document ID
               },
             ),
           ],
@@ -490,6 +497,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             TextButton(
               child: const Text('Save'),
+              // When saving, pass the messageId to _editMessage
               onPressed: () {
                 if (editController.text.trim().isNotEmpty) {
                   _editMessage(message.uid!, editController.text.trim());

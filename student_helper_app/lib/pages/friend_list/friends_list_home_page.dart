@@ -107,13 +107,13 @@ class _FriendListPageState extends State<FriendListPage> {
       await doc.reference.delete();
     }
     // Delete messages received by the current user
-    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
-        .collection('messages')
-        .where('receiverUid', isEqualTo: currentUserUid)
-        .get();
-    for (var doc in receivedMessages.docs) {
-      await doc.reference.delete();
-    }
+    // QuerySnapshot receivedMessages = await FirebaseFirestore.instance
+    //     .collection('messages')
+    //     .where('receiverUid', isEqualTo: currentUserUid)
+    //     .get();
+    // for (var doc in receivedMessages.docs) {
+    //   await doc.reference.delete();
+    // }
     // Provide feedback to the user
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -133,31 +133,94 @@ class _FriendListPageState extends State<FriendListPage> {
   // Backs up chat messages to local storage
   Future<void> backupChatToLocal() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    int messagesBackedUpCount = 0;  // To count how many messages are backed up
 
-    for (var message in messages) {
-      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+    var senderSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .get();
+    var receiverSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('receiverUid', isEqualTo: currentUserUid)
+        .get();
+    for (var doc in senderSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
         await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
       }
     }
+    for (var doc in receiverSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
+        await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
+      }
+    }
+    print('Total messages backed up: $messagesBackedUpCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Chat history backed up: $messagesBackedUpCount messages'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   // Uploads local backup of chat messages to the cloud
   Future<void> uploadLocalBackupToCloud() async {
     // Fetch messages from local storage
-    List<Message> localMessages = (await _databaseHelper.queryAllMessages()).cast<Message>();
+    List<Map<String, dynamic>> queryRows = await _databaseHelper.queryAllMessages();
+    List<Message> localMessages = queryRows.map((row) => Message.fromMap(row, null)).toList();
+    int messagesUploadedCount = 0;  // To count how many messages are uploaded
 
     for (var localMessage in localMessages) {
-      // Check if the message already exists in the cloud
-      var existingDoc = await FirebaseFirestore.instance.collection('messages')
-          .doc(localMessage.uid)
-          .get();
-
-      // If the message doesn't exist in the cloud, upload it
-      if (!existingDoc.exists) {
-        await FirebaseFirestore.instance.collection('messages')
+      try {
+        var existingDoc = await FirebaseFirestore.instance.collection(
+            'messages')
             .doc(localMessage.uid)
-            .set(localMessage.toMap());
+            .get();
+        if (!existingDoc.exists) {
+          await FirebaseFirestore.instance.collection('messages')
+              .doc(localMessage.uid)
+              .set(localMessage.toMap());
+          messagesUploadedCount++;
+        }
+      } catch (e) {
+        print('Error uploading message with UID ${localMessage.uid}: $e');
       }
+    }
+    print('Total messages uploaded to cloud: $messagesUploadedCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Local backup uploaded to cloud: $messagesUploadedCount messages'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  Future<void> _cleanAllLocalBackupMessages() async {
+    try {
+      await _databaseHelper.deleteAllMessages();
+      print("All backup messages have been deleted from local storage.");
+
+      // Optionally, update the state if your UI needs to reflect this change
+      setState(() {
+        // Update your state here if necessary
+      });
+
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All backup messages have been deleted')),
+      );
+    } catch (e) {
+      print("Error while deleting backup messages: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete backup messages')),
+      );
     }
   }
 
@@ -170,7 +233,7 @@ class _FriendListPageState extends State<FriendListPage> {
           children: <Widget>[
             ListTile(
               leading: const Icon(Icons.delete),
-              title: const Text('Delete All Chat History on Cloud'),
+              title: const Text('Delete All Message You send on Cloud'),
               onTap: () async {
                 Navigator.pop(context); // Dismiss the bottom sheet
                 await _deleteAllChatHistory();
@@ -195,15 +258,12 @@ class _FriendListPageState extends State<FriendListPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.arrow_back),
-              title: const Text('Back to Home Page'),
+              leading: const Icon(Icons.delete_forever_outlined),
+              title: const Text('Clean All Local Backup Messages'),
               onTap: () {
+                // load logic
                 Navigator.pop(context);
-                // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
-                /*Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NewHomePage()), // Go to the home page
-                )*/;
+                _cleanAllLocalBackupMessages();
               },
             ),
           ],
@@ -243,7 +303,7 @@ class _FriendListPageState extends State<FriendListPage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
+                    leading: const Icon(Icons.account_circle, size: 40), // Wait for fix: Replace with friend's profile picture
                     title: Text('$friendFullName - ${friend.status}'),
                     subtitle: const Text('Loading...'),
                     trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
@@ -628,15 +688,40 @@ class _FriendListPageState extends State<FriendListPage> {
       print('Debug: Sender messages count: ${querySnapshotSender.docs.length}');
       print('Debug: Receiver messages count: ${querySnapshotReceiver.docs.length}');
 
-      // Determine which message is the latest
+      // // Determine which message is the latest
+      // DocumentSnapshot? latestMessageSnapshot;
+      // if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
+      //   final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
+      //   final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
+      //   latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
+      // } else if (querySnapshotSender.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotSender.docs.first;
+      // } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotReceiver.docs.first;
+      // }
+      // Check if there are messages and parse timestamps safely
+      Timestamp? senderTimestamp;
+      Timestamp? receiverTimestamp;
+
+      if (querySnapshotSender.docs.isNotEmpty) {
+        var senderTimestampData = querySnapshotSender.docs.first.get('timestamp');
+        senderTimestamp = _parseTimestamp(senderTimestampData);
+      }
+
+      if (querySnapshotReceiver.docs.isNotEmpty) {
+        var receiverTimestampData = querySnapshotReceiver.docs.first.get('timestamp');
+        receiverTimestamp = _parseTimestamp(receiverTimestampData);
+      }
+
+      // Determine the latest message
       DocumentSnapshot? latestMessageSnapshot;
-      if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
-        final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
-        final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
-        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
-      } else if (querySnapshotSender.docs.isNotEmpty) {
+      if (senderTimestamp != null && receiverTimestamp != null) {
+        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0
+            ? querySnapshotSender.docs.first
+            : querySnapshotReceiver.docs.first;
+      } else if (senderTimestamp != null) {
         latestMessageSnapshot = querySnapshotSender.docs.first;
-      } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      } else if (receiverTimestamp != null) {
         latestMessageSnapshot = querySnapshotReceiver.docs.first;
       }
 
@@ -657,6 +742,16 @@ class _FriendListPageState extends State<FriendListPage> {
       print('An error occurred while fetching the last message: $e');
       return 'Error fetching messages';
     }
+  }
+
+  // Helper method to parse Timestamp safely
+  Timestamp? _parseTimestamp(dynamic data) {
+    if (data is Timestamp) {
+      return data;
+    } else if (data is int) {
+      return Timestamp.fromMillisecondsSinceEpoch(data);
+    }
+    return null;
   }
 
   // Builds the floating action buttons for search and settings

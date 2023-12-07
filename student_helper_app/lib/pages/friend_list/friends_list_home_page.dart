@@ -407,7 +407,7 @@ class _FriendListPageState extends State<FriendListPage> {
           .doc(friendUid)
           .delete();
 
-      // Optionally, delete the current user from the friend's friend list
+      // Delete the current user from the friend's friend list
       await FirebaseFirestore.instance.collection('users')
           .doc(friendUid)
           .collection('friends')

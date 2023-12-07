@@ -466,28 +466,58 @@ class _ChatPageState extends State<ChatPage> {
 
   // Shows options to edit or delete a message.
   void _showMessageOptions(BuildContext context, Message message) {
+    // showModalBottomSheet(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return Wrap(
+    //       children: <Widget>[
+    //         ListTile(
+    //           leading: const Icon(Icons.edit),
+    //           title: const Text('Edit'),
+    //           onTap: () {
+    //             // edit logic
+    //             Navigator.pop(context);
+    //             _showEditDialog(message);
+    //           },
+    //         ),
+    //         ListTile(
+    //           leading: const Icon(Icons.delete),
+    //           title: const Text('Delete'),
+    //           onTap: () {
+    //             Navigator.pop(context); // Close the modal bottom sheet
+    //             _deleteMessage(message.uid!); // Use the document ID
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+    final bool isUserMessage = message.senderUid == FirebaseAuth.instance.currentUser!.uid;
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () {
-                // edit logic
-                Navigator.pop(context);
-                _showEditDialog(message);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete),
-              title: const Text('Delete'),
-              onTap: () {
-                Navigator.pop(context); // Close the modal bottom sheet
-                _deleteMessage(message.uid!); // Use the document ID
-              },
-            ),
+            if (isUserMessage) // Only allow editing if it's the user's message
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Edit'),
+                onTap: () {
+                  // edit logic
+                  Navigator.pop(context);
+                  _showEditDialog(message);
+                },
+              ),
+            if (isUserMessage) // Only allow deleting if it's the user's message
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Delete'),
+                onTap: () {
+                  Navigator.pop(context); // Close the modal bottom sheet
+                  _deleteMessage(message.uid!); // Use the document ID
+                },
+              ),
           ],
         );
       },
@@ -618,7 +648,7 @@ class _ChatPageState extends State<ChatPage> {
         title: Text('${widget.friendName} - ${widget.friendStatus}'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.more_vert),
             onPressed: _showSettings,
           ),
 

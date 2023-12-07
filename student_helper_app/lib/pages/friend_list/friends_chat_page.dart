@@ -123,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
           children: <Widget>[
             ListTile(
               leading: const Icon(Icons.delete),
-              title: const Text('Delete Chat History'),
+              title: const Text('Delete All message you send to this friend'),
               onTap: () async {
                 Navigator.pop(context); // Dismiss the bottom sheet
                 await _deleteChatHistory();
@@ -139,7 +139,7 @@ class _ChatPageState extends State<ChatPage> {
             ),*/
             ListTile(
               leading: const Icon(Icons.download),
-              title: const Text('Back up Chat History from Cloud'),
+              title: const Text('Back up All message you send to this friend from Cloud'),
               onTap: () {
                 // load logic
                 Navigator.pop(context);
@@ -148,7 +148,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             ListTile(
               leading: const Icon(Icons.upload),
-              title: const Text('Upload Local Backup Chat History To Cloud'),
+              title: const Text('Upload Local Backup To Cloud'),
               onTap: () {
                 // load logic
                 Navigator.pop(context);

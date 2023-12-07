@@ -304,7 +304,10 @@ class _FriendListPageState extends State<FriendListPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
                     leading: const Icon(Icons.account_circle, size: 40), // Wait for fix: Replace with friend's profile picture
-                    title: Text('$friendFullName - ${friend.status}'),
+                    title: Text('$friendFullName - ${friend.status}',
+                      style: TextStyle(
+                        fontSize: 19
+                      ),),
                     subtitle: const Text('Loading...'),
                     trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   );
@@ -320,7 +323,10 @@ class _FriendListPageState extends State<FriendListPage> {
                 return ListTile(
                   leading: const Icon(Icons.account_circle, size: 40),
                   title: Text('$friendFullName - ${friend.status}'),
-                  subtitle: Text(lastMessage),
+                  subtitle: Text(lastMessage,
+                      style: TextStyle(
+                          fontSize: 14
+                      )),
                   trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   onTap: () async {
                     final AppUser user = await _fetchCurrentUser();

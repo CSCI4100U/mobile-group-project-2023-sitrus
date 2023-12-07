@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:student_helper_project/pages/fonts.dart';
 import 'package:student_helper_project/pages/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
 import 'package:student_helper_project/pages/home_page.dart';
@@ -14,6 +15,7 @@ import 'friend_list/friends_chat_page.dart';
 import 'friend_list/friends_list_home_page.dart';
 import 'info.dart';
 import 'friend_list/friends_profile_page.dart';
+import 'fonts.dart' as font;
 
 class NewHomePage extends StatefulWidget {
   NewHomePage({super.key});
@@ -93,6 +95,8 @@ class _NewHomePageState extends State<NewHomePage> {
     }
   }
 
+  var _fontSize = 10.0;
+
 
 
   @override
@@ -102,7 +106,7 @@ class _NewHomePageState extends State<NewHomePage> {
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         foregroundColor: Colors.white,
-        title: Text(_pageNames[_selectedIndex]),
+        title: Text(_pageNames[_selectedIndex], style: TextStyle(fontSize: 25),),
 
         actions: _selectedIndex == 1 ? [IconButton(
           icon: const Icon(Icons.add),
@@ -114,7 +118,7 @@ class _NewHomePageState extends State<NewHomePage> {
           },
         ),
 
-          ] : [Center(child: Text(_weatherDescription))]
+          ] : []
       ),
       body: _pages[_selectedIndex],
       drawer: Drawer(
@@ -189,9 +193,12 @@ class _NewHomePageState extends State<NewHomePage> {
                   MaterialPageRoute(builder: (context) => const InfoPage()),
                 );
               },
-            )
+            ),
+            Divider(height: 240,),
+            Text(_weatherDescription, style: TextStyle(fontSize: 19),)
 
           ],
+
         ),
 
       ),
@@ -201,9 +208,9 @@ class _NewHomePageState extends State<NewHomePage> {
         currentIndex: _selectedIndex,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         selectedItemColor: Theme.of(context).colorScheme.background,
-        items:  const [
+        items:   [
           BottomNavigationBarItem(
-              icon: Icon(Icons.table_chart, size: 40),
+              icon: Icon(Icons.table_chart, size: 40 + font.fontSize),
               label: "Schedule",),
           BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble, size: 40),

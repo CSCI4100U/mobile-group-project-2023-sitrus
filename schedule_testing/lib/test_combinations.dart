@@ -1,88 +1,90 @@
 import 'package:flutter/material.dart';
 
-// import 'schedule_model.dart';
+import 'schedule_model.dart';
 import 'course_model.dart';
 // import 'rectangle_model.dart';
 
 //treat this as the build method?
 void main() {
 
-  HourMinute eight_ten = HourMinute(8, 10);
-  HourMinute nine_fourty = HourMinute(9, 40);
-  HourMinute eleven_ten = HourMinute(11, 10);
-  HourMinute twelve_forty = HourMinute(12, 40);
-  HourMinute two_ten = HourMinute(2 +12, 10);
-  HourMinute three_fourty = HourMinute(3 +12, 40);
+  HourMinute eight_ten = HourMinute(hour: 8, minute: 10);
+  HourMinute nine_fourty = HourMinute(hour: 9, minute: 40);
+  HourMinute eleven_ten = HourMinute(hour: 11, minute: 10);
+  HourMinute twelve_forty = HourMinute(hour: 12, minute: 40);
+  HourMinute two_ten = HourMinute(hour: 2 +12, minute: 10);
+  HourMinute three_fourty = HourMinute(hour: 3 +12, minute: 40);
 
-  HourMinute nine_thirty = HourMinute(9, 30);
-  HourMinute eleven_0 = HourMinute(11, 00);
-  HourMinute twelve_thirty = HourMinute(12, 30);
-  HourMinute two_0 = HourMinute(2 +12, 00);
-  HourMinute three_thirty = HourMinute(3 +12, 30);
-  HourMinute five_0 = HourMinute(5 +12, 00);
+  HourMinute nine_thirty = HourMinute(hour: 9, minute: 30);
+  HourMinute eleven_0 = HourMinute(hour: 11, minute: 00);
+  HourMinute twelve_thirty = HourMinute(hour: 12, minute: 30);
+  HourMinute two_0 = HourMinute(hour: 2 +12, minute: 00);
+  HourMinute three_thirty = HourMinute(hour: 3 +12, minute: 30);
+  HourMinute five_0 = HourMinute(hour: 5 +12, minute: 00);
 
-  ClassTime mon8_9 = ClassTime(eight_ten, nine_thirty, 'Monday');
-  ClassTime mon9_11 = ClassTime(nine_fourty, eleven_0, 'Monday');
-  ClassTime mon11_12 = ClassTime(eleven_ten, twelve_thirty, 'Monday');
-  ClassTime mon2_3 = ClassTime(two_ten, three_thirty, 'Monday');
-  ClassTime tue8_9 = ClassTime(eight_ten, nine_thirty, 'Tuesday');
-  ClassTime tue9_11 = ClassTime(nine_fourty, eleven_0, 'Tuesday');
-  ClassTime tue11_12 = ClassTime(eleven_ten, twelve_thirty, 'Tuesday');
-  ClassTime tue2_3 = ClassTime(two_ten, three_thirty, 'Tuesday');
-  ClassTime wed8_9 = ClassTime(eight_ten, nine_thirty, 'Wednesday');
-  ClassTime wed9_11 = ClassTime(nine_fourty, eleven_0, 'Wednesday');
-  ClassTime wed11_12 = ClassTime(eleven_ten, twelve_thirty, 'Wednesday');
-  ClassTime wed2_3 = ClassTime(two_ten, three_thirty, 'Wednesday');
-  ClassTime thu8_9 = ClassTime(eight_ten, nine_thirty, 'Thursday');
-  ClassTime thu9_11 = ClassTime(nine_fourty, eleven_0, 'Thursday');
-  ClassTime thu11_12 = ClassTime(eleven_ten, twelve_thirty, 'Thursday');
-  ClassTime thu2_3 = ClassTime(two_ten, three_thirty, 'Thursday');
-  ClassTime fri8_9 = ClassTime(eight_ten, nine_thirty, 'Friday');
-  ClassTime fri9_11 = ClassTime(nine_fourty, eleven_0, 'Friday');
-  ClassTime fri11_12 = ClassTime(eleven_ten, twelve_thirty, 'Friday');
-  ClassTime fri2_3 = ClassTime(two_ten, three_thirty, 'Friday');
+  ClassTime mon8_9 = ClassTime(startTime: eight_ten, endTime: nine_thirty, dayOfWeek: 'Monday');
+  ClassTime mon9_11 = ClassTime(startTime: nine_fourty, endTime: eleven_0, dayOfWeek: 'Monday');
+  ClassTime mon11_12 = ClassTime(startTime: eleven_ten, endTime: twelve_thirty, dayOfWeek: 'Monday');
+  ClassTime mon2_3 = ClassTime(startTime: two_ten, endTime: three_thirty, dayOfWeek: 'Monday');
+  ClassTime tue8_9 = ClassTime(startTime: eight_ten, endTime: nine_thirty, dayOfWeek: 'Tuesday');
+  ClassTime tue9_11 = ClassTime(startTime: nine_fourty, endTime: eleven_0, dayOfWeek: 'Tuesday');
+  ClassTime tue11_12 = ClassTime(startTime: eleven_ten, endTime: twelve_thirty, dayOfWeek: 'Tuesday');
+  ClassTime tue2_3 = ClassTime(startTime: two_ten, endTime: three_thirty, dayOfWeek: 'Tuesday');
+  ClassTime wed8_9 = ClassTime(startTime: eight_ten, endTime: nine_thirty, dayOfWeek: 'Wednesday');
+  ClassTime wed9_11 = ClassTime(startTime: nine_fourty, endTime: eleven_0, dayOfWeek: 'Wednesday');
+  ClassTime wed11_12 = ClassTime(startTime: eleven_ten, endTime: twelve_thirty, dayOfWeek: 'Wednesday');
+  ClassTime wed2_3 = ClassTime(startTime: two_ten, endTime: three_thirty, dayOfWeek: 'Wednesday');
+  ClassTime thu8_9 = ClassTime(startTime: eight_ten, endTime: nine_thirty, dayOfWeek: 'Thursday');
+  ClassTime thu9_11 = ClassTime(startTime: nine_fourty, endTime: eleven_0, dayOfWeek: 'Thursday');
+  ClassTime thu11_12 = ClassTime(startTime: eleven_ten, endTime: twelve_thirty, dayOfWeek: 'Thursday');
+  ClassTime thu2_3 = ClassTime(startTime: two_ten, endTime: three_thirty, dayOfWeek: 'Thursday');
+  ClassTime fri8_9 = ClassTime(startTime: eight_ten,endTime:  nine_thirty, dayOfWeek: 'Friday');
+  ClassTime fri9_11 = ClassTime(startTime: nine_fourty, endTime: eleven_0, dayOfWeek: 'Friday');
+  ClassTime fri11_12 = ClassTime(startTime: eleven_ten, endTime: twelve_thirty, dayOfWeek: 'Friday');
+  ClassTime fri2_3 = ClassTime(startTime: two_ten, endTime: three_thirty, dayOfWeek: 'Friday');
 
-  Section pl_sec1 = Section([mon8_9]);
-  Section pl_sec2 = Section([tue8_9]);
-  Section prob_sec1 = Section([wed8_9, fri8_9]);
-  Section md_sec1 = Section([wed9_11, fri9_11]);
-  // Section md_sec2 = Section([wed2_3, fri2_3]);
-  Section md_sec2 = Section([tue2_3, thu2_3]);
-  Section ada_sec1 = Section([mon11_12, thu11_12]);
-  // Section ada_sec2 = Section([mon2_3, thu2_3]);
-  Section ada_sec2 = Section([tue2_3, thu2_3]);
-  Section eth_sec1 = Section([wed11_12]);
-  Section d_sec1 = Section([mon9_11, tue9_11]);
+  Section pl_sec1 = Section(lectureTimes: [mon8_9]);
+  Section pl_sec2 = Section(lectureTimes: [tue8_9]);
+  Section prob_sec1 = Section(lectureTimes: [wed8_9, fri8_9]);
+  Section md_sec1 = Section(lectureTimes: [wed9_11, fri9_11]);
+  // Section md_sec2 = Section(lectureTimes: [wed2_3, fri2_3]);
+  Section md_sec2 = Section(lectureTimes: [tue2_3, thu2_3]);
+  Section md_sec3 = Section(lectureTimes: [mon11_12, thu11_12]);
+  Section ada_sec1 = Section(lectureTimes: [mon11_12, thu11_12]);
+  // Section ada_sec2 = Section(lectureTimes: [mon2_3, thu2_3]);
+  Section ada_sec2 = Section(lectureTimes: [tue2_3, thu2_3]);
+  Section eth_sec1 = Section(lectureTimes: [wed11_12]);
+  Section d_sec1 = Section(lectureTimes: [mon9_11, tue9_11]);
 
   List<Section> pl_secs = [pl_sec1,
     // pl_sec2
   ];
   List<Section> prob_secs = [prob_sec1];
   List<Section> md_secs = [md_sec1,
-    // md_sec2
+    md_sec2,
+    md_sec3
   ];
   List<Section> ada_secs = [ada_sec1];
   List<Section> eth_secs = [eth_sec1];
   List<Section> d_secs = [d_sec1];
 
-  Tutorial ada_tut1 = Tutorial([thu9_11]);
-  Tutorial ada_tut2 = Tutorial([fri2_3]);
+  Tutorial ada_tut1 = Tutorial(tutorialTime: thu9_11);
+  Tutorial ada_tut2 = Tutorial(tutorialTime: fri2_3);
 
   List<Tutorial> ada_tuts = [ada_tut1, ada_tut2];
   List<Tutorial> tutorials = [];  //empty tutorial list, represents courses with no tutorials
 
-  Laboratory md_lab1 = Laboratory([mon2_3]);
-  Laboratory md_lab2 = Laboratory([wed2_3]);
+  Laboratory md_lab1 = Laboratory(labTime: mon2_3);
+  Laboratory md_lab2 = Laboratory(labTime: fri2_3);
 
   List<Laboratory> md_labs = [md_lab1, md_lab2];
   List<Laboratory> labs = []; //empty lab list, represents courses with no labs
 
-  Course pl = Course('1 pl', pl_secs, tutorials, labs, Colors.red);
-  Course prob = Course('2 prob', prob_secs, tutorials, labs, Colors.green);
-  Course md = Course('3 md', md_secs, tutorials, md_labs, Colors.brown);
-  Course ada = Course('4 ada', ada_secs, ada_tuts, labs, Colors.blue);
-  Course eth = Course('5 eth', eth_secs, tutorials, labs, Colors.purple);
-  Course d = Course('6 d', d_secs, tutorials, labs, Colors.orange);
+  Course pl = Course(courseName: '1 pl', sections: pl_secs, tutorials: tutorials, labs: labs, color: Colors.red);
+  Course prob = Course(courseName: '2 prob', sections: prob_secs, tutorials: tutorials, labs: labs, color: Colors.green);
+  Course md = Course(courseName: '3 md', sections: md_secs, tutorials: tutorials, labs: md_labs, color: Colors.brown);
+  Course ada = Course(courseName: '4 ada', sections: ada_secs, tutorials: ada_tuts, labs: labs, color: Colors.blue);
+  Course eth = Course(courseName:  '5 eth', sections: eth_secs, tutorials: tutorials, labs: labs, color: Colors.purple);
+  Course d = Course(courseName: '6 d', sections: d_secs, tutorials: tutorials, labs: labs, color: Colors.orange);
 
   List<Course> coursesFromInput = [
     pl,
@@ -115,64 +117,87 @@ void main() {
 
   for (List<Course> schedule in comb.schedules) {
     comb.getAllOneSectionCombinations(schedule);
+    //validate schedule sections
+    comb.schedulesOneSection = Schedule.validateSchedulesSections(comb.schedulesOneSection);
+    // print(comb.schedulesOneSection.length);
   }
   for (List<Course> schedule in comb.schedulesOneSection) {
     for (Course course in schedule) {
-      print('${course.courseName}, ${course.sections[0].lectureTimes?[0].dayOfWeek}');
+      print('${course.courseName}, ${course.sections[0].lectureTimes[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}');
     }
     print('----schedule---');
   }
   //expected output from above (with comb.schedules = [pl, prob, md, ada, eth]:
-  //c1.sec[0],    c2.sec[0],        c3.sec[0],      c4.sec[0],    c5.sec[0]
-  //1 pl monday,  2 prob wednesday, 3 md wednesday, 4 ada monday, 5 eth wednesday
-  //c1.sec[0],    c2.sec[0],        c3.sec[1],      c4.sec[0],    c5.sec[0]
-  //1 pl monday,  2 prob wednesday, 3 md tuesday,   4 ada monday, 5 eth wednesday
-  //c1.sec[1],    c2.sec[0],        c3.sec[0],      c4.sec[0],    c5.sec[0]
-  //1 pl tuesday, 2 prob wednesday, 3 md wednesday, 4 ada monday, 5 eth wednesday
-  //c1.sec[1],    c2.sec[0],        c3.sec[1],      c4.sec[0],    c5.sec[0]
-  //1 pl tuesday, 2 prob wednesday, 3 md tuesday,   4 ada monday, 5 eth wednesday
+  //c1.sec[0],        c2.sec[0],            c3.sec[0],          c4.sec[0],         c5.sec[0]
+  //1 pl monday 810,  2 prob wednesday 810, 3 md wednesday 940, 4 ada monday 1110, 5 eth wednesday 1110
+  //c1.sec[0],        c2.sec[0],            c3.sec[1],          c4.sec[0],         c5.sec[0]
+  //1 pl monday 810,  2 prob wednesday 810, 3 md tuesday 210,   4 ada monday 1110, 5 eth wednesday 1110
+  //c1.sec[1],        c2.sec[0],            c3.sec[0],          c4.sec[0],         c5.sec[0]
+  //1 pl tuesday 810, 2 prob wednesday 810, 3 md wednesday 940, 4 ada monday 1110, 5 eth wednesday 1110
+  //c1.sec[1],        c2.sec[0],            c3.sec[1],          c4.sec[0],         c5.sec[0]
+  //1 pl tuesday 810, 2 prob wednesday 810, 3 md tuesday 210,   4 ada monday 1110, 5 eth wednesday 1110
 
   for (List<Course> schedule in comb.schedulesOneSection) {
     comb.getAllOneSectionOneTutorialCombinations(schedule);
   }
+  // print(comb.schedulesOneSectionOneTut.length);
+  // validate schedule tuts
+  comb.schedulesOneSectionOneTut = Schedule.validateSchedulesTuts(comb.schedulesOneSectionOneTut);
   // for (List<Course> schedule in comb.schedulesOneSectionOneTut) {
   //   for (Course course in schedule) {
   //     if (course.tutorials.isNotEmpty) {
-  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek}, tut: ${course.tutorials[0].tutorialTimes?[0].dayOfWeek}');
+  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //           'tut: ${course.tutorials[0].tutorialTime.dayOfWeek} ${course.tutorials[0].tutorialTime.startTime.convertToInt()}');
   //     } else {
-  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek}, no tut');
+  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //           'no tut');
   //     }
   //   }
   //   print('----schedule---');
   // }
   //expected output from above,
   // with comb.schedulesOneSection = [pl.sec[0], prob.sec[0], md.sec[0], ada.sec[0], eth.sec[0]]: *note only ada has tutorial in this example
-  //    c1.sec[0]+<NA>,            c2.sec[0]+<NA>,                 c3.sec[0]+<NA>,               c4.sec[0]+tut[0],                  c5.sec[0]+<NA>
-  //    1 pl, lec: monday, no tut, 2 prob, lec: wednesday, no tut, 3 md, lec: wednesday, no tut, 4 ada, lec: monday, tut: thursday, 5 eth, lec: wednesday, no tut
-  //    c1.sec[0]+<NA>,            c2.sec[0]+<NA>,                 c3.sec[0]+<NA>,               c4.sec[0]+tut[1],                  c5.sec[0]+<NA>
-  //    1 pl, lec: monday, no tut, 2 prob, lec: wednesday, no tut, 3 md, lec: wednesday, no tut, 4 ada, lec: monday, tut: friday, 5 eth, lec: wednesday, no tut
+  //    c1.sec[0]+<NA>,                c2.sec[0]+<NA>,                     c3.sec[0]+<NA>,                   c4.sec[0]+tut[0],                           c5.sec[0]+<NA>
+  //    1 pl, lec: monday 810, no tut, 2 prob, lec: wednesday 810, no tut, 3 md, lec: wednesday 940, no tut, 4 ada, lec: monday 1110  tut: thursday 940, 5 eth, lec: wednesday 1110, no tut
+  //    c1.sec[0]+<NA>,                c2.sec[0]+<NA>,                     c3.sec[0]+<NA>,                   c4.sec[0]+tut[1],                          c5.sec[0]+<NA>
+  //    1 pl, lec: monday 810, no tut, 2 prob, lec: wednesday 810, no tut, 3 md, lec: wednesday 940, no tut, 4 ada, lec: monday 1110, tut: friday 210, 5 eth, lec: wednesday 1110, no tut
 
   for (List<Course> schedule in comb.schedulesOneSectionOneTut) {
     comb.getAllOneSectionOneTutorialOneLabCombinations(schedule);
   }
-  for (List<Course> schedule in comb.schedulesOneSectionOneTutOneLab) {
-    for (Course course in schedule) {
-      if (course.tutorials.isNotEmpty) {
-        print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek}, tut: ${course.tutorials[0].tutorialTimes?[0].dayOfWeek}');
-      } else if (course.labs.isNotEmpty) {
-        print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek}, lab: ${course.labs[0].labTimes?[0].dayOfWeek}');
-      } else {
-        print('${course.courseName}, no lab');
-      }
-    }
-    print('----schedule---');
-  }
+  //validate scheulde labs
+  // print(comb.schedulesOneSectionOneTutOneLab.length);
+  comb.schedulesOneSectionOneTutOneLab = Schedule.validateSchedulesLabs(comb.schedulesOneSectionOneTutOneLab);
+  // print(comb.schedulesOneSectionOneTutOneLab.length);
+  // for (List<Course> schedule in comb.schedulesOneSectionOneTutOneLab) {
+  //   for (Course course in schedule) {
+  //     if (course.tutorials.isNotEmpty) {
+  //       if (course.labs.isNotEmpty) {
+  //         print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //             'tut: ${course.tutorials[0].tutorialTime.dayOfWeek} ${course.tutorials[0].tutorialTime.startTime.convertToInt()}, '
+  //             'lab: ${course.labs[0].labTime.dayOfWeek} ${course.labs[0].labTime.startTime.convertToInt()}');
+  //       } else {
+  //         print('${course.courseName}, lec: ${course.sections[0].lectureTimes?[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //             'tut: ${course.tutorials[0].tutorialTime.dayOfWeek} ${course.tutorials[0].tutorialTime.startTime.convertToInt()}, '
+  //             'no lab');
+  //       }
+  //     } else if (course.labs.isNotEmpty) {
+  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //           'lab: ${course.labs[0].labTime.dayOfWeek} ${course.labs[0].labTime.startTime.convertToInt()}');
+  //     } else {
+  //       print('${course.courseName}, lec: ${course.sections[0].lectureTimes[0].dayOfWeek} ${course.sections[0].lectureTimes[0].startTime.convertToInt()}, '
+  //           'no tut, '
+  //           'no lab');
+  //     }
+  //   }
+  //   print('----schedule---');
+  // }
   //expected output from above,
   // with comb.schedulesOneSection = [pl.sec[0]+<NA>, prob.sec[0]+<NA>, md.sec[0]+<NA>, ada.sec[0]+tut[0], eth.sec[0]+<NA>]: *note only md has labs in this example
-  //    c1.sec[0]+<NA>+<NA>,       c2.sec[0]+<NA>+<NA>,            c3.sec[0]+<NA>+lab[0],             c4.sec[0]+tut[0]+<NA>,      c5.sec[0]+<NA>+<NA>
-  //    1 pl, lec: monday, no lab, 2 prob, lec: wednesday, no lab, 3 md, lec: wednesday, lab: monday, 4 ada, lec: monday, no lab, 5 eth, lec: wednesday, no lab
-  //    c1.sec[0]+<NA>+<NA>,       c2.sec[0]+<NA>+<NA>,            c3.sec[0]+<NA>+lab[0],                c4.sec[0]+tut[1]+<NA>,      c5.sec[0]+<NA>+<NA>
-  //    1 pl, lec: monday, no lab, 2 prob, lec: wednesday, no lab, 3 md, lec: wednesday, lab: wednesday, 4 ada, lec: monday, no lab, 5 eth, lec: wednesday, no lab
+  //    c1.sec[0]+<NA>+<NA>,                   c2.sec[0]+<NA>+<NA>,                        c3.sec[0]+<NA>+lab[0],                             c4.sec[0]+tut[0]+<NA>,                              c5.sec[0]+<NA>+<NA>
+  //    1 pl, lec: monday 810, no tut, no lab, 2 prob, lec: wednesday 810, no tut, no lab, 3 md, lec: wednesday 940, no tut, lab: monday 210, 4 ada, lec: monday 1110, tut: thursday 940, no lab, 5 eth, lec: wednesday 1110, no tut, no lab
+  //    c1.sec[0]+<NA>+<NA>,                   c2.sec[0]+<NA>+<NA>,                        c3.sec[0]+<NA>+lab[1],                                c4.sec[0]+tut[1]+<NA>,                              c5.sec[0]+<NA>+<NA>
+  //    1 pl, lec: monday 810, no tut, no lab, 2 prob, lec: wednesday 810, no tut, no lab, 3 md, lec: wednesday 940, no tut, lab: wednesday 210, 4 ada, lec: monday 1110, tut: thursday 940, no lab, 5 eth, lec: wednesday 1110, no tut, no lab
 }
 
 class Combinations {
@@ -217,7 +242,12 @@ class Combinations {
       if (currentIndex == schedule.length) {
         int currentCourse = 0;
         for (Course course in schedule) {
-          currentSchedule.add(Course(course.courseName, [course.sections[sectionNumbers[currentCourse]]], course.tutorials, course.labs, course.color));
+          currentSchedule.add(Course(
+              courseName: course.courseName,
+              sections: [course.sections[sectionNumbers[currentCourse]]],
+              tutorials: course.tutorials,
+              labs: course.labs,
+              color: course.color));
           currentCourse++;
         }
         schedulesOneSection.add(currentSchedule);
@@ -247,8 +277,12 @@ class Combinations {
       if (currentIndex == schedule.length) {
         int currentCourse = 0;
         for (Course course in schedule) {
-          currentSchedule.add(Course(course.courseName, course.sections,
-              tutorialNumbers[currentCourse] == 0 ? course.tutorials : [course.tutorials[tutorialNumbers[currentCourse] - 1]], course.labs, course.color));
+          currentSchedule.add(Course(
+              courseName: course.courseName,
+              sections: course.sections,
+              tutorials: tutorialNumbers[currentCourse] == 0 ? course.tutorials : [course.tutorials[tutorialNumbers[currentCourse] - 1]],
+              labs: course.labs,
+              color: course.color));
           currentCourse++;
         }
         schedulesOneSectionOneTut.add(currentSchedule);
@@ -278,8 +312,12 @@ class Combinations {
       if (currentIndex == schedule.length) {
         int currentCourse = 0;
         for (Course course in schedule) {
-          currentSchedule.add(Course(course.courseName, course.sections, course.tutorials,
-              labNumbers[currentCourse] == 0 ? course.labs : [course.labs[labNumbers[currentCourse] - 1]], course.color));
+          currentSchedule.add(Course(
+              courseName: course.courseName,
+              sections: course.sections,
+              tutorials: course.tutorials,
+              labs: labNumbers[currentCourse] == 0 ? course.labs : [course.labs[labNumbers[currentCourse] - 1]],
+              color: course.color));
           currentCourse++;
         }
         schedulesOneSectionOneTutOneLab.add(currentSchedule);
@@ -296,8 +334,6 @@ class Combinations {
     generateLabCombinations(currentSchedule, 0);
   }
 
-
-  //check for conflict between lectures - need to modify current conflict check a little. i.e classtimes -> sections.lecturetimes
   //get new schedules with no lecture conflicts
 
 }

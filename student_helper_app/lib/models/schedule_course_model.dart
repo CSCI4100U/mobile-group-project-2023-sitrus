@@ -1,21 +1,41 @@
 import 'package:flutter/material.dart';
 
 class Course {
-  String? courseName;
-  List<ClassTime>? times;
-  Color? color;
+  String courseName;
 
-  Course(this.courseName, this.times, this.color);
+  List<Section> sections;
+  List<Tutorial> tutorials;
+  List<Laboratory> labs;
 
-  //maybe have a setColor function?
+  Color color;
+
+  Course(
+      {required this.courseName, required this.sections, required this.tutorials, required this.labs, required this.color});
+
+//maybe have a setColor function?
+}
+
+class Section {
+  List<ClassTime> lectureTimes;
+  Section({required this.lectureTimes});
+}
+
+class Tutorial {
+  ClassTime tutorialTime;
+  Tutorial({required this.tutorialTime});
+}
+
+class Laboratory {
+  ClassTime labTime;
+  Laboratory({required this.labTime});
 }
 
 class ClassTime {
-  HourMinute? startTime;
-  HourMinute? endTime;
-  String? dayOfWeek;
+  HourMinute startTime;
+  HourMinute endTime;
+  String dayOfWeek;
 
-  ClassTime(this.startTime, this.endTime, this.dayOfWeek);
+  ClassTime({required this.startTime, required this.endTime, required this.dayOfWeek});
 
   int lengthOfClass() {
     return this.endTime!.convertToInt() - this.startTime!.convertToInt();
@@ -24,30 +44,26 @@ class ClassTime {
   int getDayOfWeekAsInt() {
     //maybe use switch statements? idk if it's necessarily faster/better
 
-    if (dayOfWeek == "Sunday") {
+    //no Sunday/Saturday because normal courses don't occur on weekends
+    if (dayOfWeek == "Monday") {
       return 0;
-    } else if (dayOfWeek == "Monday") {
-      return 1;
     } else if (dayOfWeek == "Tuesday") {
-      return 2;
+      return 1;
     } else if (dayOfWeek == "Wednesday") {
-      return 3;
+      return 2;
     } else if (dayOfWeek == "Thursday") {
+      return 3;
+    } else { //Friday
       return 4;
-    } else if (dayOfWeek == "Friday") {
-      return 5;
-    } else {  //Saturday
-      return 6;
     }
   }
-
 }
 
 class HourMinute {
-  int? hour;
-  int? minute;
+  int hour;
+  int minute;
 
-  HourMinute(this.hour, this.minute);
+  HourMinute({required this.hour, required this.minute});
 
   int convertToInt() {
     return (this.hour! * 100) + (this.minute!);

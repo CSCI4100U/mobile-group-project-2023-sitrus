@@ -1,40 +1,41 @@
 import 'package:flutter/material.dart';
 
 class Course {
-  String? courseName;
+  String courseName;
 
   List<Section> sections;
   List<Tutorial> tutorials;
   List<Laboratory> labs;
 
-  Color? color;
+  Color color;
 
-  Course(this.courseName, this.sections, this.tutorials, this.labs, this.color);
+  Course(
+      {required this.courseName, required this.sections, required this.tutorials, required this.labs, required this.color});
 
   //maybe have a setColor function?
 }
 
 class Section {
-  List<ClassTime>? lectureTimes;
-  Section(this.lectureTimes);
+  List<ClassTime> lectureTimes;
+  Section({required this.lectureTimes});
 }
 
 class Tutorial {
-  List<ClassTime>? tutorialTimes;
-  Tutorial(this.tutorialTimes);
+  ClassTime tutorialTime;
+  Tutorial({required this.tutorialTime});
 }
 
 class Laboratory {
-  List<ClassTime>? labTimes;
-  Laboratory(this.labTimes);
+  ClassTime labTime;
+  Laboratory({required this.labTime});
 }
 
 class ClassTime {
-  HourMinute? startTime;
-  HourMinute? endTime;
-  String? dayOfWeek;
+  HourMinute startTime;
+  HourMinute endTime;
+  String dayOfWeek;
 
-  ClassTime(this.startTime, this.endTime, this.dayOfWeek);
+  ClassTime({required this.startTime, required this.endTime, required this.dayOfWeek});
 
   int lengthOfClass() {
     return this.endTime!.convertToInt() - this.startTime!.convertToInt();
@@ -59,10 +60,10 @@ class ClassTime {
 }
 
 class HourMinute {
-  int? hour;
-  int? minute;
+  int hour;
+  int minute;
 
-  HourMinute(this.hour, this.minute);
+  HourMinute({required this.hour, required this.minute});
 
   int convertToInt() {
     return (this.hour! * 100) + (this.minute!);

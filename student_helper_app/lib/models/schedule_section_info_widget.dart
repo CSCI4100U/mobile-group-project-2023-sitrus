@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'class_info_widget.dart';
-import 'course_model.dart';
+import 'schedule_class_info_widget.dart';
+import 'schedule_course_model.dart';
 
 //section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
 //can also be thought of as a widget holding class info containers and a button to add more class containers to the listview

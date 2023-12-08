@@ -1,50 +1,39 @@
 import 'package:flutter/material.dart';
-import 'class_info_widget.dart';
-import 'course_model.dart';
+import 'schedule_course_model.dart';
+import 'schedule_class_info_widget.dart';
 
-//section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
+//basically the same as tutorial (which is like a section)
+//lab = [(name, time), (name, time), +button] = (classinfo, classinfo, +button) i.e. contains info for all lab sections, each lab is essentially just 1 class
 //can also be thought of as a widget holding class info containers and a button to add more class containers to the listview
-class SectionInfoContainer extends StatefulWidget {
+class LabsInfoContainer extends StatefulWidget {
   final String name;
-  int id;
-  final Function(int) onDelete;
+  LabsInfoContainer({required this.name});
 
-  SectionInfoContainer({required this.name, required this.id, required this.onDelete});
+  List<ClassInfoContainer> labsInfoContainer = [];
 
-  List<ClassInfoContainer> classInfoContainerList = [];
-
-  Section getSectionInfo() {
-    List<ClassTime> lectureTimes = [];
-
-    for (ClassInfoContainer classInfoContainer in classInfoContainerList) {
-      lectureTimes.add(classInfoContainer.getClassInfo());
+  List<Laboratory> getLabsInfo() {
+    List<Laboratory> labs = [];
+    for (ClassInfoContainer classInfoContainer in labsInfoContainer) {
+      ClassTime labTime = classInfoContainer.getClassInfo();
+      labs.add(Laboratory(labTime: labTime));
     }
-    Section section = Section(lectureTimes: lectureTimes);
-    return section;
+    return labs;
   }
 
   @override
-  _SectionInfoContainerState createState() => _SectionInfoContainerState();
+  _LabsInfoContainerState createState() => _LabsInfoContainerState();
 
 }
 
-class _SectionInfoContainerState extends State<SectionInfoContainer> {
-
-  @override
-  void initState() {
-    super.initState();
-
-    addClassContainer();
-  }
+class _LabsInfoContainerState extends State<LabsInfoContainer> {
 
   void addClassContainer() {
-    widget.classInfoContainerList.add(ClassInfoContainer(
-        name: 'Lecture',
-        id: widget.classInfoContainerList.length,
+    widget.labsInfoContainer.add(ClassInfoContainer(
+        name: 'Laboratory',
+        id: widget.labsInfoContainer.length,
         onDelete: (int id) {
           setState(() {
-            // print(classInfoContainerList[id].selectedDay);
-            widget.classInfoContainerList.removeAt(id);
+            widget.labsInfoContainer.removeAt(id);
             updateID();
           });
         })
@@ -52,8 +41,8 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
   }
 
   void updateID() {
-    for (int i = 0; i < widget.classInfoContainerList.length; i++) {
-      widget.classInfoContainerList[i].id = i;
+    for (int i = 0; i < widget.labsInfoContainer.length; i++) {
+      widget.labsInfoContainer[i].id = i;
     }
   }
 
@@ -73,25 +62,23 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
             children: [
               Padding(
                 padding: EdgeInsets.only(left: 10.0),
-                child: Text('${widget.name} ${widget.id + 1}', style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
+                child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
-              IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
-                onPressed: () {
-                  widget.onDelete(widget.id);
-                },
-              ),
+              // IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
+              //   onPressed: () {},
+              // ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: widget.classInfoContainerList.length,
+            itemCount: widget.labsInfoContainer.length,
             itemBuilder: (context, index) {
-              return widget.classInfoContainerList[index];
+              return widget.labsInfoContainer[index];
             },
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
             child: Row(
               children: [
                 Expanded(

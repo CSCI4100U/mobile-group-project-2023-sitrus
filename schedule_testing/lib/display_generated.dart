@@ -2,57 +2,77 @@ import 'package:flutter/material.dart';
 
 import 'schedule_model.dart';
 import 'course_model.dart';
+import 'schedule_combinations.dart';
+
 import 'rectangle_model.dart';
 
 //display_generated.dart
-class DisplayGeneratedSchedulesPage extends StatelessWidget {
-  DisplayGeneratedSchedulesPage({super.key, required this.coursesFromInput});
-
+class DisplayGeneratedSchedulesPage extends StatefulWidget {
   List<Course> coursesFromInput;
 
   //todo: get numOfCoursesInSchedule from user input
-  int? numOfCoursesInSchedule = 5;  //this will be taken from user input like
-  // coursesFromInput; however, doing hard coded 5 for demo
+  int numOfCoursesInSchedule = 5; //this will be taken from user input like numFromInput; however, doing hard coded 5 for demo
 
-  List<List<Course>>? schedules = [];
+  DisplayGeneratedSchedulesPage({super.key, required this.coursesFromInput});
 
-  void getAllCombinations(List<Course> courses, int numOfCoursesInSchedule,
-      List<Course> currentCombination) {
-    if (numOfCoursesInSchedule == 0) {
-      schedules!.add(List.from(currentCombination));
-      return;
+  ScheduleCombinations? scheduleCombinations;
+
+  @override
+  _DisplayGeneratedSchedulesPageState createState() => _DisplayGeneratedSchedulesPageState();
+
+}
+
+class _DisplayGeneratedSchedulesPageState extends State<DisplayGeneratedSchedulesPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scheduleCombinations = ScheduleCombinations(coursesFromInput: widget.coursesFromInput);
+
+    //generate all possible combinations of the courses
+    widget.scheduleCombinations!.getAllCourseCombinations(widget.coursesFromInput, widget.numOfCoursesInSchedule, []);
+
+    //generate all possible schedules with one section
+    for (List<Course> schedule in widget.scheduleCombinations!.schedules) {
+      widget.scheduleCombinations!.getAllOneSectionCombinations(schedule);
     }
+    //validate schedule sections
+    widget.scheduleCombinations!.schedulesOneSection = Schedule.validateSchedulesSections(widget.scheduleCombinations!.schedulesOneSection);
 
-    for (int i = 0; i <= courses.length - numOfCoursesInSchedule; i++) {
-      currentCombination.add(courses[i]);
-      getAllCombinations(courses.sublist(i + 1), numOfCoursesInSchedule - 1,
-          currentCombination);
-      currentCombination.removeLast();
+    //generate all possible schedules with one section + one tut
+    for (List<Course> schedule in widget.scheduleCombinations!.schedulesOneSection) {
+      widget.scheduleCombinations!.getAllOneSectionOneTutorialCombinations(schedule);
     }
+    // validate schedule tuts
+    widget.scheduleCombinations!.schedulesOneSectionOneTut = Schedule.validateSchedulesTuts(widget.scheduleCombinations!.schedulesOneSectionOneTut);
+
+    //generate all possible schedules with one section + one tut + one lab
+    for (List<Course> schedule in widget.scheduleCombinations!.schedulesOneSectionOneTut) {
+      widget.scheduleCombinations!.getAllOneSectionOneTutorialOneLabCombinations(schedule);
+    }
+    //validate scheulde labs
+    widget.scheduleCombinations!.schedulesOneSectionOneTutOneLab = Schedule.validateSchedulesLabs(widget.scheduleCombinations!.schedulesOneSectionOneTutOneLab);
   }
 
-  //this is a list of courses (a single schedule) but
+  //a List<ClassRectangle> would be list of courses (a single schedule) but
   // represented by the rectangles needed to draw the schedule
-  List<CourseRectangle> scheduleAsRectangles = [];
-
-  //this is the list of schedules (can be thought of as a list of a list of courses), with each
+  //List<List<ClassRectangle>> is a list of schedules (can be thought of as a list of a list of courses), with each
   // schedule represented by the rectangles that are needed to draw the schedule
-  List<List<CourseRectangle>> schedulesAsRectanglesList = [];
+  List<List<ClassRectangle>> schedulesAsRectanglesList = [];
 
   static const double timeFontSize = 14.0;
   static const double dayFontSize = 16.0;
 
   @override
   Widget build(BuildContext context) {
-    //generate all the possible combinations of nunOfCourseInSchedule-course schedules from
-    // the courses given from input
-    getAllCombinations(coursesFromInput, numOfCoursesInSchedule!, []);
+
+    initState();
+    // getAllCombinations(coursesFromInput, numOfCoursesInSchedule!, []);
 
     //check all the schedules generated and save the ones that don't have time conflicts
-    List<Schedule>? validatedSchedules = Schedule.validateSchedules(schedules!);
+    // List<Schedule>? validatedSchedules = Schedule.validateScheduleSections(schedules!);
 
-    schedulesAsRectanglesList =
-        CourseRectangle.convertSchedulesListToRectangles(validatedSchedules);
+    schedulesAsRectanglesList = ClassRectangle.convertSchedulesListToRectangles(widget.scheduleCombinations!.schedulesOneSectionOneTutOneLab);
 
     return Scaffold(
         appBar: AppBar(
@@ -73,7 +93,7 @@ class DisplayGeneratedSchedulesPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 40.0,),
-                      for (var day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'])
+                      for (var day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 9.0), // Adjust the padding as needed
                           child: Text(day, style: const TextStyle(fontSize: dayFontSize)),

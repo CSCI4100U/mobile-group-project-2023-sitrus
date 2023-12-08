@@ -44,36 +44,7 @@ class ScheduleMakerHomePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(10),
         children: <Widget>[
-          Container(
-            color: Theme.of(context).colorScheme.primary,
-            width: 200,
-            height: 300,
-            child: const Text("primary schedule, empty if not set"),
-          ),
-          SizedBox(height: buttonSpacing),
-          OutlinedButton.icon(
-              icon: Icon(
-                Icons.calendar_view_week,
-                size: iconSize,
-              ),
-              style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  minimumSize: Size(buttonWidth, buttonHeight),
-                  maximumSize: Size(buttonWidth, buttonHeight),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0)),
-                  textStyle: TextStyle(
-                    fontSize: buttonFontSize,
-                  )),
-              onPressed: () {_goto_scheduleSavedList_page(context);},
-              label: const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text("View Saved Courses"),
-                ],
-              )),
-          SizedBox(height: buttonSpacing),
+
           OutlinedButton.icon(
               icon: Icon(
                 Icons.search,
@@ -133,8 +104,6 @@ class ScheduleMakerHomePage extends StatelessWidget {
                 Icons.add,
                 size: iconSize,
               ),
-
-
               style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Theme.of(context).colorScheme.primary,

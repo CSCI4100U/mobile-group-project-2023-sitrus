@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'course_model.dart';
+import 'schedule_course_model.dart';
 
 //classinfo = (name, time) i.e. contains info for a single class
 //section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
@@ -119,12 +119,12 @@ class _ClassInfoContainerState extends State<ClassInfoContainer> {
               Padding(
                 padding: EdgeInsets.only(left: 15.0),
                 child:
-                  Text('${widget.name} ${widget.id + 1}', style: TextStyle(fontSize: 24.0, color: Colors.white)),
+                Text('${widget.name} ${widget.id + 1}', style: TextStyle(fontSize: 24.0, color: Colors.white)),
               ),
               IconButton(icon: Icon(Icons.close, color: Colors.white,),
-                  onPressed: () {
-                    widget.onDelete(widget.id);
-                  },
+                onPressed: () {
+                  widget.onDelete(widget.id);
+                },
               ),
             ],
           ),

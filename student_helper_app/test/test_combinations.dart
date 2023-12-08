@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'schedule_model.dart';
-import 'course_model.dart';
-// import 'rectangle_model.dart';
+import '../lib/models/schedule_course_model.dart';
+import '../lib/models/schedule_schedule_model.dart';
 
-//treat this as the build method?
+//some testing for the schedule combination functions
+// ...not sure how to use flutter properly so i've been running this as it's own 'app' by running this file in run configurations
+
 void main() {
 
   HourMinute eight_ten = HourMinute(hour: 8, minute: 10);

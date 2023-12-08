@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:student_helper_project/pages/home_page.dart';
@@ -5,6 +6,7 @@ import 'package:student_helper_project/pages/intropage1.dart';
 import 'package:student_helper_project/pages/intropage2.dart';
 import 'package:student_helper_project/pages/intropage3.dart';
 import 'package:student_helper_project/pages/new_home_page.dart';
+import 'friend_list/friend_login_page.dart';
 
 import 'intropage4.dart';
 
@@ -62,9 +64,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                          builder: (context) {
-                            return NewHomePage();
-                          }));
+                          // builder: (context) {
+                          //   return LoginPage();
+                          // }
+                            builder: (context) {
+                              // Check if user is logged in and decide initial route
+                              if (FirebaseAuth.instance.currentUser != null) {
+                                return NewHomePage();
+                              } else {
+                                return LoginPage();
+                              }
+                            },
+                          ));
                     },
                     child: const Text(
                       "done",

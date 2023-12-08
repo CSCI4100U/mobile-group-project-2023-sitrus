@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_testing/course_model.dart';
 import 'class_info_widget.dart';
 
 //basically the same as lab (which is like a section)
@@ -8,22 +9,43 @@ class TutsInfoContainer extends StatefulWidget {
   final String name;
   TutsInfoContainer({required this.name});
 
+  List<ClassInfoContainer> tutsInfoContainer = [];
+
+  List<Tutorial> getTutorialsInfo() {
+    List<Tutorial> tutorials = [];
+    for (ClassInfoContainer classInfoContainer in tutsInfoContainer) {
+      ClassTime tutorialTime = classInfoContainer.getClassInfo();
+      tutorials.add(Tutorial(tutorialTime: tutorialTime));
+    }
+    return tutorials;
+  }
+
   @override
   _TutsInfoContainerState createState() => _TutsInfoContainerState();
+
 }
 
 class _TutsInfoContainerState extends State<TutsInfoContainer> {
   // List<ClassInfoContainer> classInfoContainerList = [ClassInfoContainer(name: 'Tutorial 1')];
-  List<ClassInfoContainer> tutsInfoContainer = [];
+
 
   void addClassContainer() {
-    tutsInfoContainer.add(ClassInfoContainer(
-        name: 'Tutorial ${tutsInfoContainer.length + 1}',
-        onDelete: () {
+    widget.tutsInfoContainer.add(ClassInfoContainer(
+        name: 'Tutorial',
+        id: widget.tutsInfoContainer.length,
+        onDelete: (int id) {
           setState(() {
-            tutsInfoContainer.removeAt(tutsInfoContainer.length - 1);
+            widget.tutsInfoContainer.removeAt(id);
+            updateID();
           });
-        }));
+        })
+    );
+  }
+
+  void updateID() {
+    for (int i = 0; i < widget.tutsInfoContainer.length; i++) {
+      widget.tutsInfoContainer[i].id = i;
+    }
   }
 
   @override
@@ -44,21 +66,21 @@ class _TutsInfoContainerState extends State<TutsInfoContainer> {
                 padding: EdgeInsets.only(left: 10.0),
                 child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
-              IconButton(
-                icon: const Icon(
-                  Icons.close,
-                  color: Color(0xFFe47c43),
-                ),
-                onPressed: () {},
-              ),
+              // IconButton(
+              //   icon: const Icon(
+              //     Icons.close,
+              //     color: Color(0xFFe47c43),
+              //   ),
+              //   onPressed: () {},
+              // ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: tutsInfoContainer.length,
+            itemCount: widget.tutsInfoContainer.length,
             itemBuilder: (context, index) {
-              return tutsInfoContainer[index];
+              return widget.tutsInfoContainer[index];
             },
           ),
           Container(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:schedule_testing/course_model.dart';
 import 'class_info_widget.dart';
 
 //basically the same as tutorial (which is like a section)
@@ -8,22 +9,41 @@ class LabsInfoContainer extends StatefulWidget {
   final String name;
   LabsInfoContainer({required this.name});
 
+  List<ClassInfoContainer> labsInfoContainer = [];
+
+  List<Laboratory> getLabsInfo() {
+    List<Laboratory> labs = [];
+    for (ClassInfoContainer classInfoContainer in labsInfoContainer) {
+      ClassTime labTime = classInfoContainer.getClassInfo();
+      labs.add(Laboratory(labTime: labTime));
+    }
+    return labs;
+  }
+
   @override
   _LabsInfoContainerState createState() => _LabsInfoContainerState();
+
 }
 
 class _LabsInfoContainerState extends State<LabsInfoContainer> {
-  // List<ClassInfoContainer> classInfoContainerList = [ClassInfoContainer(name: 'Laboratory 1')];
-  List<ClassInfoContainer> labsInfoContainer = [];
 
   void addClassContainer() {
-    labsInfoContainer.add(ClassInfoContainer(
-        name: 'Laboratory ${labsInfoContainer.length + 1}',
-        onDelete: () {
+    widget.labsInfoContainer.add(ClassInfoContainer(
+        name: 'Laboratory',
+        id: widget.labsInfoContainer.length,
+        onDelete: (int id) {
           setState(() {
-            labsInfoContainer.removeAt(labsInfoContainer.length - 1);
+            widget.labsInfoContainer.removeAt(id);
+            updateID();
           });
-        }));
+        })
+    );
+  }
+
+  void updateID() {
+    for (int i = 0; i < widget.labsInfoContainer.length; i++) {
+      widget.labsInfoContainer[i].id = i;
+    }
   }
 
   @override
@@ -44,17 +64,17 @@ class _LabsInfoContainerState extends State<LabsInfoContainer> {
                 padding: EdgeInsets.only(left: 10.0),
                 child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
-              IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
-                onPressed: () {},
-              ),
+              // IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
+              //   onPressed: () {},
+              // ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: labsInfoContainer.length,
+            itemCount: widget.labsInfoContainer.length,
             itemBuilder: (context, index) {
-              return labsInfoContainer[index];
+              return widget.labsInfoContainer[index];
             },
           ),
           Container(

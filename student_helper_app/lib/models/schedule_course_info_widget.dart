@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'section_info_widget.dart';
-import 'tutorial_info_widget.dart';
-import 'lab_info_widget.dart';
+import 'schedule_section_info_widget.dart';
+import 'schedule_tutorial_info_widget.dart';
+import 'schedule_lab_info_widget.dart';
 
-import 'course_model.dart';
+import 'schedule_course_model.dart';
 
 //course = [[(name, time), (name, time), +button], [(name, time), (name, time), +button], +button] = [(section), (section)] i.e. contains info for a single course, usually a course has 1-3 sections for lectures
 //  course will also need to have lab/tut
@@ -78,19 +78,19 @@ class _CourseInfoContainerState extends State<CourseInfoContainer> {
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
                       child:
-                        TextField(
-                          style: TextStyle(fontSize: 24.0),
-                          controller: widget.courseNameController,
-                          decoration: InputDecoration(
-                            labelText: 'Enter course name',
-                            labelStyle: TextStyle(fontSize: 24.0),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                            ),
+                      TextField(
+                        style: TextStyle(fontSize: 24.0),
+                        controller: widget.courseNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Enter course name',
+                          labelStyle: TextStyle(fontSize: 24.0),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                           ),
                         ),
+                      ),
                     ),
                     widget.sectionList,
                     widget.tutInfoContainer,

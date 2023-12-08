@@ -1,114 +1,137 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import 'schedule_display_generated_page.dart';
+
+import '../models/schedule_course_info_widget.dart';
+
 import '../models/schedule_course_model.dart';
-import '../models/schedule_input_course_widget.dart';
+
 
 class CreateNewSchedulePage extends StatefulWidget {
-  const CreateNewSchedulePage({super.key});
+
+  List<CourseInfoContainer> courseInfoContainerList = [];
 
   @override
-  State<StatefulWidget> createState() => _CreateNewSchedulePageState();
+  _CreateNewSchedulePageState createState() => _CreateNewSchedulePageState();
 }
 
 class _CreateNewSchedulePageState extends State<CreateNewSchedulePage> {
 
+  // List<CourseInfoContainer> courseInfoContainerList = [CourseInfoContainer(name: 'Course 1')];
+
+  void initState() {
+    super.initState();
+    addCourseContainer();
+  }
+
+  List<Course> getAllCourses() {
+    List<Course> courses = [];
+    for (CourseInfoContainer courseInfoContainer in widget.courseInfoContainerList) {
+      courses.add(courseInfoContainer.getCourse());
+    }
+    return courses;
+  }
+
   @override
   Widget build(BuildContext context) {
-    //todo (for final): change this so that a CourseWidget is added when a button is pressed
-    // instead of having a fixed amount (currently 7 - allows you to test all the functionality so far)
-    List<InputCourseWidget> courseWidgets = [
-      InputCourseWidget(),
-      InputCourseWidget(),
-      InputCourseWidget(),
-      InputCourseWidget(),
-      InputCourseWidget(),
-    ];
-
-    List<Course> courses = [];
-
-
-
-    //todo (for final): change Colors list so that it's based on the number of courses entered
-    // loop through courseWidgets.length and generate a random (no overlap) list
-    // of Colors of equal length
-    List<Color> colors = [Colors.redAccent, Colors.blue, Colors.green, Colors.yellow, Colors.purpleAccent, Colors.orange, Colors.cyan];
-
-    bool courseInfoFilled = true;
-
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: const Text("Make New Schedules"),
-          //todo (for final): add a better button? for when the user finishes inputting course info
-          actions: [
-            IconButton(
-              onPressed: () {
-                courseInfoFilled = true;
-                for (int i = 0; i < courseWidgets.length; i++) {
-                  //todo: implement better error checking/handling
-                  if (courseWidgets[i].endHour.value < courseWidgets[i].startHour.value
-                      ||
-                      courseWidgets[i].endHour.value == courseWidgets[i].startHour.value && courseWidgets[i].endMinute.value <= courseWidgets[i].startMinute.value) {
-                    courseInfoFilled = false;
-                    break;
-                  } else if (courseWidgets[i].courseNameController.text.isEmpty) {
-                    courseInfoFilled = false;
-                    break;
-                  } else {
-                    courses.add(courseWidgets[i].getCourse(colors[i]));
-                  }
-                }
-                if (courseInfoFilled) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            DisplayGeneratedSchedulesPage(
-                                coursesFromInput: courses)),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill in all fields'),
-                    ),
-                  );
-                }
-              },
-              icon: Icon(Icons.navigate_next),
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child:
-                ListView.separated(
-                    padding: EdgeInsets.all(10.0),
-                    itemCount: courseWidgets.length, // temp
-                    separatorBuilder: (context, index) => Divider(height: 2),
-                    itemBuilder: (context, index) {
-                      return courseWidgets[index].build(context);
-                    }),
+      appBar: AppBar(
+        title: Text('Schedule Maker (testing)', style: TextStyle(color: Colors.white),),
+        backgroundColor: Color(0xFF243f6e),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              List<Course> courses = [];
+              courses = getAllCourses();
+              if (courses.length < 5) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please have at least 5 courses'),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          DisplayGeneratedSchedulesPage(
+                              coursesFromInput: courses)),
+                );
+              }
+            },
+            child: Text('Done', style: TextStyle(fontSize: 18.0, color: Color(0xFF243f6e),)
             ),
-            OutlinedButton.icon(
-                icon: Icon(
-                  Icons.add,
-                  size: 30,
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+        children: [
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: widget.courseInfoContainerList.length,
+            itemBuilder: (context, index) {
+              return widget.courseInfoContainerList[index];
+            },
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 4.0),
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.add, size: 36.0,),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.blue[50],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
                 ),
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.background,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    minimumSize: Size(400, 50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0.0)),
-                    textStyle: TextStyle(
-                      fontSize: 30,
-                    )),
-                onPressed: () {},
-                label: Text("Add Course")),
-          ],
-        )
+                textStyle: const TextStyle(fontSize: 36.0,),
+              ),
+              onPressed: () {
+                setState(() {
+                  addCourseContainer();
+                });
+              },
+              label: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding:  EdgeInsets.only(right: 40.0, top: 30.0, bottom: 30.0),
+                    child: Text(
+                      "Add Course",
+                      style: TextStyle(
+                        fontSize: 32.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
+  void addCourseContainer() {
+    widget.courseInfoContainerList.add(CourseInfoContainer(
+        name: 'Course',
+        id: widget.courseInfoContainerList.length,
+        onDelete: (int id) {
+          setState(() {
+            widget.courseInfoContainerList.removeAt(id);
+            updateID();
+          });
+        })
+    );
+    // courseInfoContainerList[0]
+  }
+
+  void updateID() {
+    for (int i = 0; i < widget.courseInfoContainerList.length; i++) {
+      widget.courseInfoContainerList[i].id = i;
+    }
+  }
+
 }

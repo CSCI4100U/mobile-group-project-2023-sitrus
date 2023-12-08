@@ -1,50 +1,41 @@
 import 'package:flutter/material.dart';
-import 'class_info_widget.dart';
-import 'course_model.dart';
+import 'schedule_course_model.dart';
+import 'schedule_class_info_widget.dart';
 
-//section = [(name, time), (name, time), +button] = (classinfo, classinfo) i.e. contains info for a single section, which is usually 1-2 classes
+//basically the same as lab (which is like a section)
+//lab = [(name, time), (name, time), +button] = (classinfo, classinfo, +button) i.e. contains info for all tut sections, each tut is essentially just 1 class
 //can also be thought of as a widget holding class info containers and a button to add more class containers to the listview
-class SectionInfoContainer extends StatefulWidget {
+class TutsInfoContainer extends StatefulWidget {
   final String name;
-  int id;
-  final Function(int) onDelete;
+  TutsInfoContainer({required this.name});
 
-  SectionInfoContainer({required this.name, required this.id, required this.onDelete});
+  List<ClassInfoContainer> tutsInfoContainer = [];
 
-  List<ClassInfoContainer> classInfoContainerList = [];
-
-  Section getSectionInfo() {
-    List<ClassTime> lectureTimes = [];
-
-    for (ClassInfoContainer classInfoContainer in classInfoContainerList) {
-      lectureTimes.add(classInfoContainer.getClassInfo());
+  List<Tutorial> getTutorialsInfo() {
+    List<Tutorial> tutorials = [];
+    for (ClassInfoContainer classInfoContainer in tutsInfoContainer) {
+      ClassTime tutorialTime = classInfoContainer.getClassInfo();
+      tutorials.add(Tutorial(tutorialTime: tutorialTime));
     }
-    Section section = Section(lectureTimes: lectureTimes);
-    return section;
+    return tutorials;
   }
 
   @override
-  _SectionInfoContainerState createState() => _SectionInfoContainerState();
+  _TutsInfoContainerState createState() => _TutsInfoContainerState();
 
 }
 
-class _SectionInfoContainerState extends State<SectionInfoContainer> {
+class _TutsInfoContainerState extends State<TutsInfoContainer> {
+  // List<ClassInfoContainer> classInfoContainerList = [ClassInfoContainer(name: 'Tutorial 1')];
 
-  @override
-  void initState() {
-    super.initState();
-
-    addClassContainer();
-  }
 
   void addClassContainer() {
-    widget.classInfoContainerList.add(ClassInfoContainer(
-        name: 'Lecture',
-        id: widget.classInfoContainerList.length,
+    widget.tutsInfoContainer.add(ClassInfoContainer(
+        name: 'Tutorial',
+        id: widget.tutsInfoContainer.length,
         onDelete: (int id) {
           setState(() {
-            // print(classInfoContainerList[id].selectedDay);
-            widget.classInfoContainerList.removeAt(id);
+            widget.tutsInfoContainer.removeAt(id);
             updateID();
           });
         })
@@ -52,8 +43,8 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
   }
 
   void updateID() {
-    for (int i = 0; i < widget.classInfoContainerList.length; i++) {
-      widget.classInfoContainerList[i].id = i;
+    for (int i = 0; i < widget.tutsInfoContainer.length; i++) {
+      widget.tutsInfoContainer[i].id = i;
     }
   }
 
@@ -73,21 +64,23 @@ class _SectionInfoContainerState extends State<SectionInfoContainer> {
             children: [
               Padding(
                 padding: EdgeInsets.only(left: 10.0),
-                child: Text('${widget.name} ${widget.id + 1}', style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
+                child: Text(widget.name, style: const TextStyle(fontSize: 24.0, color: Color(0xFFe47c43)),),
               ),
-              IconButton(icon: const Icon(Icons.close, color: Color(0xFFe47c43),),
-                onPressed: () {
-                  widget.onDelete(widget.id);
-                },
-              ),
+              // IconButton(
+              //   icon: const Icon(
+              //     Icons.close,
+              //     color: Color(0xFFe47c43),
+              //   ),
+              //   onPressed: () {},
+              // ),
             ],
           ),
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: widget.classInfoContainerList.length,
+            itemCount: widget.tutsInfoContainer.length,
             itemBuilder: (context, index) {
-              return widget.classInfoContainerList[index];
+              return widget.tutsInfoContainer[index];
             },
           ),
           Container(

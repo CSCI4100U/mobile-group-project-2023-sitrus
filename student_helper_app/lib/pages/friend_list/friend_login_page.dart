@@ -4,10 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:student_helper_project/pages/home_page.dart';
 import '../new_home_page.dart';
 import 'friend_registration_page.dart';
-import 'friends_list_home_page.dart';
 
 // LoginPage allows users to sign in to the application.
 class LoginPage extends StatefulWidget {
@@ -121,7 +119,10 @@ class _LoginPageState extends State<LoginPage> {
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${e.message}'),
+            content: Text('Login failed: ${e.message}',
+            style: TextStyle(
+              fontSize: 17
+            ),),
             backgroundColor: Colors.red,
           ),
         );
@@ -160,29 +161,11 @@ class _LoginPageState extends State<LoginPage> {
     // Scaffold provides the structure for the login form.
     // The form includes fields for email and password, a "Remember Me" checkbox, and buttons to login or register.
     return Scaffold(
-      backgroundColor: Colors.indigo[100],
+      backgroundColor: Theme.of(context).colorScheme.tertiary,
       // Other UI components such as AppBar, TextFormField, and ElevatedButton are used to create the form and handle user input.
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     // Navigate to the HomePage for now
-        //     // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => FriendListPage()));
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(builder: (context) => NewHomePage()),
-        //     );
-        //   },
-        // ),
-        title: const Text('Login'),
-      ),
-      body: ListView(
 
-        //CHANGES TO LOGIN PAGE: BY NIRUJAN
-        //ADDED ICON AT TOP OF PAGE, ADDED APP NAME, SPACED OUT LOGIN PAGE ELEMENTS
-        //COMMENTED OUT REMEMBER ME WIDGET, MOVED REGISTER BUTTON DOWN
-        // ADDED TEXT ASKING IF YOU DONT HAVE AN ACCOUNT, ADDED STYLING AND PADDING
+      body: ListView(
 
         children: [
           const Padding(
@@ -206,17 +189,17 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.person),
                     labelText: 'Email',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) => value!.isEmpty ? 'Enter your email' : null,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(),
@@ -225,20 +208,10 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) => value!.isEmpty ? 'Enter your password' : null,
                 ),
                 SizedBox(height: 20),
-                /*CheckboxListTile(
-                  value: _rememberMe,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _rememberMe = value!;
-                    });
-                  },
-                  title: Text('Remember me'),
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),*/
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
 
                     Expanded(
                       child:
@@ -246,8 +219,8 @@ class _LoginPageState extends State<LoginPage> {
                           //icon: Icon(Icons.arrow_forward_ios),
 
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.indigo[400],
-                            foregroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.background,
                             elevation: 14,
                             minimumSize: Size(30, 40)
                           ),
@@ -261,9 +234,12 @@ class _LoginPageState extends State<LoginPage> {
 
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(28.0),
-                  child: Text("Don't Have An Account?"),
+                const Padding(
+                  padding: EdgeInsets.only(top: 25, bottom: 5),
+                  child: Text("Don't Have An Account?",
+                    style: TextStyle(
+                      fontSize: 20
+                    ),),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -271,8 +247,8 @@ class _LoginPageState extends State<LoginPage> {
                             Expanded(
                               child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.indigo[400],
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Theme.of(context).colorScheme.background,
                                   elevation: 14,
                                   minimumSize: Size(30, 40)
                               ),

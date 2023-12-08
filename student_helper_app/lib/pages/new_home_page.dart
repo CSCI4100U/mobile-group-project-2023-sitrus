@@ -1,15 +1,21 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:student_helper_project/pages/fonts.dart';
 import 'package:student_helper_project/pages/friend_list/friend_login_page.dart';
 import 'package:student_helper_project/pages/accommodations_home_page.dart';
 import 'package:student_helper_project/pages/home_page.dart';
 import 'package:student_helper_project/pages/schedule_home_page.dart';
 import 'package:student_helper_project/pages/settings_page.dart';
-
+import 'package:http/http.dart' as http;
+import 'friend_list/friends_add_friend_page.dart';
 import 'friend_list/friends_chat_page.dart';
 import 'friend_list/friends_list_home_page.dart';
-import 'info.dart';
+import 'help.dart';
 import 'friend_list/friends_profile_page.dart';
+import 'fonts.dart' as font;
 
 class NewHomePage extends StatefulWidget {
   NewHomePage({super.key});
@@ -39,25 +45,87 @@ class _NewHomePageState extends State<NewHomePage> {
     SASHomePage()
   ];
 
+  final List _pageNames = [
+    "Schedule",
+    "Chat",
+    "Accommodations"
+  ];
+
+  String _apiKey = '984d27836b39334bf123679ca9d4d96c'; // Replace with your actual API key from OpenWeatherMap
+  String location = 'Oshawa'; // Example location
+
+  String _weatherDescription = 'Loading weather...';
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetches the current user and stores it in a Future for later use
+    _fetchWeather();
+  }
+  Future<Map<String, dynamic>> fetchWeather(String apiKey, String location) async {
+    String url = 'http://api.weatherstack.com/current?access_key=$apiKey&query=$location';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final responseJson = json.decode(response.body);
+      if (responseJson['error'] != null) {
+        throw Exception('Weather API error: ${responseJson['error']['info']}');
+      }
+      return responseJson;
+    } else {
+      throw Exception('Failed to load weather data with status code: ${response.statusCode}');
+    }
+  }
+
+  void _fetchWeather() async {
+    try {
+      // Make sure to use https if you're on a paid plan for Weatherstack
+      final weatherData = await fetchWeather(_apiKey, location);
+      setState(() {
+        _weatherDescription = '${weatherData['current']['temperature']}°C, ${weatherData['current']['weather_descriptions'][0]}';
+      });
+    } catch (e) {
+      setState(() {
+        _weatherDescription = 'Weather unavailable';
+      });
+      if (kDebugMode) {
+        print('Error fetching weather: $e');
+      }
+    }
+  }
+
+  var _fontSize = 10.0;
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
+        elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.secondary,
-        foregroundColor: Theme.of(context).colorScheme.background,
-        title: const Text(
-            "Sitrus Student Aid",
-            style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold
-            )
+        foregroundColor: Colors.white,
+        title: Text(_pageNames[_selectedIndex], style: TextStyle(fontSize: 25),),
+
+        actions: _selectedIndex == 1 ? [IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddFriendPage()),
+            );
+          },
         ),
+
+          ] : []
       ),
       body: _pages[_selectedIndex],
       drawer: Drawer(
         backgroundColor: Theme.of(context).colorScheme.secondary,
+
         child: Column(
+
           children: [
               const DrawerHeader(child: Icon(
                   Icons.backpack,
@@ -78,7 +146,7 @@ class _NewHomePageState extends State<NewHomePage> {
                 );
               },
             ),
-            ListTile(
+            /*ListTile(
               leading:  const Icon(
                 Icons.settings,
                 size: 40,
@@ -93,8 +161,8 @@ class _NewHomePageState extends State<NewHomePage> {
                   MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
               },
-            ),
-            ListTile(
+            ),*/
+            /*ListTile(
               leading:  const Icon(
                 Icons.info,
                 size: 40,
@@ -109,7 +177,7 @@ class _NewHomePageState extends State<NewHomePage> {
                   MaterialPageRoute(builder: (context) => const InfoPage()),
                 );
               },
-            ),
+            ),*/
             ListTile(
               leading:  const Icon(
                 Icons.question_mark,
@@ -122,13 +190,17 @@ class _NewHomePageState extends State<NewHomePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const InfoPage()),
+                  MaterialPageRoute(builder: (context) => const HelpPage()),
                 );
               },
-            )
+            ),
+            const Divider(height: 350,),
+            Text(_weatherDescription, style: TextStyle(fontSize: 19),)
 
           ],
-        )
+
+        ),
+
       ),
 
       bottomNavigationBar: BottomNavigationBar(
@@ -136,14 +208,14 @@ class _NewHomePageState extends State<NewHomePage> {
         currentIndex: _selectedIndex,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         selectedItemColor: Theme.of(context).colorScheme.background,
-        items:  [
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.table_chart, size: 40),
+        items:   [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.table_chart, size: 40 + font.fontSize),
               label: "Schedule",),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.chat_bubble, size: 40),
               label: "Chat"),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
               icon: Icon(Icons.person, size: 40),
               label: "Accommodations"),
 

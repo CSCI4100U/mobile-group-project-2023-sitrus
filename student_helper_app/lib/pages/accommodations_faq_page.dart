@@ -14,22 +14,22 @@ class FAQPage extends StatefulWidget {
 class FAQPageState extends State<FAQPage> {
   final List<FAQItem> faqList = [
     FAQItem(
-      question: 'What are accommodations?',
-      answerSections:[ 'Accommodations are services provided to students with disabilities/handicaps that prevent them'
-          'from working at the same level as their peers.',]
+        question: 'What are accommodations?',
+        answerSections:[ 'Accommodations are services provided to students with disabilities/handicaps that prevent them'
+            'from working at the same level as their peers.',]
     ),
     FAQItem(
-      question: 'Do I have accommodations?',
-      answerSections: ['If you are registered with your university\'s student accessibility services, '
-          'it is very likely that you have accommodations.',]
+        question: 'Do I have accommodations?',
+        answerSections: ['If you are registered with your university\'s student accessibility services, '
+            'it is very likely that you have accommodations.',]
     ),
     FAQItem(
-      question: 'What is this for?',
-      answerSections: ['This part of the app is meant to make the process of managing your accommodations easier.'
-          'Navigating Student Accessibility can be complicated, especially for those unfamiliar with it.'
-          'Here, you can see how your accommodations affect the way you take assignments.'
-          'You can also schedule your upcoming assignments, to see what your accommodations provide you with.',
-]
+        question: 'What is this for?',
+        answerSections: ['This part of the app is meant to make the process of managing your accommodations easier.'
+            'Navigating Student Accessibility can be complicated, especially for those unfamiliar with it.'
+            'Here, you can see how your accommodations affect the way you take assignments.'
+            'You can also schedule your upcoming assignments, to see what your accommodations provide you with.',
+        ]
     ),
     FAQItem(
       question: 'How can I register for Student Accessibility?',
@@ -43,6 +43,38 @@ class FAQPageState extends State<FAQPage> {
         'Step 3: You will need to complete a disability documentation form. This has been provided in Renew Accommodations.',
         'Step 4: Submit the intake and disability documents by emailing studentaccessibility@ontariotechu.ca.',
         'Step 5: Wait for an email response from studentaccessibility@ontariotechu.ca. They will help you arrange an appointment with an accessibility advisor.',
+      ],
+    ),
+    FAQItem(
+      question: 'Do my accommodations matter?',
+      answerSections: [
+        'Yes, they are.\nYour university has an obligation to ensure that your needs are met.'
+            ' Otherwise, this could result in potential legal trouble. Your university also legally cannot deny '
+            'a student their required services, or discriminate against them for having a disabilty.'
+      ],
+    ),
+    FAQItem(
+      question: 'Why is there a two week warning in Upcoming Assessments?',
+      answerSections: [
+        'That is because you have a limited time window to book an upcoming test or quiz with the Test Center, should you '
+            'need it. If you wish to book an assessment with the test center, you must do so A MINIMUM of '
+            'seven days before the assessment takes place.',
+      ],
+    ),
+    FAQItem(
+      question: 'Do I need to renew my accommodations regularly?',
+      answerSections: [
+        'You should renew your accommodations before the start of every semester.',
+        'To do this, a short cut has been provided in this app.\nSimply go back from '
+            'this page and select Renew Accommodations. The first link will take you to where you need to go.'
+      ],
+    ),
+    FAQItem(
+      question: 'Should my professors be aware that I have accommodations?',
+      answerSections: [
+        'Yes.\nIn order to provide you with what you require, your professors must be aware of your accommodations.\nYou do not have to tell them yourself, '
+            'as when you renew your accommodations, it automatically sends your professors a letter ',
+        'detailing what you need.',
       ],
     ),
   ];
@@ -61,8 +93,12 @@ class FAQPageState extends State<FAQPage> {
             title: Text(faqList[index].question),
             children: [
               Container(
-                height: 200, // Set a specific height or use constraints based on your design
+
+                 // Set a specific height or use constraints based on your design
+
                 child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: faqList[index].answerSections.length,
                   itemBuilder: (context, sectionIndex) {
                     return Padding(
@@ -77,13 +113,11 @@ class FAQPageState extends State<FAQPage> {
               ),
             ],
           );
-
         },
       ),
     );
   }
 }
-
 class FAQItem {
   final String question;
   //final String answer;

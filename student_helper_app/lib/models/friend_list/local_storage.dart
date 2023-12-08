@@ -32,7 +32,8 @@ class DatabaseHelper {
             receiverUid TEXT NOT NULL,
             content TEXT NOT NULL,
             edited INTEGER NOT NULL,
-            deleted INTEGER NOT NULL DEFAULT 0
+            deleted INTEGER NOT NULL DEFAULT 0,
+            mediaUrl TEXT
           )
           ''');
 
@@ -118,6 +119,12 @@ class DatabaseHelper {
       whereArgs: [userUid, friendUid, friendUid, userUid],
     );
 
-    return messageMaps.map((map) => Message.fromMap(map)).toList();
+    return messageMaps.map((map) => Message.fromMap(map, null)).toList();
+  }
+
+  // Method to delete all messages on local storage
+  Future<void> deleteAllMessages() async {
+    Database db = await instance.database;
+    await db.delete('messages'); // Replace 'messages' with your actual table name
   }
 }

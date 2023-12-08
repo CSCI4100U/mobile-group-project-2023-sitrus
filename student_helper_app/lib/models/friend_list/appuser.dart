@@ -3,19 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // Defines a user model for an application with fields for user details.
 class AppUser {
   final String uid;
-  late final String studentNumber;
-  late final String firstName;
-  final String? middleName;
-  final String lastName;
-  final String email;
-  final String? phoneNumber;
-  final DateTime? birthday;
-  final String? grade;
-  final String status;
-  final String? major;
-  final String? description;
-  final String? icon;
-  final List<String>? friendList;
+  // late final String studentNumber;
+  // late final String firstName;
+  String studentNumber;
+  String firstName;
+  String? middleName;
+  String lastName;
+  String email;
+  String? phoneNumber;
+  DateTime? birthday;
+  String? grade;
+  String status;
+  String? major;
+  String? description;
+  String? icon;
+  List<String>? friendList;
   bool isFriend; // Indicates if the user is a friend
   bool isRequested; // Indicates if a friend request has been sent
 

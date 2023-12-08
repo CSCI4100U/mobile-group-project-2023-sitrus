@@ -5,12 +5,25 @@ class IntroPage3  extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.blue[200],
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.lightBlue[700]!,
+                Colors.lightBlue[200]!,
+              ],
+            )
+        ),
 
-        child: const Row(
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Check your accomodations!", style: TextStyle(fontSize: 20),),
+            Text("Check your accomodations!",
+              style: TextStyle(fontSize: 30, color: Colors.white)),
+              //image
+              Image(image: AssetImage('assets/accomodations.jpg'),
+              height: 550,)
           ],
         )
     );

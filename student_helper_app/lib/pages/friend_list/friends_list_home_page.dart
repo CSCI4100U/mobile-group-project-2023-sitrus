@@ -2,13 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../new_home_page.dart';
 import '../../models/friend_list/appuser.dart';
 import '../../models/friend_list/message.dart';
 import '../../models/friend_list/local_storage.dart';
-import 'friends_add_friend_page.dart';
 import 'friends_chat_page.dart';
-import 'friends_profile_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -107,13 +104,13 @@ class _FriendListPageState extends State<FriendListPage> {
       await doc.reference.delete();
     }
     // Delete messages received by the current user
-    QuerySnapshot receivedMessages = await FirebaseFirestore.instance
-        .collection('messages')
-        .where('receiverUid', isEqualTo: currentUserUid)
-        .get();
-    for (var doc in receivedMessages.docs) {
-      await doc.reference.delete();
-    }
+    // QuerySnapshot receivedMessages = await FirebaseFirestore.instance
+    //     .collection('messages')
+    //     .where('receiverUid', isEqualTo: currentUserUid)
+    //     .get();
+    // for (var doc in receivedMessages.docs) {
+    //   await doc.reference.delete();
+    // }
     // Provide feedback to the user
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -133,44 +130,120 @@ class _FriendListPageState extends State<FriendListPage> {
   // Backs up chat messages to local storage
   Future<void> backupChatToLocal() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    int messagesBackedUpCount = 0;  // To count how many messages are backed up
 
-    for (var message in messages) {
-      if (message.senderUid == currentUserUid || message.receiverUid == currentUserUid) {
+    var senderSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('senderUid', isEqualTo: currentUserUid)
+        .get();
+    var receiverSnapshot = await FirebaseFirestore.instance.collection('messages')
+        .where('receiverUid', isEqualTo: currentUserUid)
+        .get();
+    for (var doc in senderSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
         await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
       }
     }
+    for (var doc in receiverSnapshot.docs) {
+      var message = Message.fromMap(doc.data(), null);
+      try {
+        await _databaseHelper.insertMessage(message.toMap());
+        messagesBackedUpCount++;
+      } catch (e) {
+        print('Error backing up message: $e');
+      }
+    }
+    print('Total messages backed up: $messagesBackedUpCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Chat history backed up: $messagesBackedUpCount messages'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   // Uploads local backup of chat messages to the cloud
   Future<void> uploadLocalBackupToCloud() async {
     // Fetch messages from local storage
-    List<Message> localMessages = (await _databaseHelper.queryAllMessages()).cast<Message>();
+    List<Map<String, dynamic>> queryRows = await _databaseHelper.queryAllMessages();
+    List<Message> localMessages = queryRows.map((row) => Message.fromMap(row, null)).toList();
+    int messagesUploadedCount = 0;  // To count how many messages are uploaded
 
     for (var localMessage in localMessages) {
-      // Check if the message already exists in the cloud
-      var existingDoc = await FirebaseFirestore.instance.collection('messages')
-          .doc(localMessage.uid)
-          .get();
-
-      // If the message doesn't exist in the cloud, upload it
-      if (!existingDoc.exists) {
-        await FirebaseFirestore.instance.collection('messages')
+      try {
+        var existingDoc = await FirebaseFirestore.instance.collection(
+            'messages')
             .doc(localMessage.uid)
-            .set(localMessage.toMap());
+            .get();
+        if (!existingDoc.exists) {
+          await FirebaseFirestore.instance.collection('messages')
+              .doc(localMessage.uid)
+              .set(localMessage.toMap());
+          messagesUploadedCount++;
+        }
+      } catch (e) {
+        print('Error uploading message with UID ${localMessage.uid}: $e');
       }
+    }
+    print('Total messages uploaded to cloud: $messagesUploadedCount');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Local backup uploaded to cloud: $messagesUploadedCount messages'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  Future<void> _cleanAllLocalBackupMessages() async {
+    try {
+      await _databaseHelper.deleteAllMessages();
+      print("All backup messages have been deleted from local storage.");
+
+      // Optionally, update the state if your UI needs to reflect this change
+      setState(() {
+        // Update your state here if necessary
+      });
+
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All backup messages have been deleted')),
+      );
+    } catch (e) {
+      print("Error while deleting backup messages: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete backup messages')),
+      );
     }
   }
 
   // Shows a bottom sheet with settings options
-  void _showSettings() {
+  void _showOptions() {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
             ListTile(
+              leading: Container(
+                width: 25, // Adjust the width as needed to match the other icons
+                alignment: Alignment.center,
+                child: Icon(Icons.circle, size: 15, color: getStatusColor(userStatus)),
+              ),
+              title: const Text('Change your status'),
+              onTap: () async {
+                Navigator.pop(context); // Dismiss the bottom sheet
+                _showStatusChangeDialog();
+              },
+            ),
+
+            ListTile(
               leading: const Icon(Icons.delete),
-              title: const Text('Delete All Chat History on Cloud'),
+              title: const Text('Delete All Message You send on Cloud'),
               onTap: () async {
                 Navigator.pop(context); // Dismiss the bottom sheet
                 await _deleteAllChatHistory();
@@ -195,14 +268,12 @@ class _FriendListPageState extends State<FriendListPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.arrow_back),
-              title: const Text('Back to Home Page'),
+              leading: const Icon(Icons.delete_forever_outlined),
+              title: const Text('Clean All Local Backup Messages'),
               onTap: () {
-                // This will cause the homepage AppBar not to be displayed WAIT FOR FIX
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NewHomePage()), // Go to the home page
-                );
+                // load logic
+                Navigator.pop(context);
+                _cleanAllLocalBackupMessages();
               },
             ),
           ],
@@ -219,14 +290,14 @@ class _FriendListPageState extends State<FriendListPage> {
       stream: _friendsStream(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
           print('Error loading friends: ${snapshot.error}');
           return Center(child: Text('Error: ${snapshot.error.toString()}'));
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No friends yet'));
+          return const Center(child: Text('No friends yet'));
         }
 
         List<AppUser> friendsList = snapshot.data!;
@@ -236,14 +307,18 @@ class _FriendListPageState extends State<FriendListPage> {
           itemCount: friendsToDisplay.length,
           itemBuilder: (context, index) {
             AppUser friend = friendsList[index];
-            String friendFullName = "${friend.firstName} ${friend.middleName ?? ''} ${friend.lastName}".trim();
+            // String friendFullName = "${friend.firstName} ${friend.middleName ?? ''} ${friend.lastName}".trim();
+            String friendFullName = friend.getFullName();
             return FutureBuilder<String>(
               future: _getLastMessage(currentUserId, friend.uid, friendFullName),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
-                    leading: const Icon(Icons.account_circle, size: 40), // TODO: Replace with friend's profile picture
-                    title: Text('$friendFullName - ${friend.status}'),
+                    leading: const Icon(Icons.account_circle, size: 40), // Wait for modify: Replace with friend's profile picture
+                    title: Text('$friendFullName - ${friend.status}',
+                      style: const TextStyle(
+                        fontSize: 19
+                      ),),
                     subtitle: const Text('Loading...'),
                     trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   );
@@ -256,10 +331,13 @@ class _FriendListPageState extends State<FriendListPage> {
                   );
                 }
                 String lastMessage = snapshot.data ?? 'No messages';
-                return ListTile(
+                Widget friendTile = ListTile(
                   leading: const Icon(Icons.account_circle, size: 40),
                   title: Text('$friendFullName - ${friend.status}'),
-                  subtitle: Text(lastMessage),
+                  subtitle: Text(lastMessage,
+                      style: const TextStyle(
+                          fontSize: 14
+                      )),
                   trailing: Icon(Icons.circle, size: 15, color: getStatusColor(friend.status)),
                   onTap: () async {
                     final AppUser user = await _fetchCurrentUser();
@@ -276,12 +354,74 @@ class _FriendListPageState extends State<FriendListPage> {
                     );
                   },
                 );
+                // Wrap the ListTile with GestureDetector for long press
+                return GestureDetector(
+                  onLongPress: () => _showDeleteConfirmationDialog(friend),
+                  child: friendTile,
+                );
               },
             );
           },
         );
       },
     );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(AppUser friend) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Friend'),
+          content: Text('Are you sure you want to delete ${friend.getFullName()} from your friend list?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog
+                await _deleteFriendAndUpdateStatus(friend);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteFriendAndUpdateStatus(AppUser friend) async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    String friendUid = friend.uid;
+
+    try {
+      // Delete friend from current user's friend list
+      await FirebaseFirestore.instance.collection('users')
+          .doc(currentUserUid)
+          .collection('friends')
+          .doc(friendUid)
+          .delete();
+
+      // Delete the current user from the friend's friend list
+      await FirebaseFirestore.instance.collection('users')
+          .doc(friendUid)
+          .collection('friends')
+          .doc(currentUserUid)
+          .delete();
+
+      // Provide feedback and refresh friend list
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${friend.getFullName()} has been deleted from your friend list')),
+      );
+      _refreshFriendsList();
+    } catch (e) {
+      print("Error deleting friend: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete friend')),
+      );
+    }
   }
 
   // Refreshes the friend list UI
@@ -627,15 +767,40 @@ class _FriendListPageState extends State<FriendListPage> {
       print('Debug: Sender messages count: ${querySnapshotSender.docs.length}');
       print('Debug: Receiver messages count: ${querySnapshotReceiver.docs.length}');
 
-      // Determine which message is the latest
+      // // Determine which message is the latest
+      // DocumentSnapshot? latestMessageSnapshot;
+      // if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
+      //   final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
+      //   final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
+      //   latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
+      // } else if (querySnapshotSender.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotSender.docs.first;
+      // } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      //   latestMessageSnapshot = querySnapshotReceiver.docs.first;
+      // }
+      // Check if there are messages and parse timestamps safely
+      Timestamp? senderTimestamp;
+      Timestamp? receiverTimestamp;
+
+      if (querySnapshotSender.docs.isNotEmpty) {
+        var senderTimestampData = querySnapshotSender.docs.first.get('timestamp');
+        senderTimestamp = _parseTimestamp(senderTimestampData);
+      }
+
+      if (querySnapshotReceiver.docs.isNotEmpty) {
+        var receiverTimestampData = querySnapshotReceiver.docs.first.get('timestamp');
+        receiverTimestamp = _parseTimestamp(receiverTimestampData);
+      }
+
+      // Determine the latest message
       DocumentSnapshot? latestMessageSnapshot;
-      if (querySnapshotSender.docs.isNotEmpty && querySnapshotReceiver.docs.isNotEmpty) {
-        final senderTimestamp = querySnapshotSender.docs.first.get('timestamp') as Timestamp;
-        final receiverTimestamp = querySnapshotReceiver.docs.first.get('timestamp') as Timestamp;
-        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0 ? querySnapshotSender.docs.first : querySnapshotReceiver.docs.first;
-      } else if (querySnapshotSender.docs.isNotEmpty) {
+      if (senderTimestamp != null && receiverTimestamp != null) {
+        latestMessageSnapshot = senderTimestamp.compareTo(receiverTimestamp) > 0
+            ? querySnapshotSender.docs.first
+            : querySnapshotReceiver.docs.first;
+      } else if (senderTimestamp != null) {
         latestMessageSnapshot = querySnapshotSender.docs.first;
-      } else if (querySnapshotReceiver.docs.isNotEmpty) {
+      } else if (receiverTimestamp != null) {
         latestMessageSnapshot = querySnapshotReceiver.docs.first;
       }
 
@@ -658,6 +823,16 @@ class _FriendListPageState extends State<FriendListPage> {
     }
   }
 
+  // Helper method to parse Timestamp safely
+  Timestamp? _parseTimestamp(dynamic data) {
+    if (data is Timestamp) {
+      return data;
+    } else if (data is int) {
+      return Timestamp.fromMillisecondsSinceEpoch(data);
+    }
+    return null;
+  }
+
   // Builds the floating action buttons for search and settings
   Widget _buildFloatingActionButtons() {
     return Column(
@@ -666,21 +841,24 @@ class _FriendListPageState extends State<FriendListPage> {
         FloatingActionButton(
           onPressed: _showSearchDialog,
           mini: true,
-          child: const Icon(Icons.search),
+          child: Icon(Icons.search,
+            color: Theme.of(context).colorScheme.background),
         ),
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
           onPressed: _showFilterDialog,
           mini: true,
-          child: const Icon(Icons.filter_list),
+          child: Icon(Icons.filter_list,
+              color: Theme.of(context).colorScheme.background),
         ),
         const SizedBox(height: 10), // Spacing between the buttons
         FloatingActionButton(
           onPressed: () {
-            _showSettings();
+            _showOptions();
           },
           mini: true,
-          child: const Icon(Icons.settings),
+          child:  Icon(Icons.more_vert,
+              color: Theme.of(context).colorScheme.background),
         ),
       ],
     );
@@ -704,8 +882,9 @@ class _FriendListPageState extends State<FriendListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
+      /*appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        *//*leading: IconButton(
           icon: const Icon(Icons.account_circle, size: 45),
           onPressed: () {
             Navigator.of(context).push(
@@ -714,8 +893,8 @@ class _FriendListPageState extends State<FriendListPage> {
               ),
             );
           },
-        ),
-        title: const Text('Friend List'),
+        ),*//*
+        //title: const Text('Friend List'),
         actions: <Widget>[
           // Center(child: Text(_weatherDescription)), // weather display
           IconButton(
@@ -732,7 +911,7 @@ class _FriendListPageState extends State<FriendListPage> {
             onPressed: _showStatusChangeDialog,
           ),
         ],
-      ),
+      ),*/
       body:
       _buildFriendListWithLastMessage(),
       floatingActionButton: _buildFloatingActionButtons(),

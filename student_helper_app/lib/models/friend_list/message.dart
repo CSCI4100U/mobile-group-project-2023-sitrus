@@ -41,7 +41,8 @@ class Message {
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
-      'timestamp': timestamp,
+      // 'timestamp': timestamp,
+      'timestamp': timestamp.millisecondsSinceEpoch,
       'sender': sender,
       'senderUid': senderUid,
       'receiver': receiver,
@@ -54,19 +55,45 @@ class Message {
   }
 
   // Factory constructor to create a Message instance from a map of values.
-  static Message fromMap(Map<String, dynamic> map) {
+  static Message fromMap(Map<String, dynamic> map, String? documentId) {
+    Timestamp timestamp = _getTimestampFromMap(map);
+    bool edited = _getBoolFromInt(map['edited']);
+    bool deleted = _getBoolFromInt(map['deleted']);
+
     return Message(
-      uid: map['uid'],
-      timestamp: map['timestamp'] as Timestamp,
+      uid: documentId,
+      timestamp: timestamp,
       sender: map['sender'],
       senderUid: map['senderUid'],
       receiver: map['receiver'],
       receiverUid: map['receiverUid'],
       content: map['content'],
-      edited: map['edited'] ?? false,
-      deleted: map['deleted'] ?? false,
+      edited: edited,
+      deleted: deleted,
       mediaUrl: map['mediaUrl'],
     );
+  }
+
+  static Timestamp _getTimestampFromMap(Map<String, dynamic> map) {
+    Timestamp timestamp;
+    // Check if the 'timestamp' field is a string or an integer
+    if (map['timestamp'] is String) {
+      int timestampMilliseconds = int.parse(map['timestamp']);
+      timestamp = Timestamp.fromMillisecondsSinceEpoch(timestampMilliseconds);
+    } else if (map['timestamp'] is int) {
+      timestamp = Timestamp.fromMillisecondsSinceEpoch(map['timestamp']);
+    } else {
+      // Handle the case where 'timestamp' is neither int nor String
+      throw FormatException('Invalid format for timestamp field');
+    }
+    return timestamp;
+  }
+
+  static bool _getBoolFromInt(dynamic value) {
+    if (value is int) {
+      return value != 0;
+    }
+    return value ?? false;
   }
 
   // Creates a copy of the Message with modified fields, providing default values for unmodified fields.

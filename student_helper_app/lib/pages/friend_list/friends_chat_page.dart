@@ -498,23 +498,22 @@ class _ChatPageState extends State<ChatPage> {
       builder: (BuildContext context) {
         return Wrap(
           children: <Widget>[
-            if (isUserMessage) // Only allow editing if it's the user's message
+            if (isUserMessage) // Only show edit/delete if the current user sent the message
               ListTile(
                 leading: const Icon(Icons.edit),
                 title: const Text('Edit'),
                 onTap: () {
-                  // edit logic
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close the bottom sheet before showing the edit dialog
                   _showEditDialog(message);
                 },
               ),
-            if (isUserMessage) // Only allow deleting if it's the user's message
+            if (isUserMessage)
               ListTile(
                 leading: const Icon(Icons.delete),
                 title: const Text('Delete'),
                 onTap: () {
-                  Navigator.pop(context); // Close the modal bottom sheet
-                  _deleteMessage(message.uid!); // Use the document ID
+                  Navigator.pop(context); // Close the bottom sheet before deleting the message
+                  _deleteMessage(message.uid!); // Ensure you have the correct document ID here
                 },
               ),
           ],

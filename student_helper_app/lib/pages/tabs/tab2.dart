@@ -20,11 +20,17 @@ class FriendsTab extends StatelessWidget {
           fontSize: 18
     ),),
 
-          Image(image: AssetImage('assets/add_friends.jpg')),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image(image: AssetImage('assets/add_friends.jpg')),
+          ),
           Text("Search and Filter your Friends with these buttons", style: TextStyle(
               fontSize: 18
           ),),
-          Image(image: AssetImage('assets/buttons.jpg'))
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image(image: AssetImage('assets/buttons.jpg')),
+          )
 
 
 

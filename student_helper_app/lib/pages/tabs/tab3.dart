@@ -11,20 +11,20 @@ class AccomodationsTab extends StatelessWidget {
       child: ListView(
         children:
           const [Center(
-            child: Text("Accomodations", style: TextStyle(
+            child: Text("Accommodations", style: TextStyle(
                 fontSize: 24),),
           ),
       //image
             Center(
               child: Text(
-                "Add, view, edit accomodations",
+                "Add, view, edit accommodations",
                 style: TextStyle(fontSize: 18),
               ),
             ),
             Image(image: AssetImage('assets/view_accomodations.jpg')),
             Center(
               child: Text(
-                "Schedule and view upcoming accomodations",
+                "Schedule and view upcoming accommodations",
                 style: TextStyle(
                   fontSize: 18
               ),),
@@ -32,17 +32,13 @@ class AccomodationsTab extends StatelessWidget {
             Image(image: AssetImage('assets/upcoming_assessments.jpg')),
             Center(
               child: Text(
-                "Helpful links to renew accomodations",
+                "Find links to renew accommodations",
                 style: TextStyle(
                   fontSize: 18
               ),),
             ),
             Image(image: AssetImage('assets/renew_accomodations.jpg')),
           ]
-
-
-
-
           ,
 
       ),
